@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EngiCalc Ultimate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap');
+  :root {
+    --bg-base: #0a0c10;
+    --bg-card: #111318;
+    --bg-elevated: #161a21;
+    --border: #1e2330;
+    --border-bright: #2a3040;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --accent4: #fb923c;
+    --accent5: #f472b6;
+    --text-primary: #e2e8f0;
+    --text-secondary: #64748b;
+    --text-muted: #334155;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg-base); color: var(--text-primary); font-family: 'Syne', sans-serif; overflow-x: hidden; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .sidebar { background: var(--bg-card); border-right: 1px solid var(--border); transition: width 0.3s ease; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+  .nav-item:hover { background: var(--bg-elevated); color: var(--text-primary); }
+  .nav-item.active { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.2); }
+  .nav-item.active svg { stroke: var(--accent); }
+  .nav-section { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); padding: 16px 14px 6px; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card-elevated { background: var(--bg-elevated); border: 1px solid var(--border-bright); border-radius: 10px; padding: 16px; }
+  input[type="number"], input[type="text"], select {
+    background: var(--bg-base); border: 1px solid var(--border-bright); color: var(--text-primary);
+    padding: 9px 12px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    width: 100%; outline: none; transition: border-color 0.15s;
+  }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(56,189,248,0.1); }
+  label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); display: block; margin-bottom: 5px; }
+  .btn { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-primary { background: var(--accent); color: #0a0c10; }
+  .btn-primary:hover { background: #7dd3fc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(56,189,248,0.25); }
+  .btn-ghost { background: var(--bg-elevated); color: var(--text-secondary); border: 1px solid var(--border-bright); }
+  .btn-ghost:hover { color: var(--text-primary); border-color: var(--border-bright); }
+  .btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .result-box { background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.2); border-radius: 10px; padding: 14px 18px; margin-top: 14px; }
+  .result-value { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent); }
+  .result-label { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+  .formula-box { background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-top: 10px; text-align: center; }
+  .tag { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+  .tag-blue { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.2); }
+  .tag-green { background: rgba(52,211,153,0.12); color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+  .tag-purple { background: rgba(129,140,248,0.12); color: var(--accent2); border: 1px solid rgba(129,140,248,0.2); }
+  .tag-orange { background: rgba(251,146,60,0.12); color: var(--accent4); border: 1px solid rgba(251,146,60,0.2); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+  @media(max-width:640px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr 1fr; } }
+  @media(max-width:400px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; } }
+  .tab-bar { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab { padding: 8px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text-primary); }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .section-header h2 { font-size: 17px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+  .section-header .icon-wrap { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  .history-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-elevated); cursor: pointer; transition: all 0.15s; }
+  .history-item:hover { border-color: var(--accent); background: rgba(56,189,248,0.04); }
+  .resistor-band { width: 24px; height: 48px; border-radius: 4px; display: inline-block; border: 1px solid rgba(255,255,255,0.1); }
+  .logic-gate { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 8px; background: var(--bg-elevated); border: 1px solid var(--border-bright); cursor: pointer; font-weight: 700; font-size: 13px; transition: all 0.15s; }
+  .logic-gate.selected { background: rgba(56,189,248,0.15); border-color: var(--accent); color: var(--accent); }
+  .logic-input { display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--bg-elevated); border-radius: 8px; border: 1px solid var(--border-bright); }
+  .toggle-switch { width: 44px; height: 24px; background: var(--border-bright); border-radius: 12px; cursor: pointer; position: relative; transition: background 0.2s; }
+  .toggle-switch.on { background: var(--accent3); }
+  .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 10px; transition: transform 0.2s; }
+  .toggle-switch.on::after { transform: translateX(20px); }
+  .led-indicator { width: 16px; height: 16px; border-radius: 50%; display: inline-block; transition: all 0.15s; }
+  .led-on { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
+  .led-off { background: #1e2330; }
+  .color-band-display { display: flex; align-items: center; gap: 6px; padding: 14px 18px; background: var(--bg-base); border-radius: 10px; border: 1px solid var(--border); justify-content: center; flex-wrap: wrap; }
+  .smd-display { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; color: var(--text-primary); text-align: center; padding: 16px; background: #1a1200; border: 2px solid #3a2d00; border-radius: 8px; letter-spacing: 4px; }
+  .mobile-menu-btn { display: none; }
+  @media(max-width: 768px) {
+    .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; z-index: 50; transition: left 0.3s ease; width: 270px !important; }
+    .sidebar.open { left: 0; box-shadow: 4px 0 40px rgba(0,0,0,0.5); }
+    .mobile-menu-btn { display: flex; }
+    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
+    .mobile-overlay.visible { display: block; }
+  }
+  .glow-line { height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.3; }
+  .number-input-group { display: flex; gap: 6px; }
+  .number-input-group input { flex: 1; }
+  .number-input-group select { width: 80px; flex-shrink: 0; }
+  .chart-container { position: relative; height: 220px; }
+  .bode-chart-container { position: relative; height: 200px; }
+  .parallel-row { display: flex; align-items: center; gap: 8px; }
+  .parallel-row input { flex: 1; }
+  .add-row-btn { min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.2); border-radius: 6px; cursor: pointer; color: var(--accent3); transition: all 0.15s; }
+  .add-row-btn:hover { background: rgba(52,211,153,0.2); }
+  .remove-row-btn { min-width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.15); border-radius: 6px; cursor: pointer; color: #f87171; transition: all 0.15s; flex-shrink: 0; }
+  .remove-row-btn:hover { background: rgba(239,68,68,0.2); }
+  .katex { color: var(--text-primary); font-size: 15px; }
+  .tooltip { position: relative; }
+  .tooltip::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1e2330; color: var(--text-primary); font-size: 11px; padding: 4px 8px; border-radius: 4px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; border: 1px solid var(--border-bright); z-index: 99; }
+  .tooltip:hover::after { opacity: 1; }
+  .fade-in { animation: fadeIn 0.25s ease forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .pulse { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.5} }
+  .export-bar { background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(129,140,248,0.08)); border: 1px solid rgba(56,189,248,0.15); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div id="mobile-overlay" class="mobile-overlay" onclick="closeSidebar()"></div>
+
+<!-- LAYOUT -->
+<div style="display:flex;height:100vh;overflow:hidden;">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="sidebar" style="width:260px;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">
+    <div style="padding:18px 16px 12px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0c10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:800;letter-spacing:-0.01em;">EngiCalc</div>
+          <div style="font-size:10px;color:var(--accent);font-weight:700;letter-spacing:0.1em;">ULTIMATE v2.0</div>
+        </div>
+      </div>
+    </div>
+    <nav style="flex:1;padding:10px 10px;">
+      <div class="nav-section">DC Analyse</div>
+      <div class="nav-item active" onclick="showPage('ohm')" data-page="ohm"><i data-lucide="zap" style="width:15px;height:15px;"></i>Ohmsches Gesetz</div>
+      <div class="nav-item" onclick="showPage('power')" data-page="power"><i data-lucide="activity" style="width:15px;height:15px;"></i>Leistung</div>
+      <div class="nav-item" onclick="showPage('series-parallel')" data-page="series-parallel"><i data-lucide="git-branch" style="width:15px;height:15px;"></i>Reihe / Parallel</div>
+      <div class="nav-item" onclick="showPage('voltage-divider')" data-page="voltage-divider"><i data-lucide="divide" style="width:15px;height:15px;"></i>Spannungsteiler</div>
+
+      <div class="nav-section" style="margin-top:4px;">AC Analyse</div>
+      <div class="nav-item" onclick="showPage('impedance')" data-page="impedance"><i data-lucide="radio" style="width:15px;height:15px;"></i>Impedanz RLC</div>
+      <div class="nav-item" onclick="showPage('ac-power')" data-page="ac-power"><i data-lucide="bolt" style="width:15px;height:15px;"></i>AC Leistung</div>
+      <div class="nav-item" onclick="showPage('resonance')" data-page="resonance"><i data-lucide="audio-waveform" style="width:15px;height:15px;"></i>Resonanz (Thomson)</div>
+      <div class="nav-item" onclick="showPage('filter')" data-page="filter"><i data-lucide="filter" style="width:15px;height:15px;"></i>Filter-Rechner</div>
+
+      <div class="nav-section" style="margin-top:4px;">Bauelemente</div>
+      <div class="nav-item" onclick="showPage('color-code')" data-page="color-code"><i data-lucide="palette" style="width:15px;height:15px;"></i>Widerstand Farbcode</div>
+      <div class="nav-item" onclick="showPage('smd')" data-page="smd"><i data-lucide="cpu" style="width:15px;height:15px;"></i>SMD Code</div>
+      <div class="nav-item" onclick="showPage('capacitor-code')" data-page="capacitor-code"><i data-lucide="box" style="width:15px;height:15px;"></i>Kondensator Code</div>
+      <div class="nav-item" onclick="showPage('led')" data-page="led"><i data-lucide="lightbulb" style="width:15px;height:15px;"></i>LED Vorwiderstand</div>
+
+      <div class="nav-section" style="margin-top:4px;">Halbleiter</div>
+      <div class="nav-item" onclick="showPage('zener')" data-page="zener"><i data-lucide="shield" style="width:15px;height:15px;"></i>Z-Diode</div>
+      <div class="nav-item" onclick="showPage('transistor')" data-page="transistor"><i data-lucide="toggle-left" style="width:15px;height:15px;"></i>Transistor Schalter</div>
+
+      <div class="nav-section" style="margin-top:4px;">Digitaltechnik</div>
+      <div class="nav-item" onclick="showPage('number-conv')" data-page="number-conv"><i data-lucide="binary" style="width:15px;height:15px;"></i>Zahlensysteme</div>
+      <div class="nav-item" onclick="showPage('logic-gate')" data-page="logic-gate"><i data-lucide="circuit-board" style="width:15px;height:15px;"></i>Logikgatter</div>
+
+      <div class="nav-section" style="margin-top:4px;">Verlauf & Tools</div>
+      <div class="nav-item" onclick="showPage('history')" data-page="history"><i data-lucide="clock" style="width:15px;height:15px;"></i>History</div>
+      <div class="nav-item" onclick="showPage('unit-conv')" data-page="unit-conv"><i data-lucide="arrow-left-right" style="width:15px;height:15px;"></i>Einheiten-Konverter</div>
+    </nav>
+    <div style="padding:12px 14px;border-top:1px solid var(--border);">
+      <div style="font-size:10px;color:var(--text-muted);letter-spacing:0.06em;">© 2025 EngiCalc Ultimate</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0;">
+
+    <!-- TOPBAR -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30;flex-shrink:0;">
+      <button class="mobile-menu-btn btn btn-ghost" style="padding:7px;" onclick="toggleSidebar()">
+        <i data-lucide="menu" style="width:16px;height:16px;"></i>
+      </button>
+      <div style="flex:1;">
+        <div id="topbar-title" style="font-size:15px;font-weight:800;">Ohmsches Gesetz</div>
+        <div id="topbar-sub" style="font-size:11px;color:var(--text-secondary);">DC Analyse</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn btn-ghost tooltip" data-tip="History" onclick="showPage('history')" style="padding:7px;">
+          <i data-lucide="clock" style="width:15px;height:15px;"></i>
+        </button>
+        <button class="btn btn-ghost tooltip" data-tip="PDF Export" onclick="exportCurrentPDF()" style="padding:7px;">
+          <i data-lucide="file-down" style="width:15px;height:15px;"></i>
+        </button>
+        <div class="tag tag-blue pulse" style="font-size:10px;">LIVE</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="main-content" style="flex:1;padding:20px;max-width:900px;width:100%;margin:0 auto;">
+      <!-- pages injected here -->
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ===== GLOBALS =====
+let history_data = JSON.parse(localStorage.getItem('engicalc_history') || '[]');
+let currentPage = 'ohm';
+let currentResult = null;
+let charts = {};
+
+// ===== UNITS =====
+const SI_PREFIXES = {
+  'T':1e12,'G':1e9,'M':1e6,'k':1e3,'':1,'m':1e-3,'µ':1e-6,'u':1e-6,'n':1e-9,'p':1e-12,'f':1e-15
+};
+const SI_ORDER = ['T','G','M','k','','m','µ','n','p','f'];
+
+function parseValue(str) {
+  if(!str) return NaN;
+  str = str.toString().trim().replace(',','.');
+  const m = str.match(/^([+-]?[\d.]+)\s*([TGMkmµunpf]?)/i);
+  if(!m) return parseFloat(str);
+  const num = parseFloat(m[1]);
+  const prefix = m[2] || '';
+  const mult = SI_PREFIXES[prefix] ?? SI_PREFIXES[prefix.toLowerCase()] ?? 1;
+  return num * mult;
+}
+
+function engineerFormat(val, unit='', decimals=4) {
+  if(!isFinite(val) || isNaN(val)) return 'N/A';
+  const sign = val < 0 ? '-' : '';
+  const abs = Math.abs(val);
+  if(abs === 0) return `0 ${unit}`;
+  for(const p of SI_ORDER) {
+    const m = SI_PREFIXES[p];
+    if(abs >= m * 0.999) {
+      const scaled = val / m;
+      const d = Math.abs(scaled) >= 100 ? 2 : Math.abs(scaled) >= 10 ? 3 : decimals;
+      return `${parseFloat(scaled.toFixed(d))} ${p}${unit}`;
+    }
+  }
+  return `${val.toExponential(3)} ${unit}`;
+}
+
+// ===== HISTORY =====
+function addHistory(category, name, inputs, result, formula) {
+  const entry = { id: Date.now(), category, name, inputs, result, formula, ts: new Date().toLocaleString('de-DE') };
+  history_data.unshift(entry);
+  if(history_data.length > 100) history_data.pop();
+  localStorage.setItem('engicalc_history', JSON.stringify(history_data));
+  currentResult = entry;
+}
+
+// ===== NAV =====
+const PAGE_TITLES = {
+  'ohm':['Ohmsches Gesetz','DC Analyse'],
+  'power':['Leistungsberechnung','DC Analyse'],
+  'series-parallel':['Reihen- / Parallelschaltung','DC Analyse'],
+  'voltage-divider':['Spannungsteiler','DC Analyse'],
+  'impedance':['Impedanz RLC','AC Analyse'],
+  'ac-power':['AC Leistung','AC Analyse'],
+  'resonance':['Resonanzfrequenz (Thomson)','AC Analyse'],
+  'filter':['Filter-Rechner','AC Analyse'],
+  'color-code':['Widerstand Farbcode','Bauelemente'],
+  'smd':['SMD Widerstand Code','Bauelemente'],
+  'capacitor-code':['Kondensator Code','Bauelemente'],
+  'led':['LED Vorwiderstand','Bauelemente'],
+  'zener':['Z-Dioden-Stabilisierung','Halbleiter'],
+  'transistor':['Transistor als Schalter','Halbleiter'],
+  'number-conv':['Zahlensysteme Konverter','Digitaltechnik'],
+  'logic-gate':['Logikgatter Simulator','Digitaltechnik'],
+  'history':['Berechnungs-History','Verlauf'],
+  'unit-conv':['Einheiten-Konverter','Tools'],
+};
+
+function showPage(id) {
+  currentPage = id;
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === id);
+  });
+  const [title, sub] = PAGE_TITLES[id] || [id, ''];
+  document.getElementById('topbar-title').textContent = title;
+  document.getElementById('topbar-sub').textContent = sub;
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = '<div class="fade-in">' + PAGES[id]() + '</div>';
+  // destroy old charts
+  Object.values(charts).forEach(c => { try { c.destroy(); } catch(e){} });
+  charts = {};
+  lucide.createIcons();
+  // close mobile sidebar
+  closeSidebar();
+  // page init
+  if(PAGE_INITS[id]) PAGE_INITS[id]();
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('mobile-overlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('visible');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobile-overlay').classList.remove('visible');
+}
+
+// ===== HELPERS =====
+function renderKatex(el, formula) {
+  try { katex.render(formula, el, { throwOnError: false, displayMode: true }); } catch(e) { el.textContent = formula; }
+}
+
+function showResult(containerId, html) {
+  const el = document.getElementById(containerId);
+  if(el) { el.innerHTML = html; el.style.display=''; }
+}
+
+function resultHTML(label, value, unit, formula_katex, extras='') {
+  const fid = 'f_'+Math.random().toString(36).slice(2);
+  setTimeout(() => {
+    const el = document.getElementById(fid);
+    if(el && formula_katex) renderKatex(el, formula_katex);
+  }, 50);
+  return `<div class="result-box fade-in">
+    <div class="result-label">${label}</div>
+    <div class="result-value">${value} <span style="font-size:14px;color:var(--text-secondary);">${unit}</span></div>
+    ${extras}
+    <div class="formula-box" style="margin-top:10px;"><div id="${fid}"></div></div>
+  </div>`;
+}
+
+function multiResultHTML(results, formula_katex) {
+  const fid = 'f_'+Math.random().toString(36).slice(2);
+  setTimeout(() => {
+    const el = document.getElementById(fid);
+    if(el && formula_katex) renderKatex(el, formula_katex);
+  }, 50);
+  const items = results.map(r => `
+    <div style="text-align:center;padding:10px;">
+      <div class="result-label">${r.label}</div>
+      <div class="result-value" style="font-size:17px;">${r.value}</div>
+    </div>`).join('');
+  return `<div class="result-box fade-in">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:4px;">${items}</div>
+    <div class="formula-box"><div id="${fid}"></div></div>
+  </div>`;
+}
+
+// ===== PAGES =====
+const PAGES = {};
+const PAGE_INITS = {};
+
+// ============================================================
+// PAGE: OHM
+// ============================================================
+PAGES['ohm'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(56,189,248,0.12);">
+    <i data-lucide="zap" style="width:18px;height:18px;color:var(--accent);"></i>
+  </div>
+  <div><h2>Ohmsches Gesetz</h2><div style="font-size:12px;color:var(--text-secondary);">U = R · I — löse nach beliebiger Größe auf</div></div>
+</div>
+<div class="card">
+  <div class="tab-bar" id="ohm-tabs">
+    <div class="tab active" onclick="ohmSetMode('U')">Spannung berechnen</div>
+    <div class="tab" onclick="ohmSetMode('R')">Widerstand berechnen</div>
+    <div class="tab" onclick="ohmSetMode('I')">Strom berechnen</div>
+  </div>
+  <div id="ohm-form"></div>
+  <div id="ohm-result" style="display:none;"></div>
+</div>
+<div class="card" style="margin-top:16px;">
+  <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-secondary);">RC Ladekurve</div>
+  <div class="grid-2" style="gap:12px;margin-bottom:14px;">
+    <div><label>Widerstand R</label><div class="number-input-group"><input type="number" id="rc-r" value="1000" step="any"/><select id="rc-r-u"><option value="1000">kΩ</option><option value="1" selected>Ω</option><option value="0.001">mΩ</option></select></div></div>
+    <div><label>Kapazität C</label><div class="number-input-group"><input type="number" id="rc-c" value="100" step="any"/><select id="rc-c-u"><option value="0.000001">µF</option><option value="0.000000001" selected>nF</option><option value="0.000000000001">pF</option></select></div></div>
+    <div><label>Betriebsspannung U₀ (V)</label><input type="number" id="rc-u0" value="5" step="any"/></div>
+    <div style="display:flex;align-items:flex-end;"><button class="btn btn-primary" onclick="plotRC()" style="width:100%"><i data-lucide="play" style="width:14px;height:14px;"></i>Kurve zeichnen</button></div>
+  </div>
+  <div class="chart-container"><canvas id="chart-rc"></canvas></div>
+</div>`;
+
+let ohmMode = 'U';
+PAGE_INITS['ohm'] = () => {
+  ohmSetMode('U');
+};
+
+function ohmSetMode(mode) {
+  ohmMode = mode;
+  document.querySelectorAll('#ohm-tabs .tab').forEach((t,i) => {
+    t.classList.toggle('active', ['U','R','I'][i] === mode);
+  });
+  const forms = {
+    'U': `<div class="grid-2"><div><label>Widerstand R</label><div class="number-input-group"><input type="number" id="ohm-r" placeholder="z.B. 1000" step="any"/><select id="ohm-r-u"><option value="1000">kΩ</option><option value="1" selected>Ω</option><option value="0.001">mΩ</option></select></div></div><div><label>Strom I</label><div class="number-input-group"><input type="number" id="ohm-i" placeholder="z.B. 10" step="any"/><select id="ohm-i-u"><option value="1">A</option><option value="0.001" selected>mA</option><option value="0.000001">µA</option></select></div></div></div><button class="btn btn-primary" onclick="calcOhm()" style="margin-top:14px;"><i data-lucide="calculator" style="width:14px;height:14px;"></i>Berechnen</button>`,
+    'R': `<div class="grid-2"><div><label>Spannung U</label><div class="number-input-group"><input type="number" id="ohm-u" placeholder="z.B. 12" step="any"/><select id="ohm-u-u"><option value="1000">kV</option><option value="1" selected>V</option><option value="0.001">mV</option></select></div></div><div><label>Strom I</label><div class="number-input-group"><input type="number" id="ohm-i" placeholder="z.B. 10" step="any"/><select id="ohm-i-u"><option value="1">A</option><option value="0.001" selected>mA</option><option value="0.000001">µA</option></select></div></div></div><button class="btn btn-primary" onclick="calcOhm()" style="margin-top:14px;"><i data-lucide="calculator" style="width:14px;height:14px;"></i>Berechnen</button>`,
+    'I': `<div class="grid-2"><div><label>Spannung U</label><div class="number-input-group"><input type="number" id="ohm-u" placeholder="z.B. 12" step="any"/><select id="ohm-u-u"><option value="1000">kV</option><option value="1" selected>V</option><option value="0.001">mV</option></select></div></div><div><label>Widerstand R</label><div class="number-input-group"><input type="number" id="ohm-r" placeholder="z.B. 1000" step="any"/><select id="ohm-r-u"><option value="1000">kΩ</option><option value="1" selected>Ω</option><option value="0.001">mΩ</option></select></div></div></div><button class="btn btn-primary" onclick="calcOhm()" style="margin-top:14px;"><i data-lucide="calculator" style="width:14px;height:14px;"></i>Berechnen</button>`
+  };
+  document.getElementById('ohm-form').innerHTML = forms[mode];
+  document.getElementById('ohm-result').style.display='none';
+  lucide.createIcons();
+}
+
+function calcOhm() {
+  let result, label, unit, formula;
+  if(ohmMode==='U') {
+    const R = parseFloat(document.getElementById('ohm-r').value)*parseFloat(document.getElementById('ohm-r-u').value);
+    const I = parseFloat(document.getElementById('ohm-i').value)*parseFloat(document.getElementById('ohm-i-u').value);
+    result = R*I; label='Spannung U'; unit='V'; formula='U = R \\cdot I';
+    addHistory('DC','Ohm: Spannung',{R:engineerFormat(R,'Ω'),I:engineerFormat(I,'A')},engineerFormat(result,'V'),formula);
+  } else if(ohmMode==='R') {
+    const U = parseFloat(document.getElementById('ohm-u').value)*parseFloat(document.getElementById('ohm-u-u').value);
+    const I = parseFloat(document.getElementById('ohm-i').value)*parseFloat(document.getElementById('ohm-i-u').value);
+    result = U/I; label='Widerstand R'; unit='Ω'; formula='R = \\frac{U}{I}';
+    addHistory('DC','Ohm: Widerstand',{U:engineerFormat(U,'V'),I:engineerFormat(I,'A')},engineerFormat(result,'Ω'),formula);
+  } else {
+    const U = parseFloat(document.getElementById('ohm-u').value)*parseFloat(document.getElementById('ohm-u-u').value);
+    const R = parseFloat(document.getElementById('ohm-r').value)*parseFloat(document.getElementById('ohm-r-u').value);
+    result = U/R; label='Strom I'; unit='A'; formula='I = \\frac{U}{R}';
+    addHistory('DC','Ohm: Strom',{U:engineerFormat(U,'V'),R:engineerFormat(R,'Ω')},engineerFormat(result,'A'),formula);
+  }
+  if(!isFinite(result)) { alert('Ungültige Eingabe!'); return; }
+  const el = document.getElementById('ohm-result');
+  el.innerHTML = resultHTML(label, engineerFormat(result,unit.replace(unit,'')), unit, formula);
+  el.style.display='';
+}
+
+function plotRC() {
+  const R = parseFloat(document.getElementById('rc-r').value)*parseFloat(document.getElementById('rc-r-u').value);
+  const C = parseFloat(document.getElementById('rc-c').value)*parseFloat(document.getElementById('rc-c-u').value);
+  const U0 = parseFloat(document.getElementById('rc-u0').value);
+  const tau = R*C;
+  const tEnd = 5*tau;
+  const N = 100;
+  const labels = [], data = [];
+  for(let i=0;i<=N;i++) {
+    const t = (i/N)*tEnd;
+    labels.push((t*1000).toFixed(3));
+    data.push(U0*(1-Math.exp(-t/tau)));
+  }
+  const ctx = document.getElementById('chart-rc').getContext('2d');
+  if(charts['rc']) charts['rc'].destroy();
+  charts['rc'] = new Chart(ctx, {
+    type:'line', data:{labels,datasets:[{label:`U_C (τ=${engineerFormat(tau,'s')})`,data,borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,0.08)',fill:true,tension:0.4,pointRadius:0,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{ticks:{color:'#64748b',maxTicksLimit:8},grid:{color:'#1e2330'},title:{display:true,text:'Zeit (ms)',color:'#64748b',font:{size:11}}},y:{ticks:{color:'#64748b'},grid:{color:'#1e2330'},title:{display:true,text:'Spannung (V)',color:'#64748b',font:{size:11}}}}}
+  });
+}
+
+// ============================================================
+// PAGE: POWER
+// ============================================================
+PAGES['power'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(251,146,60,0.12);">
+    <i data-lucide="activity" style="width:18px;height:18px;color:var(--accent4);"></i>
+  </div>
+  <div><h2>Leistungsberechnung</h2><div style="font-size:12px;color:var(--text-secondary);">P = U · I = U²/R = I²·R</div></div>
+</div>
+<div class="card">
+  <div style="margin-bottom:14px;">
+    <label>Berechne</label>
+    <select id="pow-solve" onchange="powerBuildForm()" style="max-width:200px;">
+      <option value="P">Leistung P</option>
+      <option value="U">Spannung U</option>
+      <option value="I">Strom I</option>
+      <option value="R">Widerstand R</option>
+    </select>
+  </div>
+  <div id="pow-form"></div>
+  <div id="pow-result" style="display:none;"></div>
+</div>`;
+
+PAGE_INITS['power'] = () => powerBuildForm();
+
+function powerBuildForm() {
+  const s = document.getElementById('pow-solve').value;
+  const opts = {
+    'P': ['U (V)','ohm-pu','I (A)','ohm-pi','R (Ω)','ohm-pr'],
+    'U': ['P (W)','ohm-pu','I (A)','ohm-pi','',''],
+    'I': ['P (W)','ohm-pu','U (V)','ohm-pi','',''],
+    'R': ['P (W)','ohm-pu','I (A)','ohm-pi','',''],
+  };
+  const hints = {
+    'P':['Wenn U & I bekannt; oder U & R; oder I & R — lasse das unbekannte Feld leer'],
+    'U':['Aus P und I'],
+    'I':['Aus P und U'],
+    'R':['Aus P und I'],
+  };
+  document.getElementById('pow-form').innerHTML = `
+    <div class="grid-2" id="pow-inputs">
+      <div><label>Spannung U (V)</label><input type="number" id="pow-u" placeholder="optional" step="any"/></div>
+      <div><label>Strom I (A)</label><input type="number" id="pow-i" placeholder="optional" step="any"/></div>
+      <div><label>Widerstand R (Ω)</label><input type="number" id="pow-r" placeholder="optional" step="any"/></div>
+      <div><label>Leistung P (W)</label><input type="number" id="pow-p" placeholder="optional" step="any"/></div>
+    </div>
+    <div style="font-size:11px;color:var(--text-secondary);margin:8px 0;">Gib mindestens 2 bekannte Größen ein, lasse die gesuchte leer.</div>
+    <button class="btn btn-primary" onclick="calcPower()" style="margin-top:6px;"><i data-lucide="calculator" style="width:14px;height:14px;"></i>Berechnen</button>`;
+  document.getElementById('pow-result').style.display='none';
+  lucide.createIcons();
+}
+
+function calcPower() {
+  const U = parseFloat(document.getElementById('pow-u').value);
+  const I = parseFloat(document.getElementById('pow-i').value);
+  const R = parseFloat(document.getElementById('pow-r').value);
+  const P = parseFloat(document.getElementById('pow-p').value);
+  const known = {U:!isNaN(U),I:!isNaN(I),R:!isNaN(R),P:!isNaN(P)};
+  let results = {}, formula='';
+  if(known.U && known.I) { results.P=U*I; results.R=U/I; formula='P = U \\cdot I'; }
+  else if(known.U && known.R) { results.P=U*U/R; results.I=U/R; formula='P = \\frac{U^2}{R}'; }
+  else if(known.I && known.R) { results.P=I*I*R; results.U=I*R; formula='P = I^2 \\cdot R'; }
+  else if(known.P && known.U) { results.I=P/U; results.R=U*U/P; formula='I = \\frac{P}{U}'; }
+  else if(known.P && known.I) { results.U=P/I; results.R=P/(I*I); formula='U = \\frac{P}{I}'; }
+  else if(known.P && known.R) { results.I=Math.sqrt(P/R); results.U=Math.sqrt(P*R); formula='I = \\sqrt{\\frac{P}{R}}'; }
+  else { alert('Bitte mindestens 2 Größen eingeben!'); return; }
+  if(known.U) results.U=U; if(known.I) results.I=I; if(known.R) results.R=R; if(known.P) results.P=P;
+  const r = [
+    {label:'Leistung P', value: engineerFormat(results.P,'W')},
+    {label:'Spannung U', value: engineerFormat(results.U,'V')},
+    {label:'Strom I', value: engineerFormat(results.I,'A')},
+    {label:'Widerstand R', value: engineerFormat(results.R,'Ω')},
+  ];
+  const el = document.getElementById('pow-result');
+  el.innerHTML = multiResultHTML(r, formula);
+  el.style.display='';
+  addHistory('DC','Leistung',{U:engineerFormat(results.U,'V'),I:engineerFormat(results.I,'A'),R:engineerFormat(results.R,'Ω')},engineerFormat(results.P,'W'),formula);
+}
+
+// ============================================================
+// PAGE: SERIES/PARALLEL
+// ============================================================
+PAGES['series-parallel'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(52,211,153,0.12);">
+    <i data-lucide="git-branch" style="width:18px;height:18px;color:var(--accent3);"></i>
+  </div>
+  <div><h2>Reihen- / Parallelschaltung</h2><div style="font-size:12px;color:var(--text-secondary);">Beliebig viele Widerstände</div></div>
+</div>
+<div class="card">
+  <div class="tab-bar" id="sp-tabs">
+    <div class="tab active" onclick="spSetMode('series')">Reihenschaltung</div>
+    <div class="tab" onclick="spSetMode('parallel')">Parallelschaltung</div>
+  </div>
+  <div id="sp-resistors"></div>
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+    <button class="btn" style="background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.2);color:var(--accent3);" onclick="spAddRow()"><i data-lucide="plus" style="width:14px;height:14px;"></i>Widerstand hinzufügen</button>
+    <button class="btn btn-primary" onclick="calcSP()"><i data-lucide="calculator" style="width:14px;height:14px;"></i>Berechnen</button>
+  </div>
+  <div id="sp-result" style="display:none;"></div>
+</div>`;
+
+let spMode = 'series', spCount = 3;
+PAGE_INITS['series-parallel'] = () => { spMode='series'; spCount=3; spBuildRows(); };
+
+function spSetMode(m) {
+  spMode=m;
+  document.querySelectorAll('#sp-tabs .tab').forEach((t,i)=>t.classList.toggle('active',['series','parallel'][i]===m));
+  calcSP_silent();
+}
+
+function spBuildRows() {
+  const c = document.getElementById('sp-resistors');
+  c.innerHTML = '';
+  for(let i=0;i<spCount;i++) {
+    const row = document.createElement('div');
+    row.className = 'parallel-row'; row.style.marginBottom='8px'; row.id=`sp-row-${i}`;
+    row.innerHTML = `<span style="font-size:11px;color:var(--text-secondary);min-width:20px;font-family:monospace;">R${i+1}</span>
+      <input type="number" id="sp-r${i}" placeholder="Wert" value="${[100,220,470,1000,2200][i]||1000}" step="any" oninput="calcSP_silent()"/>
+      <select id="sp-u${i}" onchange="calcSP_silent()"><option value="1000000">MΩ</option><option value="1000">kΩ</option><option value="1" selected>Ω</option><option value="0.001">mΩ</option></select>
+      ${i>1?`<div class="remove-row-btn" onclick="spRemoveRow(${i})"><i data-lucide="x" style="width:12px;height:12px;"></i></div>`:'<div style="width:28px;"></div>'}`;
+    c.appendChild(row);
+  }
+  lucide.createIcons();
+}
+
+function spAddRow() {
+  spCount++;
+  spBuildRows();
+  // restore values won't work but at least add new row
+}
+
+function spRemoveRow(idx) {
+  if(spCount<=2) return;
+  // collect values, remove idx, rebuild
+  const vals=[], units=[];
+  for(let i=0;i<spCount;i++) { vals.push(document.getElementById(`sp-r${i}`)?.value||''); units.push(document.getElementById(`sp-u${i}`)?.value||'1'); }
+  vals.splice(idx,1); units.splice(idx,1);
+  spCount--;
+  spBuildRows();
+  for(let i=0;i<spCount;i++) { document.getElementById(`sp-r${i}`).value=vals[i]; document.getElementById(`sp-u${i}`).value=units[i]; }
+  lucide.createIcons();
+}
+
+function spGetValues() {
+  const rs=[];
+  for(let i=0;i<spCount;i++) {
+    const v=parseFloat(document.getElementById(`sp-r${i}`)?.value)*parseFloat(document.getElementById(`sp-u${i}`)?.value||'1');
+    if(isFinite(v)&&v>0) rs.push(v);
+  }
+  return rs;
+}
+
+function calcSP_silent() { try { calcSP(true); } catch(e){} }
+
+function calcSP(silent=false) {
+  const rs = spGetValues();
+  if(rs.length<2) { if(!silent) alert('Mindestens 2 Widerstände!'); return; }
+  let result;
+  if(spMode==='series') {
+    result = rs.reduce((a,b)=>a+b,0);
+  } else {
+    result = 1/rs.reduce((a,b)=>a+1/b,0);
+  }
+  const formula = spMode==='series' ? 'R_{ges} = R_1 + R_2 + \\ldots + R_n' : '\\frac{1}{R_{ges}} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\ldots + \\frac{1}{R_n}';
+  const el = document.getElementById('sp-result');
+  el.innerHTML = resultHTML(`Gesamtwiderstand (${spMode==='series'?'Reihenschaltung':'Parallelschaltung'})`, engineerFormat(result,'').replace(' ',''), 'Ω', formula);
+  el.style.display='';
+  if(!silent) addHistory('DC', `${spMode==='series'?'Reihe':'Parallel'}schaltung`, {n:rs.length}, engineerFormat(result,'Ω'), formula);
+}
+
+// ============================================================
+// PAGE: VOLTAGE DIVIDER
+// ============================================================
+PAGES['voltage-divider'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(129,140,248,0.12);">
+    <i data-lucide="divide" style="width:18px;height:18px;color:var(--accent2);"></i>
+  </div>
+  <div><h2>Spannungsteiler</h2><div style="font-size:12px;color:var(--text-secondary);">Belastet & unbelastet</div></div>
+</div>
+<div class="card">
+  <div class="grid-3" style="gap:12px;">
+    <div><label>Eingangsspannung U_in (V)</label><input type="number" id="vd-uin" value="12" step="any" oninput="calcVD()"/></div>
+    <div><label>R₁ (Ω)</label><input type="number" id="vd-r1" value="10000" step="any" oninput="calcVD()"/></div>
+    <div><label>R₂ (Ω)</label><input type="number" id="vd-r2" value="4700" step="any" oninput="calcVD()"/></div>
+    <div><label>Last R_L (Ω, leer = ∞)</label><input type="number" id="vd-rl" placeholder="∞ (unbelastet)" step="any" oninput="calcVD()"/></div>
+  </div>
+  <div id="vd-result" style="margin-top:14px;"></div>
+</div>`;
+
+PAGE_INITS['voltage-divider'] = () => calcVD();
+
+function calcVD() {
+  const Uin=parseFloat(document.getElementById('vd-uin').value);
+  const R1=parseFloat(document.getElementById('vd-r1').value);
+  const R2=parseFloat(document.getElementById('vd-r2').value);
+  const RL_raw=document.getElementById('vd-rl').value;
+  if(!isFinite(Uin)||!isFinite(R1)||!isFinite(R2)) return;
+  const unloaded = R2/(R1+R2)*Uin;
+  let loaded='N/A', formula='U_{out} = U_{in} \\cdot \\frac{R_2}{R_1+R_2}';
+  let extras='';
+  if(RL_raw!=='' && isFinite(parseFloat(RL_raw))) {
+    const RL=parseFloat(RL_raw);
+    const R2p = (R2*RL)/(R2+RL);
+    loaded = R2p/(R1+R2p)*Uin;
+    extras = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+      <div><div class="result-label">Unbelastet</div><div class="result-value" style="font-size:17px;">${engineerFormat(unloaded,'V')}</div></div>
+      <div><div class="result-label">Belastet (R_L=${engineerFormat(RL,'Ω')})</div><div class="result-value" style="font-size:17px;">${engineerFormat(loaded,'V')}</div></div>
+    </div>`;
+    formula = 'U_{out,belastet} = U_{in} \\cdot \\frac{R_2 \\| R_L}{R_1 + R_2 \\| R_L}';
+    const el = document.getElementById('vd-result');
+    const fid='fvd'+Date.now();
+    el.innerHTML=`<div class="result-box fade-in">${extras}<div class="formula-box"><div id="${fid}"></div></div></div>`;
+    setTimeout(()=>{const e=document.getElementById(fid);if(e)renderKatex(e,formula);},50);
+    return;
+  }
+  const el = document.getElementById('vd-result');
+  el.innerHTML = resultHTML('Ausgangsspannung U_out', engineerFormat(unloaded,'').replace(' ',''), 'V', formula);
+}
+
+// ============================================================
+// PAGE: IMPEDANCE
+// ============================================================
+PAGES['impedance'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(56,189,248,0.12);">
+    <i data-lucide="radio" style="width:18px;height:18px;color:var(--accent);"></i>
+  </div>
+  <div><h2>Impedanz RLC</h2><div style="font-size:12px;color:var(--text-secondary);">Betrag und Phasenwinkel berechnen</div></div>
+</div>
+<div class="card">
+  <div class="grid-3" style="gap:12px;">
+    <div><label>Frequenz f (Hz)</label><div class="number-input-group"><input type="number" id="imp-f" value="1000" step="any" oninput="calcImp()"/><select id="imp-f-u" onchange="calcImp()"><option value="1000000">MHz</option><option value="1000">kHz</option><option value="1" selected>Hz</option></select></div></div>
+    <div><label>Widerstand R (Ω)</label><input type="number" id="imp-r" value="100" step="any" oninput="calcImp()"/></div>
+    <div><label>Induktivität L (leer = 0)</label><div class="number-input-group"><input type="number" id="imp-l" placeholder="0" step="any" oninput="calcImp()"/><select id="imp-l-u" onchange="calcImp()"><option value="1">H</option><option value="0.001" selected>mH</option><option value="0.000001">µH</option></select></div></div>
+    <div><label>Kapazität C (leer = ∞)</label><div class="number-input-group"><input type="number" id="imp-c" placeholder="∞" step="any" oninput="calcImp()"/><select id="imp-c-u" onchange="calcImp()"><option value="0.000001">µF</option><option value="0.000000001" selected>nF</option><option value="0.000000000001">pF</option></select></div></div>
+  </div>
+  <div id="imp-result" style="margin-top:14px;"></div>
+</div>`;
+
+PAGE_INITS['impedance'] = () => calcImp();
+
+function calcImp() {
+  const f=parseFloat(document.getElementById('imp-f').value)*parseFloat(document.getElementById('imp-f-u').value);
+  const R=parseFloat(document.getElementById('imp-r').value)||0;
+  const L_v=document.getElementById('imp-l').value; const L=L_v?parseFloat(L_v)*parseFloat(document.getElementById('imp-l-u').value):0;
+  const C_v=document.getElementById('imp-c').value; const C=C_v?parseFloat(C_v)*parseFloat(document.getElementById('imp-c-u').value):0;
+  if(!isFinite(f)||f<=0) return;
+  const w=2*Math.PI*f;
+  const XL=w*L;
+  const XC=C>0?1/(w*C):0;
+  const X=XL-XC;
+  const Z=Math.sqrt(R*R+X*X);
+  const phi=Math.atan2(X,R)*180/Math.PI;
+  const el = document.getElementById('imp-result');
+  el.innerHTML = multiResultHTML([
+    {label:'Impedanz |Z|', value: engineerFormat(Z,'Ω')},
+    {label:'Reaktanz X', value: engineerFormat(X,'Ω')},
+    {label:'X_L', value: engineerFormat(XL,'Ω')},
+    {label:'X_C', value: engineerFormat(XC,'Ω')},
+    {label:'Phasenwinkel φ', value: phi.toFixed(2)+'°'},
+    {label:'Frequenz f', value: engineerFormat(f,'Hz')},
+  ], 'Z = \\sqrt{R^2 + (X_L - X_C)^2}');
+}
+
+// ============================================================
+// PAGE: AC POWER
+// ============================================================
+PAGES['ac-power'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(251,146,60,0.12);">
+    <i data-lucide="bolt" style="width:18px;height:18px;color:var(--accent4);"></i>
+  </div>
+  <div><h2>AC Leistung</h2><div style="font-size:12px;color:var(--text-secondary);">Schein-, Wirk- und Blindleistung</div></div>
+</div>
+<div class="card">
+  <div class="grid-3" style="gap:12px;">
+    <div><label>Spannung U_eff (V)</label><input type="number" id="acp-u" value="230" step="any" oninput="calcACP()"/></div>
+    <div><label>Strom I_eff (A)</label><input type="number" id="acp-i" value="2.5" step="any" oninput="calcACP()"/></div>
+    <div><label>Phasenwinkel φ (°)</label><input type="number" id="acp-phi" value="30" step="any" oninput="calcACP()"/></div>
+  </div>
+  <div id="acp-result" style="margin-top:14px;"></div>
+</div>`;
+
+PAGE_INITS['ac-power'] = () => calcACP();
+
+function calcACP() {
+  const U=parseFloat(document.getElementById('acp-u').value);
+  const I=parseFloat(document.getElementById('acp-i').value);
+  const phi=parseFloat(document.getElementById('acp-phi').value)*Math.PI/180;
+  if(!isFinite(U)||!isFinite(I)||!isFinite(phi)) return;
+  const S=U*I, P=S*Math.cos(phi), Q=S*Math.sin(phi), pf=Math.cos(phi);
+  document.getElementById('acp-result').innerHTML = multiResultHTML([
+    {label:'Scheinleistung S',value:engineerFormat(S,'VA')},
+    {label:'Wirkleistung P',value:engineerFormat(P,'W')},
+    {label:'Blindleistung Q',value:engineerFormat(Q,'var')},
+    {label:'Leistungsfaktor cos φ',value:pf.toFixed(4)},
+  ],'S = U \\cdot I, \\quad P = S \\cdot \\cos\\varphi, \\quad Q = S \\cdot \\sin\\varphi');
+}
+
+// ============================================================
+// PAGE: RESONANCE
+// ============================================================
+PAGES['resonance'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(244,114,182,0.12);">
+    <i data-lucide="audio-waveform" style="width:18px;height:18px;color:var(--accent5);"></i>
+  </div>
+  <div><h2>Resonanzfrequenz</h2><div style="font-size:12px;color:var(--text-secondary);">Thomson-Formel f₀ = 1/(2π√LC)</div></div>
+</div>
+<div class="card">
+  <div class="tab-bar" id="res-tabs">
+    <div class="tab active" onclick="resSetMode('f')">f₀ berechnen</div>
+    <div class="tab" onclick="resSetMode('L')">L berechnen</div>
+    <div class="tab" onclick="resSetMode('C')">C berechnen</div>
+  </div>
+  <div id="res-form"></div>
+  <div id="res-result" style="display:none;"></div>
+</div>`;
+
+let resMode = 'f';
+PAGE_INITS['resonance'] = () => resSetMode('f');
+
+function resSetMode(m) {
+  resMode=m;
+  document.querySelectorAll('#res-tabs .tab').forEach((t,i)=>t.classList.toggle('active',['f','L','C'][i]===m));
+  const forms={
+    'f':`<div class="grid-2"><div><label>Induktivität L</label><div class="number-input-group"><input type="number" id="res-l" value="100" step="any"/><select id="res-l-u"><option value="1">H</option><option value="0.001" selected>mH</option><option value="0.000001">µH</option></select></div></div><div><label>Kapazität C</label><div class="number-input-group"><input type="number" id="res-c" value="100" step="any"/><select id="res-c-u"><option value="0.000001">µF</option><option value="0.000000001" selected>nF</option><option value="0.000000000001">pF</option></select></div></div></div>`,
+    'L':`<div class="grid-2"><div><label>Frequenz f</label><div class="number-input-group"><input type="number" id="res-f" value="1000" step="any"/><select id="res-f-u"><option value="1000000">MHz</option><option value="1000">kHz</option><option value="1" selected>Hz</option></select></div></div><div><label>Kapazität C</label><div class="number-input-group"><input type="number" id="res-c" value="100" step="any"/><select id="res-c-u"><option value="0.000001">µF</option><option value="0.000000001" selected>nF</option><option value="0.000000000001">pF</option></select></div></div></div>`,
+    'C':`<div class="grid-2"><div><label>Frequenz f</label><div class="number-input-group"><input type="number" id="res-f" value="1000" step="any"/><select id="res-f-u"><option value="1000000">MHz</option><option value="1000">kHz</option><option value="1" selected>Hz</option></select></div></div><div><label>Induktivität L</label><div class="number-input-group"><input type="number" id="res-l" value="100" step="any"/><select id="res-l-u"><option value="1">H</option><option value="0.001" selected>mH</option><option value="0.000001">µH</option></select></div></div></div>`,
+  };
+  document.getElementById('res-form').innerHTML = forms[m] + `<button class="btn btn-primary" onclick="calcRes()" style="margin-top:14px;"><i data-lucide="calculator" style="width:14px;height:14px;"></i>Berechnen</button>`;
+  document.getElementById('res-result').style.display='none';
+  lucide.createIcons();
+}
+
+function calcRes() {
+  let result, label, unit, formula;
+  if(resMode==='f') {
+    const L=parseFloat(document.getElementById('res-l').value)*parseFloat(document.getElementById('res-l-u').value);
+    const C=parseFloat(document.getElementById('res-c').value)*parseFloat(document.getElementById('res-c-u').value);
+    result=1/(2*Math.PI*Math.sqrt(L*C)); label='Resonanzfrequenz f₀'; unit='Hz';
+    formula='f_0 = \\frac{1}{2\\pi\\sqrt{LC}}';
+  } else if(resMode==='L') {
+    const f=parseFloat(document.getElementById('res-f').value)*parseFloat(document.getElementById('res-f-u').value);
+    const C=parseFloat(document.getElementById('res-c').value)*parseFloat(document.getElementById('res-c-u').value);
+    result=1/(4*Math.PI*Math.PI*f*f*C); label='Induktivität L'; unit='H';
+    formula='L = \\frac{1}{(2\\pi f_0)^2 C}';
+  } else {
+    const f=parseFloat(document.getElementById('res-f').value)*parseFloat(document.getElementById('res-f-u').value);
+    const L=parseFloat(document.getElementById('res-l').value)*parseFloat(document.getElementById('res-l-u').value);
+    result=1/(4*Math.PI*Math.PI*f*f*L); label='Kapazität C'; unit='F';
+    formula='C = \\frac{1}{(2\\pi f_0)^2 L}';
+  }
+  const el=document.getElementById('res-result');
+  el.innerHTML=resultHTML(label,engineerFormat(result,'').replace(' ',''),unit,formula);
+  el.style.display='';
+  addHistory('AC','Resonanz',{},engineerFormat(result,unit),formula);
+}
+
+// ============================================================
+// PAGE: FILTER
+// ============================================================
+PAGES['filter'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(52,211,153,0.12);">
+    <i data-lucide="filter" style="width:18px;height:18px;color:var(--accent3);"></i>
+  </div>
+  <div><h2>Filter-Rechner</h2><div style="font-size:12px;color:var(--text-secondary);">Tiefpass / Hochpass 1. & 2. Ordnung + Bode-Diagramm</div></div>
+</div>
+<div class="card">
+  <div class="grid-4" style="gap:12px;margin-bottom:14px;">
+    <div><label>Filtertyp</label><select id="flt-type" onchange="calcFilter()"><option value="LP1">TP 1. Ord.</option><option value="HP1">HP 1. Ord.</option><option value="LP2">TP 2. Ord.</option><option value="HP2">HP 2. Ord.</option></select></div>
+    <div><label>R (Ω)</label><input type="number" id="flt-r" value="1000" step="any" oninput="calcFilter()"/></div>
+    <div><label>C</label><div class="number-input-group"><input type="number" id="flt-c" value="100" step="any" oninput="calcFilter()"/><select id="flt-cu" onchange="calcFilter()"><option value="0.000001">µF</option><option value="0.000000001" selected>nF</option></select></div></div>
+    <div><label>L (für 2. Ord.)</label><div class="number-input-group"><input type="number" id="flt-l" value="10" step="any" oninput="calcFilter()"/><select id="flt-lu" onchange="calcFilter()"><option value="1">H</option><option value="0.001" selected>mH</option></select></div></div>
+  </div>
+  <div id="flt-result"></div>
+  <div style="margin-top:16px;font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:10px;">Bode-Diagramm (Amplitudengang)</div>
+  <div class="bode-chart-container"><canvas id="chart-bode"></canvas></div>
+</div>`;
+
+PAGE_INITS['filter'] = () => calcFilter();
+
+function calcFilter() {
+  const type=document.getElementById('flt-type').value;
+  const R=parseFloat(document.getElementById('flt-r').value)||1000;
+  const C=parseFloat(document.getElementById('flt-c').value)*parseFloat(document.getElementById('flt-cu').value);
+  const L=parseFloat(document.getElementById('flt-l').value)*parseFloat(document.getElementById('flt-lu').value);
+  const fc=1/(2*Math.PI*R*C);
+  const fid='fflt'+Date.now();
+  let formula='';
+  if(type==='LP1'||type==='HP1') formula='f_c = \\frac{1}{2\\pi R C}';
+  else formula='f_c = \\frac{1}{2\\pi\\sqrt{LC}}';
+  const el=document.getElementById('flt-result');
+  el.innerHTML=`<div class="result-box fade-in"><div class="result-label">Grenzfrequenz f_c</div><div class="result-value">${engineerFormat(fc,'Hz')}</div><div class="formula-box"><div id="${fid}"></div></div></div>`;
+  setTimeout(()=>{const e=document.getElementById(fid);if(e)renderKatex(e,formula);},50);
+  // Bode plot
+  const N=200;
+  const fMin=fc/100, fMax=fc*100;
+  const freqs=[],gains=[];
+  for(let i=0;i<=N;i++){
+    const f=fMin*Math.pow(fMax/fMin,i/N);
+    const w=2*Math.PI*f;
+    let H;
+    if(type==='LP1') H=1/Math.sqrt(1+(w*R*C)**2);
+    else if(type==='HP1') H=(w*R*C)/Math.sqrt(1+(w*R*C)**2);
+    else if(type==='LP2') { const wc=1/Math.sqrt(L*C); H=wc*wc/Math.sqrt((wc*wc-w*w)**2+(w*R/L)**2); }
+    else { const wc=1/Math.sqrt(L*C); H=w*w/Math.sqrt((wc*wc-w*w)**2+(w*R/L)**2); }
+    freqs.push(f.toFixed(1));
+    gains.push(20*Math.log10(Math.max(H,1e-10)));
+  }
+  const ctx=document.getElementById('chart-bode').getContext('2d');
+  if(charts['bode']) charts['bode'].destroy();
+  charts['bode']=new Chart(ctx,{
+    type:'line',data:{labels:freqs,datasets:[{label:'Dämpfung (dB)',data:gains,borderColor:'#818cf8',backgroundColor:'rgba(129,140,248,0.06)',fill:true,tension:0.2,pointRadius:0,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{x:{type:'logarithmic',ticks:{color:'#64748b',maxTicksLimit:6,callback:(v)=>engineerFormat(v,'Hz')},grid:{color:'#1e2330'}},y:{ticks:{color:'#64748b'},grid:{color:'#1e2330'},title:{display:true,text:'dB',color:'#64748b',font:{size:11}}}},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}}}
+  });
+}
+
+// ============================================================
+// PAGE: COLOR CODE
+// ============================================================
+const BAND_COLORS = {
+  'Schwarz':{'val':0,'mult':1,'tol':null,'color':'#1a1a1a','text':'#fff'},
+  'Braun':{'val':1,'mult':10,'tol':1,'color':'#795548','text':'#fff'},
+  'Rot':{'val':2,'mult':100,'tol':2,'color':'#f44336','text':'#fff'},
+  'Orange':{'val':3,'mult':1000,'tol':null,'color':'#ff9800','text':'#000'},
+  'Gelb':{'val':4,'mult':10000,'tol':null,'color':'#ffeb3b','text':'#000'},
+  'Grün':{'val':5,'mult':100000,'tol':0.5,'color':'#4caf50','text':'#fff'},
+  'Blau':{'val':6,'mult':1000000,'tol':0.25,'color':'#2196f3','text':'#fff'},
+  'Violett':{'val':7,'mult':10000000,'tol':0.1,'color':'#9c27b0','text':'#fff'},
+  'Grau':{'val':8,'mult':100000000,'tol':0.05,'color':'#9e9e9e','text':'#000'},
+  'Weiß':{'val':9,'mult':1000000000,'tol':null,'color':'#f5f5f5','text':'#000'},
+  'Gold':{'val':null,'mult':0.1,'tol':5,'color':'#ffd700','text':'#000'},
+  'Silber':{'val':null,'mult':0.01,'tol':10,'color':'#c0c0c0','text':'#000'},
+};
+
+PAGES['color-code'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(251,146,60,0.12);">
+    <i data-lucide="palette" style="width:18px;height:18px;color:var(--accent4);"></i>
+  </div>
+  <div><h2>Widerstand Farbcode</h2><div style="font-size:12px;color:var(--text-secondary);">4-Ring und 5-Ring Dekodierung</div></div>
+</div>
+<div class="card">
+  <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+    <div><label>Ringe</label><select id="cc-rings" onchange="ccBuild()" style="width:100px;"><option value="4">4-Ring</option><option value="5">5-Ring</option></select></div>
+    <div style="flex:1;">
+      <div id="cc-band-display" class="color-band-display"></div>
+    </div>
+  </div>
+  <div id="cc-selectors" class="grid-4" style="gap:10px;margin-bottom:14px;"></div>
+  <div id="cc-result"></div>
+</div>`;
+
+PAGE_INITS['color-code'] = () => ccBuild();
+
+function ccBuild() {
+  const n=parseInt(document.getElementById('cc-rings').value);
+  const sel=document.getElementById('cc-selectors');
+  const digitColors=Object.entries(BAND_COLORS).filter(([k,v])=>v.val!==null);
+  const multColors=Object.entries(BAND_COLORS);
+  const tolColors=Object.entries(BAND_COLORS).filter(([k,v])=>v.tol!==null);
+  const bandLabels4=['Ring 1 (Zehner)','Ring 2 (Einer)','Ring 3 (Multiplikator)','Ring 4 (Toleranz)'];
+  const bandLabels5=['Ring 1 (Hunderter)','Ring 2 (Zehner)','Ring 3 (Einer)','Ring 4 (Multiplikator)','Ring 5 (Toleranz)'];
+  const labels=n===4?bandLabels4:bandLabels5;
+  sel.innerHTML='';
+  for(let i=0;i<n;i++){
+    const isDigit=(n===4&&i<2)||(n===5&&i<3);
+    const isMult=(n===4&&i===2)||(n===5&&i===3);
+    const isTol=(n===4&&i===3)||(n===5&&i===4);
+    const options=(isDigit?digitColors:isMult?multColors:tolColors).map(([k,v])=>`<option value="${k}">${k}</option>`).join('');
+    const defaults=['Braun','Schwarz','Rot','Gold','Braun'];
+    sel.innerHTML+=`<div><label>${labels[i]}</label><select id="cc-b${i}" onchange="ccCalc()" style="padding:8px;">${options}</select></div>`;
+  }
+  lucide.createIcons();
+  ccCalc();
+}
+
+function ccCalc() {
+  const n=parseInt(document.getElementById('cc-rings').value);
+  const bands=[];
+  for(let i=0;i<n;i++){
+    const el=document.getElementById(`cc-b${i}`);
+    if(el) bands.push(el.value);
+  }
+  // update visual
+  const disp=document.getElementById('cc-band-display');
+  disp.innerHTML=`<div style="display:flex;align-items:center;gap:6px;background:#c8a87a;padding:8px 16px;border-radius:6px;border:2px solid #8b6914;">`;
+  let html=`<div style="display:flex;align-items:center;gap:3px;background:#c8a87a;padding:10px 18px;border-radius:8px;border:2px solid #8b6914;box-shadow:0 2px 8px rgba(0,0,0,0.3);">`;
+  html+=`<div style="width:30px;height:16px;background:#c8a87a;border-radius:3px;"></div>`;
+  bands.forEach((b,i)=>{
+    const info=BAND_COLORS[b];
+    html+=`<div style="width:16px;height:44px;border-radius:3px;background:${info?.color||'#777'};border:1px solid rgba(255,255,255,0.2);margin:0 2px;"></div>`;
+    if(i===bands.length-2) html+=`<div style="width:8px;"></div>`;
+  });
+  html+=`<div style="width:30px;height:16px;background:#c8a87a;border-radius:3px;"></div></div>`;
+  disp.innerHTML=html;
+  // calculate
+  const n4=(n===4);
+  const b=bands.map(k=>BAND_COLORS[k]);
+  let val=0, mult=1, tol=0;
+  if(n4) {
+    if(b[0]?.val!=null&&b[1]?.val!=null) val=b[0].val*10+b[1].val;
+    mult=b[2]?.mult||1;
+    tol=b[3]?.tol||5;
+  } else {
+    if(b[0]?.val!=null&&b[1]?.val!=null&&b[2]?.val!=null) val=b[0].val*100+b[1].val*10+b[2].val;
+    mult=b[3]?.mult||1;
+    tol=b[4]?.tol||1;
+  }
+  const result=val*mult;
+  const el=document.getElementById('cc-result');
+  const fid='fcc'+Date.now();
+  el.innerHTML=`<div class="result-box fade-in">
+    <div class="grid-3" style="gap:8px;">
+      <div><div class="result-label">Widerstandswert</div><div class="result-value">${engineerFormat(result,'Ω')}</div></div>
+      <div><div class="result-label">Toleranz</div><div class="result-value" style="font-size:17px;">±${tol}%</div></div>
+      <div><div class="result-label">Bereich</div><div class="result-value" style="font-size:14px;">${engineerFormat(result*(1-tol/100),'Ω')} – ${engineerFormat(result*(1+tol/100),'Ω')}</div></div>
+    </div>
+    <div class="formula-box"><div id="${fid}"></div></div>
+  </div>`;
+  setTimeout(()=>{const e=document.getElementById(fid);if(e)renderKatex(e,'R = (d_1 d_2) \\times 10^{n} \\pm tol\\%');},50);
+  addHistory('Baut.','Farbcode',{bands:bands.join(', ')},engineerFormat(result,'Ω'),'Farbcode-Dekodierung');
+}
+
+// ============================================================
+// PAGE: SMD
+// ============================================================
+PAGES['smd'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(129,140,248,0.12);">
+    <i data-lucide="cpu" style="width:18px;height:18px;color:var(--accent2);"></i>
+  </div>
+  <div><h2>SMD Widerstand Code</h2><div style="font-size:12px;color:var(--text-secondary);">3-stellig, 4-stellig und EIA-96 Code</div></div>
+</div>
+<div class="card">
+  <div style="margin-bottom:16px;">
+    <label>SMD Code eingeben</label>
+    <input type="text" id="smd-in" placeholder="z.B. 472 oder 4R7 oder 01A" oninput="calcSMD()" style="font-size:18px;letter-spacing:4px;text-align:center;max-width:200px;" maxlength="6"/>
+  </div>
+  <div id="smd-display" class="smd-display" style="margin-bottom:14px;">---</div>
+  <div id="smd-result"></div>
+</div>`;
+
+PAGE_INITS['smd'] = () => {};
+
+const EIA96_TABLE = {
+  '01':100,'02':102,'03':105,'04':107,'05':110,'06':113,'07':115,'08':118,'09':121,'10':124,
+  '11':127,'12':130,'13':133,'14':137,'15':140,'16':143,'17':147,'18':150,'19':154,'20':158,
+  '21':162,'22':165,'23':169,'24':174,'25':178,'26':182,'27':187,'28':191,'29':196,'30':200,
+  '31':205,'32':210,'33':215,'34':221,'35':226,'36':232,'37':237,'38':243,'39':249,'40':255,
+  '41':261,'42':267,'43':274,'44':280,'45':287,'46':294,'47':301,'48':309,'49':316,'50':324,
+  '51':332,'52':340,'53':348,'54':357,'55':365,'56':374,'57':383,'58':392,'59':402,'60':412,
+  '61':422,'62':432,'63':442,'64':453,'65':464,'66':475,'67':487,'68':499,'69':511,'70':523,
+  '71':536,'72':549,'73':562,'74':576,'75':590,'76':604,'77':619,'78':634,'79':649,'80':665,
+  '81':681,'82':698,'83':715,'84':732,'85':750,'86':768,'87':787,'88':806,'89':825,'90':845,
+  '91':866,'92':887,'93':909,'94':931,'95':953,'96':976
+};
+const EIA96_MULT = {'Z':0.001,'Y':0.01,'X':0.1,'A':1,'B':10,'C':100,'D':1000,'E':10000,'F':100000};
+
+function calcSMD() {
+  const raw=document.getElementById('smd-in').value.trim().toUpperCase();
+  document.getElementById('smd-display').textContent = raw||'---';
+  if(!raw) { document.getElementById('smd-result').innerHTML=''; return; }
+  let result=null, type='';
+  // EIA-96 (2 digits + letter)
+  if(/^\d{2}[A-Z]$/.test(raw)&&EIA96_TABLE[raw.slice(0,2)]!==undefined&&EIA96_MULT[raw[2]]!==undefined) {
+    result=EIA96_TABLE[raw.slice(0,2)]*EIA96_MULT[raw[2]]; type='EIA-96';
+  }
+  // R-notation e.g. 4R7 = 4.7Ω
+  else if(/^\d*R\d+$/.test(raw)||/^\d+R$/.test(raw)) {
+    result=parseFloat(raw.replace('R','.')); type='R-Notation';
+  }
+  // 3-digit: 472 = 47×10² = 4700Ω
+  else if(/^\d{3}$/.test(raw)) {
+    result=parseInt(raw.slice(0,2))*Math.pow(10,parseInt(raw[2])); type='3-stellig';
+  }
+  // 4-digit
+  else if(/^\d{4}$/.test(raw)) {
+    result=parseInt(raw.slice(0,3))*Math.pow(10,parseInt(raw[3])); type='4-stellig';
+  }
+  if(result===null) { document.getElementById('smd-result').innerHTML=`<div style="color:#f87171;font-size:13px;">Unbekanntes Format</div>`; return; }
+  const el=document.getElementById('smd-result');
+  el.innerHTML=`<div class="result-box fade-in">
+    <div class="result-label">Format: ${type}</div>
+    <div class="result-value">${engineerFormat(result,'Ω')}</div>
+  </div>`;
+  addHistory('Baut.','SMD Code',{code:raw},engineerFormat(result,'Ω'),'SMD-Dekodierung');
+}
+
+// ============================================================
+// PAGE: CAPACITOR CODE
+// ============================================================
+PAGES['capacitor-code'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(56,189,248,0.12);">
+    <i data-lucide="box" style="width:18px;height:18px;color:var(--accent);"></i>
+  </div>
+  <div><h2>Kondensator Code</h2><div style="font-size:12px;color:var(--text-secondary);">3-stelliger Keramik/Folie-Code → Kapazität</div></div>
+</div>
+<div class="card">
+  <div class="grid-2" style="gap:16px;">
+    <div>
+      <label>Kondensator Code (z.B. 104)</label>
+      <input type="text" id="cap-code" placeholder="z.B. 104" oninput="calcCap()" style="font-size:20px;text-align:center;letter-spacing:6px;" maxlength="5"/>
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:6px;">Format: XYZ = XY × 10^Z pF</div>
+    </div>
+    <div>
+      <label>Kapazität → Code</label>
+      <div class="number-input-group">
+        <input type="number" id="cap-val" placeholder="100" step="any" oninput="calcCapReverse()"/>
+        <select id="cap-val-u" onchange="calcCapReverse()"><option value="0.000001">µF</option><option value="0.000000001" selected>nF</option><option value="0.000000000001">pF</option></select>
+      </div>
+    </div>
+  </div>
+  <div id="cap-result" style="margin-top:14px;"></div>
+</div>`;
+
+PAGE_INITS['capacitor-code'] = () => {};
+
+function calcCap() {
+  const code=document.getElementById('cap-code').value.trim();
+  if(code.length<3) { document.getElementById('cap-result').innerHTML=''; return; }
+  const d1=parseInt(code[0]),d2=parseInt(code[1]),mult=parseInt(code[2]);
+  const pF=(d1*10+d2)*Math.pow(10,mult);
+  const el=document.getElementById('cap-result');
+  el.innerHTML=resultHTML('Kapazität',engineerFormat(pF*1e-12,'').replace(' ',''),'F','C = (d_1 d_2) \\times 10^n \\text{ pF}');
+  addHistory('Baut.','Kond. Code',{code},engineerFormat(pF*1e-12,'F'),'Code-Dekodierung');
+}
+
+function calcCapReverse() {
+  const v=parseFloat(document.getElementById('cap-val').value)*parseFloat(document.getElementById('cap-val-u').value);
+  if(!isFinite(v)||v<=0) return;
+  const pF=v*1e12;
+  // find exponent
+  let exp=0,mant=pF;
+  while(mant>=100){mant/=10;exp++;}
+  while(mant<10&&exp>0){mant*=10;exp--;}
+  const d1=Math.floor(mant/10),d2=Math.floor(mant%10);
+  const code=`${d1}${d2}${exp}`;
+  const el=document.getElementById('cap-result');
+  el.innerHTML=`<div class="result-box fade-in"><div class="result-label">Code</div><div class="result-value" style="font-size:28px;letter-spacing:8px;">${code}</div></div>`;
+}
+
+// ============================================================
+// PAGE: LED
+// ============================================================
+PAGES['led'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(251,146,60,0.12);">
+    <i data-lucide="lightbulb" style="width:18px;height:18px;color:var(--accent4);"></i>
+  </div>
+  <div><h2>LED Vorwiderstand</h2><div style="font-size:12px;color:var(--text-secondary);">Einzel-LED und LED-Ketten</div></div>
+</div>
+<div class="card">
+  <div class="grid-3" style="gap:12px;">
+    <div><label>Versorgungsspannung U_s (V)</label><input type="number" id="led-us" value="5" step="any" oninput="calcLED()"/></div>
+    <div><label>LED Flussspannung U_f (V)</label>
+      <select id="led-uf-preset" onchange="document.getElementById('led-uf').value=this.value;calcLED()">
+        <option value="2.0">Rot/Gelb (~2.0V)</option>
+        <option value="2.1" selected>Grün (~2.1V)</option>
+        <option value="3.2">Blau/Weiß (~3.2V)</option>
+        <option value="3.4">UV (~3.4V)</option>
+        <option value="">Benutzerdefiniert</option>
+      </select>
+      <input type="number" id="led-uf" value="2.1" step="0.1" style="margin-top:6px;" oninput="calcLED()"/>
+    </div>
+    <div><label>LED Strom I_f (mA)</label><input type="number" id="led-if" value="20" step="1" oninput="calcLED()"/></div>
+    <div><label>Anzahl LEDs in Reihe</label><input type="number" id="led-n" value="1" min="1" step="1" oninput="calcLED()"/></div>
+  </div>
+  <div id="led-result" style="margin-top:14px;"></div>
+</div>`;
+
+PAGE_INITS['led'] = () => calcLED();
+
+function calcLED() {
+  const Us=parseFloat(document.getElementById('led-us').value);
+  const Uf=parseFloat(document.getElementById('led-uf').value);
+  const If=parseFloat(document.getElementById('led-if').value)/1000;
+  const n=parseInt(document.getElementById('led-n').value)||1;
+  if(!isFinite(Us)||!isFinite(Uf)||!isFinite(If)) return;
+  const Uled=Uf*n;
+  if(Us<=Uled) { document.getElementById('led-result').innerHTML=`<div class="result-box" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.05);"><div style="color:#f87171;">⚠️ Versorgungsspannung zu gering für ${n} LEDs in Reihe (${engineerFormat(Uled,'V')} benötigt)</div></div>`; return; }
+  const R=(Us-Uled)/If;
+  const P=If*If*R;
+  // find nearest E12 value
+  const E12=[10,12,15,18,22,27,33,39,47,56,68,82];
+  let nearest=R, nearestDiff=Infinity;
+  for(let decade=0;decade<6;decade++){for(const v of E12){const val=v*Math.pow(10,decade);if(Math.abs(val-R)<nearestDiff){nearestDiff=Math.abs(val-R);nearest=val;}}}
+  document.getElementById('led-result').innerHTML=multiResultHTML([
+    {label:'Vorwiderstand R',value:engineerFormat(R,'Ω')},
+    {label:'Nächste E12',value:engineerFormat(nearest,'Ω')},
+    {label:'Verlustleistung',value:engineerFormat(P,'W')},
+    {label:'Spannung an R',value:engineerFormat(Us-Uled,'V')},
+  ],'R = \\frac{U_s - n \\cdot U_f}{I_f}');
+  addHistory('Baut.','LED Vorwiderstand',{Us,Uf,If,n},engineerFormat(R,'Ω'),'R=(U_s-nU_f)/I_f');
+}
+
+// ============================================================
+// PAGE: ZENER
+// ============================================================
+PAGES['zener'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(244,114,182,0.12);">
+    <i data-lucide="shield" style="width:18px;height:18px;color:var(--accent5);"></i>
+  </div>
+  <div><h2>Z-Dioden-Stabilisierung</h2><div style="font-size:12px;color:var(--text-secondary);">Serienwiderstands-Berechnung</div></div>
+</div>
+<div class="card">
+  <div class="grid-3" style="gap:12px;">
+    <div><label>Eingangsspannung U_in (V)</label><input type="number" id="zen-uin" value="12" step="any" oninput="calcZener()"/></div>
+    <div><label>Z-Spannung U_z (V)</label><input type="number" id="zen-uz" value="5.1" step="any" oninput="calcZener()"/></div>
+    <div><label>Max. Laststrom I_L,max (mA)</label><input type="number" id="zen-il" value="50" step="any" oninput="calcZener()"/></div>
+    <div><label>Z-Diode Typ</label><select id="zen-type" onchange="calcZener()"><option value="0.005">BZX55C (5mA)</option><option value="0.01">BZX79C (10mA)</option><option value="0.02" selected>BZX84C (20mA)</option><option value="0.05">1N4733A (50mA)</option></select></div>
+    <div><label>Sicherheitsfaktor</label><select id="zen-sf" onchange="calcZener()"><option value="1.2">1.2× (minimal)</option><option value="1.5" selected>1.5× (standard)</option><option value="2.0">2.0× (sicher)</option></select></div>
+  </div>
+  <div id="zen-result" style="margin-top:14px;"></div>
+</div>`;
+
+PAGE_INITS['zener'] = () => calcZener();
+
+function calcZener() {
+  const Uin=parseFloat(document.getElementById('zen-uin').value);
+  const Uz=parseFloat(document.getElementById('zen-uz').value);
+  const IL=parseFloat(document.getElementById('zen-il').value)/1000;
+  const Iz_max=parseFloat(document.getElementById('zen-type').value);
+  const sf=parseFloat(document.getElementById('zen-sf').value);
+  if(!isFinite(Uin)||!isFinite(Uz)||!isFinite(IL)) return;
+  if(Uin<=Uz) { document.getElementById('zen-result').innerHTML=`<div class="result-box" style="border-color:rgba(239,68,68,0.3);"><div style="color:#f87171;">⚠️ U_in muss größer als U_z sein!</div></div>`; return; }
+  const I_total = IL*sf + Iz_max*0.5;
+  const Rs = (Uin-Uz)/I_total;
+  const Ps = (Uin-Uz)*I_total;
+  const Pz = Uz*Iz_max;
+  document.getElementById('zen-result').innerHTML = multiResultHTML([
+    {label:'Serienwiderstand R_s', value: engineerFormat(Rs,'Ω')},
+    {label:'Verlust P_Rs', value: engineerFormat(Ps,'W')},
+    {label:'Z-Dioden Leistung P_z', value: engineerFormat(Pz,'W')},
+    {label:'Strom I_ges', value: engineerFormat(I_total,'A')},
+  ],'R_s = \\frac{U_{in} - U_z}{I_L + I_{Z,min}}');
+  addHistory('Halbl.','Z-Diode',{Uin,Uz,IL:IL*1000},engineerFormat(Rs,'Ω'),'R_s=(U_in-U_z)/I_ges');
+}
+
+// ============================================================
+// PAGE: TRANSISTOR
+// ============================================================
+PAGES['transistor'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(52,211,153,0.12);">
+    <i data-lucide="toggle-left" style="width:18px;height:18px;color:var(--accent3);"></i>
+  </div>
+  <div><h2>Transistor als Schalter</h2><div style="font-size:12px;color:var(--text-secondary);">Basiswiderstand für BJT NPN/PNP</div></div>
+</div>
+<div class="card">
+  <div class="grid-3" style="gap:12px;">
+    <div><label>Transistortyp</label><select id="tr-type" onchange="calcTransistor()"><option value="NPN">NPN</option><option value="PNP">PNP</option></select></div>
+    <div><label>Stromverstärkung h_FE (β)</label><input type="number" id="tr-hfe" value="100" step="1" min="1" oninput="calcTransistor()"/></div>
+    <div><label>Kollektorstrom I_C (mA)</label><input type="number" id="tr-ic" value="100" step="any" oninput="calcTransistor()"/></div>
+    <div><label>Steuerspannung U_in (V)</label><input type="number" id="tr-uin" value="3.3" step="any" oninput="calcTransistor()"/></div>
+    <div><label>U_BE (typ. 0.7V)</label><input type="number" id="tr-ube" value="0.7" step="0.1" oninput="calcTransistor()"/></div>
+    <div><label>Übersättigungsfaktor</label><select id="tr-sf" onchange="calcTransistor()"><option value="2">2× (standard)</option><option value="3" selected>3× (empfohlen)</option><option value="5">5× (sicher)</option></select></div>
+  </div>
+  <div id="tr-result" style="margin-top:14px;"></div>
+</div>`;
+
+PAGE_INITS['transistor'] = () => calcTransistor();
+
+function calcTransistor() {
+  const hFE=parseFloat(document.getElementById('tr-hfe').value);
+  const IC=parseFloat(document.getElementById('tr-ic').value)/1000;
+  const Uin=parseFloat(document.getElementById('tr-uin').value);
+  const Ube=parseFloat(document.getElementById('tr-ube').value);
+  const sf=parseFloat(document.getElementById('tr-sf').value);
+  if(!isFinite(hFE)||!isFinite(IC)||!isFinite(Uin)) return;
+  const IB_min=IC/hFE;
+  const IB=IB_min*sf;
+  const RB=(Uin-Ube)/IB;
+  document.getElementById('tr-result').innerHTML = multiResultHTML([
+    {label:'Basiswiderstand R_B', value: engineerFormat(RB,'Ω')},
+    {label:'Basisstrom I_B', value: engineerFormat(IB,'A')},
+    {label:'I_B min (ohne Faktor)', value: engineerFormat(IB_min,'A')},
+    {label:'Sättigungsfaktor', value: `${sf}×`},
+  ],'R_B = \\frac{U_{in} - U_{BE}}{I_B}, \\quad I_B = \\frac{I_C}{h_{FE}} \\cdot k');
+  addHistory('Halbl.','Transistor Schalter',{IC:IC*1000,hFE,Uin},engineerFormat(RB,'Ω'),'R_B=(U_in-U_BE)/I_B');
+}
+
+// ============================================================
+// PAGE: NUMBER CONV
+// ============================================================
+PAGES['number-conv'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(56,189,248,0.12);">
+    <i data-lucide="binary" style="width:18px;height:18px;color:var(--accent);"></i>
+  </div>
+  <div><h2>Zahlensysteme Konverter</h2><div style="font-size:12px;color:var(--text-secondary);">Binär / Oktal / Dezimal / Hexadezimal</div></div>
+</div>
+<div class="card">
+  <div style="display:grid;gap:12px;">
+    <div><label>Dezimal (Basis 10)</label><input type="text" id="nc-dec" placeholder="z.B. 255" oninput="ncConvert('dec')"/></div>
+    <div><label>Binär (Basis 2)</label><input type="text" id="nc-bin" placeholder="z.B. 11111111" oninput="ncConvert('bin')" style="letter-spacing:3px;"/></div>
+    <div><label>Hexadezimal (Basis 16)</label><input type="text" id="nc-hex" placeholder="z.B. FF" oninput="ncConvert('hex')" style="text-transform:uppercase;"/></div>
+    <div><label>Oktal (Basis 8)</label><input type="text" id="nc-oct" placeholder="z.B. 377" oninput="ncConvert('oct')"/></div>
+  </div>
+  <div id="nc-extras" style="margin-top:16px;"></div>
+</div>`;
+
+PAGE_INITS['number-conv'] = () => {};
+
+let ncLock=false;
+function ncConvert(src) {
+  if(ncLock) return; ncLock=true;
+  let val;
+  try {
+    if(src==='dec') val=parseInt(document.getElementById('nc-dec').value,10);
+    else if(src==='bin') val=parseInt(document.getElementById('nc-bin').value.replace(/\s/g,''),2);
+    else if(src==='hex') val=parseInt(document.getElementById('nc-hex').value,16);
+    else val=parseInt(document.getElementById('nc-oct').value,8);
+    if(!isNaN(val)&&val>=0) {
+      if(src!=='dec') document.getElementById('nc-dec').value=val.toString(10);
+      if(src!=='bin') document.getElementById('nc-bin').value=val.toString(2).replace(/(.{4})/g,'$1 ').trim();
+      if(src!=='hex') document.getElementById('nc-hex').value=val.toString(16).toUpperCase();
+      if(src!=='oct') document.getElementById('nc-oct').value=val.toString(8);
+      // extras
+      document.getElementById('nc-extras').innerHTML=`<div class="card-elevated" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+        <div><div class="result-label">Dezimal</div><div class="mono" style="font-size:18px;color:var(--accent);">${val}</div></div>
+        <div><div class="result-label">2er-Komplement (8bit)</div><div class="mono" style="font-size:14px;color:var(--accent3);">${((val&0xFF)>>>0).toString(2).padStart(8,'0')}</div></div>
+        <div><div class="result-label">ASCII</div><div class="mono" style="font-size:18px;color:var(--accent2);">${val>=32&&val<127?String.fromCharCode(val):'N/A'}</div></div>
+        <div><div class="result-label">Vorzeichen (16bit)</div><div class="mono" style="font-size:14px;color:var(--accent4);">${val<=32767?val:val-65536}</div></div>
+      </div>`;
+    }
+  } catch(e){}
+  ncLock=false;
+}
+
+// ============================================================
+// PAGE: LOGIC GATE
+// ============================================================
+PAGES['logic-gate'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(129,140,248,0.12);">
+    <i data-lucide="circuit-board" style="width:18px;height:18px;color:var(--accent2);"></i>
+  </div>
+  <div><h2>Logikgatter Simulator</h2><div style="font-size:12px;color:var(--text-secondary);">AND, OR, NOT, XOR, NAND, NOR, XNOR</div></div>
+</div>
+<div class="card">
+  <div style="margin-bottom:16px;">
+    <label>Gatter auswählen</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+      ${['AND','OR','NOT','XOR','NAND','NOR','XNOR'].map(g=>`<div class="logic-gate ${g==='AND'?'selected':''}" id="gate-${g}" onclick="lgSetGate('${g}')">${g}</div>`).join('')}
+    </div>
+  </div>
+  <div id="lg-inputs" style="display:grid;gap:10px;margin-bottom:16px;"></div>
+  <div id="lg-output" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg-base);border-radius:10px;border:1px solid var(--border);">
+    <span style="font-size:12px;font-weight:700;color:var(--text-secondary);">AUSGANG Q</span>
+    <div id="lg-led" class="led-indicator led-off"></div>
+    <div id="lg-val" style="font-family:monospace;font-size:22px;font-weight:700;color:var(--text-secondary);">0</div>
+    <div id="lg-truth-toggle" style="margin-left:auto;"><button class="btn btn-ghost" onclick="lgToggleTruth()"><i data-lucide="table" style="width:14px;height:14px;"></i>Wahrheitstabelle</button></div>
+  </div>
+  <div id="lg-truth" style="display:none;margin-top:14px;"></div>
+</div>`;
+
+let lgGate='AND', lgInputs={A:0,B:0}, lgShowTruth=false;
+PAGE_INITS['logic-gate'] = () => { lgGate='AND'; lgBuild(); };
+
+function lgSetGate(g) {
+  lgGate=g;
+  document.querySelectorAll('.logic-gate').forEach(el=>el.classList.remove('selected'));
+  const el=document.getElementById(`gate-${g}`);
+  if(el) el.classList.add('selected');
+  lgBuild();
+}
+
+function lgBuild() {
+  const needs2 = lgGate!=='NOT';
+  const c=document.getElementById('lg-inputs');
+  c.innerHTML='';
+  ['A','B'].forEach((inp,i)=>{
+    if(i===1&&!needs2) return;
+    const row=document.createElement('div');
+    row.className='logic-input';
+    row.innerHTML=`<span style="font-size:13px;font-weight:700;color:var(--text-secondary);min-width:20px;">Eingang ${inp}</span>
+      <div class="toggle-switch ${lgInputs[inp]?'on':''}" id="tog-${inp}" onclick="lgToggle('${inp}')"></div>
+      <span id="lg-v${inp}" class="mono" style="font-size:18px;font-weight:700;color:${lgInputs[inp]?'var(--accent3)':'var(--text-muted)'};">${lgInputs[inp]}</span>`;
+    c.appendChild(row);
+  });
+  lgCalc();
+}
+
+function lgToggle(inp) {
+  lgInputs[inp]=lgInputs[inp]?0:1;
+  const tog=document.getElementById(`tog-${inp}`);
+  if(tog) tog.className=`toggle-switch ${lgInputs[inp]?'on':''}`;
+  const vEl=document.getElementById(`lg-v${inp}`);
+  if(vEl){vEl.textContent=lgInputs[inp];vEl.style.color=lgInputs[inp]?'var(--accent3)':'var(--text-muted)';}
+  lgCalc();
+}
+
+function lgCalc() {
+  const A=lgInputs.A, B=lgInputs.B;
+  const GATES={AND:()=>A&B,OR:()=>A|B,NOT:()=>A?0:1,XOR:()=>A^B,NAND:()=>(A&B)?0:1,NOR:()=>(A|B)?0:1,XNOR:()=>(A^B)?0:1};
+  const out=GATES[lgGate]?.()??0;
+  const led=document.getElementById('lg-led');
+  const val=document.getElementById('lg-val');
+  if(led){led.className=`led-indicator ${out?'led-on':'led-off'}`;}
+  if(val){val.textContent=out;val.style.color=out?'var(--accent3)':'var(--text-secondary)';}
+  if(lgShowTruth) lgRenderTruth();
+}
+
+function lgToggleTruth() {
+  lgShowTruth=!lgShowTruth;
+  document.getElementById('lg-truth').style.display=lgShowTruth?'':'none';
+  if(lgShowTruth) lgRenderTruth();
+  lucide.createIcons();
+}
+
+function lgRenderTruth() {
+  const GATES={AND:(a,b)=>a&b,OR:(a,b)=>a|b,NOT:(a,b)=>a?0:1,XOR:(a,b)=>a^b,NAND:(a,b)=>(a&b)?0:1,NOR:(a,b)=>(a|b)?0:1,XNOR:(a,b)=>(a^b)?0:1};
+  const g=GATES[lgGate];
+  const needs2=lgGate!=='NOT';
+  const rows=needs2?[[0,0],[0,1],[1,0],[1,1]]:[[0],[1]];
+  const header=needs2?`<tr><th>A</th><th>B</th><th>Q</th></tr>`:`<tr><th>A</th><th>Q</th></tr>`;
+  const body=rows.map(r=>{
+    const out=needs2?g(r[0],r[1]):g(r[0],0);
+    const isActive=(lgInputs.A===r[0]&&(!needs2||lgInputs.B===r[1]));
+    return `<tr style="${isActive?'background:rgba(56,189,248,0.1);':''}">
+      <td>${r[0]}</td>${needs2?`<td>${r[1]}</td>`:''}
+      <td style="color:${out?'var(--accent3)':'var(--text-muted)'};font-weight:700;">${out}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('lg-truth').innerHTML=`<table style="width:200px;border-collapse:collapse;font-family:monospace;font-size:14px;">
+    <thead style="color:var(--text-secondary);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;">${header}</thead>
+    <tbody>${body}</tbody>
+  </table>`;
+}
+
+// ============================================================
+// PAGE: HISTORY
+// ============================================================
+PAGES['history'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(56,189,248,0.12);">
+    <i data-lucide="clock" style="width:18px;height:18px;color:var(--accent);"></i>
+  </div>
+  <div><h2>Berechnungs-History</h2><div style="font-size:12px;color:var(--text-secondary);">Alle Berechnungen — lokal gespeichert</div></div>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+  <button class="btn btn-ghost" onclick="histExportAll()"><i data-lucide="download" style="width:14px;height:14px;"></i>Alle exportieren (PDF)</button>
+  <button class="btn btn-danger" onclick="histClearAll()"><i data-lucide="trash-2" style="width:14px;height:14px;"></i>Alle löschen</button>
+</div>
+<div id="hist-list"></div>`;
+
+PAGE_INITS['history'] = () => renderHistory();
+
+function renderHistory() {
+  const c=document.getElementById('hist-list');
+  if(!history_data.length){c.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text-muted);">Noch keine Berechnungen in der History</div>`;return;}
+  c.innerHTML=history_data.map((h,i)=>`
+    <div class="history-item" style="margin-bottom:8px;" onclick="histExpand(${i})">
+      <div style="min-width:36px;height:36px;border-radius:8px;background:rgba(56,189,248,0.1);display:flex;align-items:center;justify-content:center;">
+        <i data-lucide="file-text" style="width:15px;height:15px;color:var(--accent);"></i>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary);">${h.ts} · <span class="tag tag-blue" style="font-size:9px;">${h.category}</span></div>
+      </div>
+      <div style="font-family:monospace;font-size:14px;color:var(--accent3);white-space:nowrap;">${h.result}</div>
+      <button class="btn btn-danger" style="padding:5px 8px;font-size:11px;" onclick="event.stopPropagation();histDelete(${i})"><i data-lucide="x" style="width:12px;height:12px;"></i></button>
+    </div>
+    <div id="hist-detail-${i}" style="display:none;margin-bottom:12px;padding:12px;background:var(--bg-elevated);border-radius:8px;border:1px solid var(--border-bright);">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Eingaben: ${Object.entries(h.inputs).map(([k,v])=>`<span class="tag tag-blue" style="margin-right:4px;">${k}: ${v}</span>`).join('')}</div>
+      <div style="font-size:12px;color:var(--text-secondary);">Ergebnis: <span style="color:var(--accent3);font-family:monospace;">${h.result}</span></div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+function histExpand(i) {
+  const el=document.getElementById(`hist-detail-${i}`);
+  if(el) el.style.display=el.style.display==='none'?'':'none';
+}
+function histDelete(i) {
+  history_data.splice(i,1);
+  localStorage.setItem('engicalc_history',JSON.stringify(history_data));
+  renderHistory(); lucide.createIcons();
+}
+function histClearAll() {
+  if(confirm('Alle History-Einträge löschen?')){history_data=[];localStorage.setItem('engicalc_history','[]');renderHistory();}
+}
+function histExportAll() {
+  if(!history_data.length){alert('Keine Einträge vorhanden!');return;}
+  exportPDF(history_data,'EngiCalc History Export');
+}
+
+// ============================================================
+// PAGE: UNIT CONV
+// ============================================================
+PAGES['unit-conv'] = () => `
+<div class="section-header">
+  <div class="icon-wrap" style="background:rgba(251,146,60,0.12);">
+    <i data-lucide="arrow-left-right" style="width:18px;height:18px;color:var(--accent4);"></i>
+  </div>
+  <div><h2>Einheiten-Konverter</h2><div style="font-size:12px;color:var(--text-secondary);">pF bis TF, pΩ bis TΩ — Engineering Format</div></div>
+</div>
+<div class="card">
+  <div class="grid-2" style="gap:16px;">
+    <div>
+      <label>Wert eingeben</label>
+      <div class="number-input-group">
+        <input type="number" id="uc-val" value="1000000" step="any" oninput="calcUC()"/>
+        <select id="uc-mult" onchange="calcUC()">
+          <option value="1e12">T (Tera)</option>
+          <option value="1e9">G (Giga)</option>
+          <option value="1e6">M (Mega)</option>
+          <option value="1e3">k (Kilo)</option>
+          <option value="1" selected>  (Basis)</option>
+          <option value="1e-3">m (Milli)</option>
+          <option value="1e-6">µ (Mikro)</option>
+          <option value="1e-9">n (Nano)</option>
+          <option value="1e-12">p (Piko)</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label>Einheit</label>
+      <select id="uc-unit" onchange="calcUC()">
+        <option value="Ω">Ohm (Ω)</option>
+        <option value="F">Farad (F)</option>
+        <option value="H">Henry (H)</option>
+        <option value="V">Volt (V)</option>
+        <option value="A">Ampere (A)</option>
+        <option value="W">Watt (W)</option>
+        <option value="Hz">Hertz (Hz)</option>
+        <option value="s">Sekunde (s)</option>
+      </select>
+    </div>
+  </div>
+  <div id="uc-result" style="margin-top:16px;"></div>
+</div>`;
+
+PAGE_INITS['unit-conv'] = () => calcUC();
+
+function calcUC() {
+  const v=parseFloat(document.getElementById('uc-val').value)*parseFloat(document.getElementById('uc-mult').value);
+  const unit=document.getElementById('uc-unit').value;
+  if(!isFinite(v)) return;
+  const rows=SI_ORDER.map(p=>{
+    const m=SI_PREFIXES[p];
+    const scaled=v/m;
+    const isBase=(p==='');
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:6px;background:${Math.abs(scaled)>=0.1&&Math.abs(scaled)<1000?'rgba(56,189,248,0.08)':'transparent'};border:1px solid ${Math.abs(scaled)>=0.1&&Math.abs(scaled)<1000?'rgba(56,189,248,0.2)':'transparent'};">
+      <span style="font-size:12px;color:var(--text-secondary);min-width:80px;">${p||'Base'} (${p||''}${unit})</span>
+      <span class="mono" style="font-size:14px;color:${Math.abs(scaled)>=0.1&&Math.abs(scaled)<1000?'var(--accent)':'var(--text-primary)'};">${parseFloat(scaled.toPrecision(6))} ${p}${unit}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('uc-result').innerHTML=`<div class="card-elevated">${rows}</div>`;
+}
+
+// ============================================================
+// PDF EXPORT
+// ============================================================
+function exportCurrentPDF() {
+  if(!currentResult) { alert('Bitte zuerst eine Berechnung durchführen!'); return; }
+  exportPDF([currentResult], 'EngiCalc Protokoll');
+}
+
+function exportPDF(entries, title) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const W=210, L=20, W2=W-2*L;
+  // Header
+  doc.setFillColor(10,12,16);
+  doc.rect(0,0,W,40,'F');
+  doc.setTextColor(56,189,248);
+  doc.setFontSize(20);
+  doc.setFont('helvetica','bold');
+  doc.text('EngiCalc Ultimate', L, 18);
+  doc.setFontSize(10);
+  doc.setTextColor(100,116,139);
+  doc.text(title, L, 26);
+  doc.text(`Erstellt: ${new Date().toLocaleString('de-DE')}`, L, 32);
+  // Glow line
+  doc.setDrawColor(56,189,248);
+  doc.setLineWidth(0.5);
+  doc.line(L,38,W-L,38);
+  let y=50;
+  entries.forEach((h,i) => {
+    if(y>260){doc.addPage();y=20;}
+    doc.setFillColor(17,19,24);
+    doc.roundedRect(L,y,W2,8,2,2,'F');
+    doc.setTextColor(226,232,240);
+    doc.setFontSize(12);
+    doc.setFont('helvetica','bold');
+    doc.text(`${i+1}. ${h.name}`, L+3, y+5.5);
+    y+=12;
+    doc.setFontSize(9);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(100,116,139);
+    doc.text(`Kategorie: ${h.category}  |  ${h.ts}`, L+3, y);
+    y+=6;
+    if(h.inputs && Object.keys(h.inputs).length) {
+      doc.setTextColor(148,163,184);
+      const inStr='Eingaben: '+Object.entries(h.inputs).map(([k,v])=>`${k}=${v}`).join('  ');
+      doc.text(doc.splitTextToSize(inStr,W2-6),L+3,y);
+      y+=8;
+    }
+    doc.setTextColor(52,211,153);
+    doc.setFontSize(11);
+    doc.text(`Ergebnis: ${h.result}`, L+3, y);
+    y+=6;
+    doc.setDrawColor(30,35,48);
+    doc.setLineWidth(0.3);
+    doc.line(L,y,W-L,y);
+    y+=8;
+  });
+  // Footer
+  const pages=doc.getNumberOfPages();
+  for(let p=1;p<=pages;p++){
+    doc.setPage(p);
+    doc.setFontSize(8);
+    doc.setTextColor(51,65,85);
+    doc.text(`EngiCalc Ultimate — Seite ${p} von ${pages}`,W/2,292,{align:'center'});
+  }
+  doc.save(`engicalc_${Date.now()}.pdf`);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  showPage('ohm');
+});
+</script>
+</body>
+</html>
