@@ -1956,5 +1956,267 @@ document.addEventListener('DOMContentLoaded', () => {
   showPage('ohm');
 });
 </script>
+   <!-- ══════════════════════════════════════════════
+   EFINGER ENGINEERING SUITE UPGRADE LAYER
+   (NON-DESTRUCTIVE EXTENSION)
+══════════════════════════════════════════════ -->
+
+<style>
+/* FOOTER */
+.ef-footer {
+  text-align:center;
+  font-size:11px;
+  padding:14px;
+  border-top:1px solid var(--border);
+  color:var(--text-secondary);
+  font-family:'JetBrains Mono', monospace;
+  opacity:0.8;
+}
+.ef-badge {
+  display:inline-block;
+  margin-left:8px;
+  padding:2px 6px;
+  font-size:9px;
+  border-radius:4px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border-bright);
+}
+
+/* TOOLTIP */
+.tooltip {
+  position:absolute;
+  background:var(--bg-card);
+  border:1px solid var(--border-bright);
+  padding:6px 8px;
+  font-size:10px;
+  border-radius:6px;
+  pointer-events:none;
+  z-index:999;
+  opacity:0;
+  transition:opacity 0.15s;
+}
+
+/* FOCUS MODE */
+.focus-mode .sidebar {
+  width:0 !important;
+  overflow:hidden;
+}
+.focus-mode .main-area {
+  width:100%;
+}
+
+/* ELECTRON ANIMATION */
+.electron {
+  fill:var(--accent);
+  animation:flow 2s linear infinite;
+}
+@keyframes flow {
+  from { transform:translateX(0); }
+  to { transform:translateX(40px); }
+}
+</style>
+
+<script>
+/* ══════════════════════════════════════════════
+   FOOTER INJECTION
+══════════════════════════════════════════════ */
+window.addEventListener("load", () => {
+  const footer = document.createElement("div");
+  footer.className = "ef-footer";
+  footer.innerHTML = `
+    Designed & Developed by Simon Efinger |
+    Dual Student: Electrical Engineering & Information Technology
+    <span class="ef-badge">Built with AI • 2026</span>
+  `;
+  document.body.appendChild(footer);
+});
+
+/* ══════════════════════════════════════════════
+   EXTENDED SI PREFIX LABELS (UI UPGRADE)
+══════════════════════════════════════════════ */
+const SI_LABEL_FULL = {
+  T:'T (10¹²)', G:'G (10⁹)', M:'M (10⁶)', k:'k (10³)',
+  '':'base (10⁰)', m:'m (10⁻³)', µ:'µ (10⁻⁶)',
+  n:'n (10⁻⁹)', p:'p (10⁻¹²)', f:'f (10⁻¹⁵)'
+};
+
+/* Override dropdown labels visually */
+document.addEventListener("change", e => {
+  if(e.target.tagName === "SELECT") {
+    [...e.target.options].forEach(opt=>{
+      const key = Object.keys(SI).find(k=>SI[k]==opt.value);
+      if(key !== undefined) opt.textContent = SI_LABEL_FULL[key];
+    });
+  }
+});
+
+/* ══════════════════════════════════════════════
+   UNDO / REDO SYSTEM
+══════════════════════════════════════════════ */
+let undoStack = [];
+let redoStack = [];
+
+function saveState(state) {
+  undoStack.push(JSON.stringify(state));
+  if (undoStack.length > 50) undoStack.shift();
+  redoStack = [];
+}
+
+function undo() {
+  if (undoStack.length < 2) return;
+  redoStack.push(undoStack.pop());
+  restoreState(JSON.parse(undoStack[undoStack.length - 1]));
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  const state = redoStack.pop();
+  undoStack.push(state);
+  restoreState(JSON.parse(state));
+}
+
+function restoreState(state) {
+  if(state.circuit) {
+    circuitState = state.circuit;
+    drawCircuit();
+  }
+}
+
+/* Keyboard shortcuts */
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.key === "z") undo();
+  if (e.ctrlKey && e.key === "y") redo();
+  if (e.key === "Delete") deleteSelectedComponent();
+});
+
+/* ══════════════════════════════════════════════
+   LOCAL STORAGE (STATE PERSISTENCE)
+══════════════════════════════════════════════ */
+window.addEventListener("beforeunload", () => {
+  localStorage.setItem("ec_circuit_state", JSON.stringify(circuitState || {}));
+});
+
+window.addEventListener("load", () => {
+  const saved = localStorage.getItem("ec_circuit_state");
+  if (saved) {
+    circuitState = JSON.parse(saved);
+  }
+});
+
+/* ══════════════════════════════════════════════
+   CIRCUIT LAB ENHANCEMENTS
+══════════════════════════════════════════════ */
+
+/* CLEAR CANVAS */
+function clearCanvas() {
+  circuitState = { components: [], wires: [] };
+  drawCircuit();
+}
+
+/* DOWNLOAD PNG */
+function downloadCanvas() {
+  const canvas = document.getElementById("circuit-canvas");
+  const link = document.createElement("a");
+  link.download = "circuit.png";
+  link.href = canvas.toDataURL();
+  link.click();
+}
+
+/* FOCUS MODE */
+function toggleFocusMode() {
+  document.body.classList.toggle("focus-mode");
+}
+
+/* TOOLTIP SYSTEM */
+const tooltip = document.createElement("div");
+tooltip.className = "tooltip";
+document.body.appendChild(tooltip);
+
+document.addEventListener("mouseover", e => {
+  if (e.target.dataset.tooltip) {
+    tooltip.textContent = e.target.dataset.tooltip;
+    tooltip.style.opacity = 1;
+  }
+});
+
+document.addEventListener("mousemove", e => {
+  tooltip.style.left = e.pageX + 10 + "px";
+  tooltip.style.top = e.pageY + 10 + "px";
+});
+
+document.addEventListener("mouseout", () => {
+  tooltip.style.opacity = 0;
+});
+
+/* ══════════════════════════════════════════════
+   MANHATTAN WIRING (ENFORCED)
+══════════════════════════════════════════════ */
+function drawWire(x1,y1,x2,y2,ctx){
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2,y1);
+  ctx.lineTo(x2,y2);
+  ctx.stroke();
+}
+
+/* ══════════════════════════════════════════════
+   NODE MERGE (MNA FIX PREP)
+══════════════════════════════════════════════ */
+function mergeNodes(nodes){
+  const map = {};
+  nodes.forEach(n=>{
+    const key = `${n.x}_${n.y}`;
+    if(!map[key]) map[key]=[];
+    map[key].push(n);
+  });
+  return Object.values(map).map(group=>group[0]);
+}
+
+/* ══════════════════════════════════════════════
+   ELECTRON FLOW VISUAL
+══════════════════════════════════════════════ */
+function drawElectrons(ctx, wires, current){
+  wires.forEach(w=>{
+    const speed = Math.min(5, Math.abs(current) * 0.1);
+    ctx.beginPath();
+    ctx.arc(w.x + (Date.now()/50 % 20), w.y, 2, 0, Math.PI*2);
+    ctx.fill();
+  });
+}
+
+/* ══════════════════════════════════════════════
+   COMPONENT DRAWER GROUPING
+══════════════════════════════════════════════ */
+function getComponentGroups(){
+  return {
+    "Sources": ["DC","AC","GND"],
+    "Passives": ["R","L","C"],
+    "Actives": ["Diode","LED","Transistor"]
+  };
+}
+
+/* ══════════════════════════════════════════════
+   EXTRA UI BUTTONS IN CIRCUIT LAB
+══════════════════════════════════════════════ */
+function injectLabButtons(){
+  const lab = document.querySelector("[data-page='circuit-lab']");
+  if(!lab) return;
+
+  const bar = document.createElement("div");
+  bar.style.marginBottom = "10px";
+  bar.innerHTML = `
+    <button class="btn btn-danger" onclick="clearCanvas()">Clear</button>
+    <button class="btn btn-primary" onclick="downloadCanvas()">Download PNG</button>
+    <button class="btn btn-ghost" onclick="toggleFocusMode()">Focus Mode</button>
+  `;
+  document.querySelector("#main-content").prepend(bar);
+}
+
+const originalShowPage = showPage;
+showPage = function(id){
+  originalShowPage(id);
+  if(id === "circuit-lab") setTimeout(injectLabButtons,100);
+};
+</script>
 </body>
 </html>
