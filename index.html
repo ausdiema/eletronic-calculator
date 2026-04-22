@@ -8,7 +8,7 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"/>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>F
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
@@ -234,7 +234,7 @@ body.focus-mode .main-area{width:100%;}
 
   <!-- PROFESSIONAL FOOTER -->
 <footer class="ef-footer">
-    <div class="ef-footer-text">Designed &amp; Developed by <strong>Simon Efinger</strong></div>
+    <div class="ef-footer-text">Designed &amp; Developed by <strong>Simon </strong></div>
     <span class="ef-divider">|</span>
     <div class="ef-footer-text">Dual Student &nbsp;·&nbsp; Electrical Engineering &amp; Information Technology</div>
     <span class="ef-badge" style="color:var(--accent2);border-color:rgba(129,140,248,0.3);background:rgba(129,140,248,0.07);">2026</span>
@@ -1493,7 +1493,7 @@ function exportPDF(entries,title){
     doc.setDrawColor(28,34,50);doc.setLineWidth(0.3);doc.line(L,y,W-L,y);y+=7;
   });
   const pages=doc.getNumberOfPages();
-  for(let p=1;p<=pages;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(51,65,85);doc.text(`Designed & Developed by Simon Efinger  |  EngiCalc Ultimate — Page ${p} of ${pages}`,W/2,292,{align:'center'});}
+  for(let p=1;p<=pages;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(51,65,85);doc.text(`Designed & Developed by Simon  |  EngiCalc Ultimate — Page ${p} of ${pages}`,W/2,292,{align:'center'});}
   doc.save(`engicalc_${Date.now()}.pdf`);
 }
 
