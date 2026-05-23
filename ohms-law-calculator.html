@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ohm's Law Calculator — Solve for Voltage, Current or Resistance</title>
+  <meta name="description" content="Free Ohm's Law calculator. Enter any two values to instantly solve for voltage (V), current (I), or resistance (R). Formula, examples and FAQ included."/>
+  <link rel="canonical" href="https://ausdiema.github.io/eletronic-calculator/ohms-law-calculator.html"/>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+
+  <!-- Schema: WebApplication -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Ohm's Law Calculator",
+  "description":"Calculate voltage, current, or resistance using Ohm's Law V = I × R",
+  "url":"https://ausdiema.github.io/eletronic-calculator/ohms-law-calculator.html",
+  "applicationCategory":"EducationalApplication","operatingSystem":"Web",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
+  </script>
+
+  <!-- Schema: FAQ -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"What is Ohm's Law?",
+     "acceptedAnswer":{"@type":"Answer","text":"Ohm's Law states that voltage equals current multiplied by resistance: V = I × R. It describes the relationship between these three fundamental electrical quantities in a resistive circuit."}},
+    {"@type":"Question","name":"How do I calculate resistance with Ohm's Law?",
+     "acceptedAnswer":{"@type":"Answer","text":"Rearrange the formula to R = V / I. Divide voltage (volts) by current (amperes) to get resistance in ohms (Ω)."}},
+    {"@type":"Question","name":"What is the unit of resistance?",
+     "acceptedAnswer":{"@type":"Answer","text":"The unit of resistance is the ohm, written as Ω (omega). It is named after physicist Georg Simon Ohm."}},
+    {"@type":"Question","name":"Does Ohm's Law work for AC circuits?",
+     "acceptedAnswer":{"@type":"Answer","text":"Ohm's Law applies to resistors in AC circuits. For capacitors and inductors, impedance (Z) replaces resistance: V = I × Z."}},
+    {"@type":"Question","name":"What happens if resistance is zero?",
+     "acceptedAnswer":{"@type":"Answer","text":"Zero resistance means a short circuit. In theory, current becomes infinite. In practice, wire resistance and the power source limit the current, but short circuits are dangerous and can damage components."}}
+  ]}
+  </script>
+
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+         background:#f8f9fa;color:#1a1a2e;line-height:1.6}
+    a{color:#2563eb;text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* NAV */
+    nav{background:#1a1a2e;padding:12px 20px;display:flex;align-items:center;
+        justify-content:space-between;flex-wrap:wrap;gap:10px}
+    nav .logo{color:#fff;font-weight:700;font-size:16px}
+    nav .nav-links{display:flex;gap:16px;flex-wrap:wrap}
+    nav .nav-links a{color:#94a3b8;font-size:13px}
+    nav .nav-links a:hover{color:#fff;text-decoration:none}
+
+    /* LAYOUT */
+    .container{max-width:800px;margin:0 auto;padding:20px}
+
+    /* BREADCRUMB */
+    .breadcrumb{font-size:12px;color:#64748b;margin-bottom:16px}
+    .breadcrumb a{color:#64748b}
+
+    /* HEADER */
+    h1{font-size:28px;font-weight:800;color:#1a1a2e;margin-bottom:8px;line-height:1.2}
+    .subtitle{color:#64748b;font-size:15px;margin-bottom:24px}
+
+    /* CALCULATOR CARD */
+    .calc-card{background:#fff;border-radius:16px;padding:28px;
+               box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:32px}
+    .calc-card h2{font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:20px;
+                  text-transform:uppercase;letter-spacing:0.05em}
+
+    .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
+    .field label{display:block;font-size:12px;font-weight:700;color:#64748b;
+                 text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+    .field input{width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;
+                 font-size:16px;color:#1a1a2e;background:#f8f9fa;transition:border 0.2s}
+    .field input:focus{outline:none;border-color:#2563eb;background:#fff}
+    .field input.solve-for{background:#eff6ff;border-color:#bfdbfe;color:#1e40af;font-weight:700}
+    .field .unit{font-size:11px;color:#94a3b8;margin-top:4px}
+
+    .hint{font-size:13px;color:#94a3b8;margin-bottom:16px}
+
+    .btn{background:#2563eb;color:#fff;border:none;padding:14px 28px;
+         border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;
+         width:100%;transition:background 0.2s}
+    .btn:hover{background:#1d4ed8}
+
+    .result-box{display:none;margin-top:20px;padding:20px;background:#eff6ff;
+                border-radius:12px;border:2px solid #bfdbfe;text-align:center}
+    .result-box.show{display:block}
+    .result-label{font-size:13px;color:#2563eb;font-weight:700;text-transform:uppercase;
+                  letter-spacing:0.05em;margin-bottom:6px}
+    .result-value{font-size:42px;font-weight:900;color:#1e40af;line-height:1}
+    .result-unit{font-size:18px;color:#3b82f6;margin-left:4px}
+    .result-formula{font-size:13px;color:#64748b;margin-top:8px}
+    .error-box{display:none;margin-top:16px;padding:14px;background:#fef2f2;
+               border-radius:10px;border:2px solid #fecaca;color:#dc2626;
+               font-size:14px;font-weight:600;text-align:center}
+    .error-box.show{display:block}
+
+    /* SOLVE FOR SELECTOR */
+    .solve-selector{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+    .solve-selector label{font-size:12px;font-weight:700;color:#64748b;
+                           text-transform:uppercase;letter-spacing:0.05em;
+                           display:flex;align-items:center;margin-bottom:10px;width:100%}
+    .solve-btn{padding:8px 16px;border:2px solid #e2e8f0;border-radius:8px;
+               background:#f8f9fa;color:#64748b;font-size:13px;font-weight:700;
+               cursor:pointer;transition:all 0.2s}
+    .solve-btn.active{background:#2563eb;border-color:#2563eb;color:#fff}
+
+    /* CONTENT SECTIONS */
+    .section{margin-bottom:36px}
+    .section h2{font-size:22px;font-weight:800;color:#1a1a2e;margin-bottom:12px;
+                padding-bottom:8px;border-bottom:2px solid #e2e8f0}
+    .section h3{font-size:16px;font-weight:700;color:#1a1a2e;margin:16px 0 8px}
+    .section p{color:#374151;margin-bottom:12px;font-size:15px}
+    .section ul{color:#374151;padding-left:20px;margin-bottom:12px}
+    .section ul li{margin-bottom:6px;font-size:15px}
+
+    /* FORMULA BOX */
+    .formula-box{background:#1a1a2e;color:#fff;border-radius:12px;padding:20px;
+                 text-align:center;margin:16px 0;font-size:28px;font-weight:900;
+                 letter-spacing:0.05em}
+    .formula-variants{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+                      gap:10px;margin:16px 0}
+    .formula-variant{background:#f1f5f9;border-radius:10px;padding:14px;text-align:center}
+    .formula-variant .fml{font-size:20px;font-weight:800;color:#1a1a2e}
+    .formula-variant .fml-label{font-size:11px;color:#64748b;margin-top:4px;text-transform:uppercase}
+
+    /* EXAMPLE BOX */
+    .example{background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 10px 10px 0;
+             padding:16px;margin:12px 0}
+    .example strong{color:#15803d;font-size:14px;text-transform:uppercase;
+                    letter-spacing:0.05em;display:block;margin-bottom:6px}
+    .example p{color:#374151;margin:0;font-size:14px}
+
+    /* FAQ */
+    .faq-item{border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px;overflow:hidden}
+    .faq-q{padding:16px;font-weight:700;font-size:15px;color:#1a1a2e;cursor:pointer;
+           background:#fff;display:flex;justify-content:space-between;align-items:center}
+    .faq-q:hover{background:#f8f9fa}
+    .faq-a{padding:0 16px;max-height:0;overflow:hidden;transition:all 0.3s;
+           background:#f8f9fa;font-size:14px;color:#374151}
+    .faq-a.open{padding:16px;max-height:200px}
+    .faq-arrow{transition:transform 0.3s;font-size:12px;color:#94a3b8}
+    .faq-arrow.open{transform:rotate(180deg)}
+
+    /* RELATED */
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+    .related-card{background:#fff;border:2px solid #e2e8f0;border-radius:12px;padding:16px;
+                  transition:border-color 0.2s;text-decoration:none}
+    .related-card:hover{border-color:#2563eb;text-decoration:none}
+    .related-card .rc-title{font-weight:700;color:#1a1a2e;font-size:14px;margin-bottom:4px}
+    .related-card .rc-desc{font-size:12px;color:#64748b}
+
+    /* FOOTER */
+    footer{background:#1a1a2e;color:#94a3b8;text-align:center;padding:24px;
+           font-size:13px;margin-top:48px}
+    footer a{color:#94a3b8}
+
+    @media(max-width:600px){
+      h1{font-size:22px}
+      .result-value{font-size:32px}
+      .formula-box{font-size:20px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://ausdiema.github.io/eletronic-calculator/" class="logo">⚡ EngiCalc</a>
+  <div class="nav-links">
+    <a href="https://ausdiema.github.io/eletronic-calculator/">All Calculators</a>
+    <a href="https://ausdiema.github.io/eletronic-calculator/led-resistor-calculator.html">LED Resistor</a>
+    <a href="https://ausdiema.github.io/eletronic-calculator/voltage-divider-calculator.html">Voltage Divider</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="https://ausdiema.github.io/eletronic-calculator/">Home</a> › Ohm's Law Calculator
+  </div>
+
+  <!-- Title -->
+  <h1>Ohm's Law Calculator</h1>
+  <p class="subtitle">Enter any two values to instantly solve for the third — voltage, current, or resistance.</p>
+
+  <!-- CALCULATOR -->
+  <div class="calc-card">
+    <h2>Calculate</h2>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Solve for:</div>
+      <div class="solve-selector">
+        <button class="solve-btn active" onclick="setSolve('V')">Voltage (V)</button>
+        <button class="solve-btn" onclick="setSolve('I')">Current (I)</button>
+        <button class="solve-btn" onclick="setSolve('R')">Resistance (R)</button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field" id="field-V">
+        <label>Voltage (V)</label>
+        <input type="number" id="inp-V" placeholder="e.g. 12" step="any" oninput="autoCalc()"/>
+        <div class="unit">Volts (V)</div>
+      </div>
+      <div class="field" id="field-I">
+        <label>Current (I)</label>
+        <input type="number" id="inp-I" placeholder="e.g. 0.02" step="any" oninput="autoCalc()"/>
+        <div class="unit">Amperes (A) — e.g. 0.02 for 20mA</div>
+      </div>
+      <div class="field" id="field-R">
+        <label>Resistance (R)</label>
+        <input type="number" id="inp-R" placeholder="e.g. 330" step="any" oninput="autoCalc()"/>
+        <div class="unit">Ohms (Ω)</div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="calculate()">Calculate</button>
+
+    <div class="result-box" id="result-box">
+      <div class="result-label" id="result-label">Voltage</div>
+      <div><span class="result-value" id="result-value">—</span><span class="result-unit" id="result-unit">V</span></div>
+      <div class="result-formula" id="result-formula"></div>
+    </div>
+    <div class="error-box" id="error-box">⚠ Please enter valid numbers in both input fields.</div>
+  </div>
+
+  <!-- WHAT IS OHM'S LAW -->
+  <div class="section">
+    <h2>What Is Ohm's Law?</h2>
+    <p>Ohm's Law is the most fundamental relationship in electronics. It was formulated by German physicist <strong>Georg Simon Ohm</strong> in 1827 and states that the electric current through a conductor between two points is directly proportional to the voltage across those two points.</p>
+    <p>In simple terms: if you increase the voltage, more current flows. If you increase the resistance, less current flows. This relationship is the foundation of all circuit design.</p>
+  </div>
+
+  <!-- FORMULA -->
+  <div class="section">
+    <h2>The Formula</h2>
+    <div class="formula-box">V = I × R</div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>V</strong> = Voltage in Volts (V)</li>
+      <li><strong>I</strong> = Current in Amperes (A)</li>
+      <li><strong>R</strong> = Resistance in Ohms (Ω)</li>
+    </ul>
+    <p>The formula can be rearranged to solve for any of the three variables:</p>
+    <div class="formula-variants">
+      <div class="formula-variant"><div class="fml">V = I × R</div><div class="fml-label">Find Voltage</div></div>
+      <div class="formula-variant"><div class="fml">I = V ÷ R</div><div class="fml-label">Find Current</div></div>
+      <div class="formula-variant"><div class="fml">R = V ÷ I</div><div class="fml-label">Find Resistance</div></div>
+    </div>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="section">
+    <h2>Worked Examples</h2>
+
+    <h3>Example 1 — Find the current through a resistor</h3>
+    <div class="example">
+      <strong>Problem</strong>
+      <p>A 9V battery is connected to a 470Ω resistor. How much current flows?</p>
+      <p><strong>Solution:</strong> I = V ÷ R = 9 ÷ 470 = <strong>0.0191 A = 19.1 mA</strong></p>
+    </div>
+
+    <h3>Example 2 — Find the required resistance</h3>
+    <div class="example">
+      <strong>Problem</strong>
+      <p>You want exactly 20 mA to flow from a 5V source. What resistance do you need?</p>
+      <p><strong>Solution:</strong> R = V ÷ I = 5 ÷ 0.020 = <strong>250 Ω</strong> (use nearest standard value: 270Ω)</p>
+    </div>
+
+    <h3>Example 3 — Find the voltage drop</h3>
+    <div class="example">
+      <strong>Problem</strong>
+      <p>A current of 50 mA flows through a 100Ω resistor. What is the voltage across it?</p>
+      <p><strong>Solution:</strong> V = I × R = 0.050 × 100 = <strong>5 V</strong></p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is Ohm's Law? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">Ohm's Law states that V = I × R — voltage equals current multiplied by resistance. It describes how these three quantities relate in any resistive electrical circuit.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I calculate resistance? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">Use R = V ÷ I. Divide the voltage (volts) by the current (amperes). The result is in ohms (Ω). Example: 12V ÷ 0.5A = 24Ω.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What unit is resistance measured in? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">Resistance is measured in ohms, written as Ω (omega). Larger values are expressed in kilohms (kΩ = 1,000Ω) or megohms (MΩ = 1,000,000Ω).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Does Ohm's Law apply to AC circuits? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">Ohm's Law applies directly to resistors in AC circuits. For capacitors and inductors, impedance (Z) replaces resistance. The formula becomes V = I × Z.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is a short circuit? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">A short circuit has near-zero resistance. According to Ohm's Law, this causes very high current (I = V ÷ ~0), which can damage components or cause fires. Always protect circuits with fuses.</div>
+    </div>
+  </div>
+
+  <!-- RELATED TOOLS -->
+  <div class="section">
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a href="https://ausdiema.github.io/eletronic-calculator/" class="related-card">
+        <div class="rc-title">⚡ Power Calculator</div>
+        <div class="rc-desc">Calculate power using P = V × I</div>
+      </a>
+      <a href="https://ausdiema.github.io/eletronic-calculator/" class="related-card">
+        <div class="rc-title">💡 LED Resistor Calculator</div>
+        <div class="rc-desc">Find the right resistor for any LED</div>
+      </a>
+      <a href="https://ausdiema.github.io/eletronic-calculator/" class="related-card">
+        <div class="rc-title">🔀 Voltage Divider</div>
+        <div class="rc-desc">Calculate output voltage from two resistors</div>
+      </a>
+      <a href="https://ausdiema.github.io/eletronic-calculator/" class="related-card">
+        <div class="rc-title">🎨 Resistor Color Code</div>
+        <div class="rc-desc">Decode resistor bands instantly</div>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<footer>
+  <p>© 2025 EngiCalc · Free Electronics Calculators for Students & Hobbyists</p>
+  <p style="margin-top:6px"><a href="https://ausdiema.github.io/eletronic-calculator/">All Calculators</a></p>
+</footer>
+
+<script>
+  let solveFor = 'V';
+
+  function setSolve(target) {
+    solveFor = target;
+    document.querySelectorAll('.solve-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    // Highlight the solve-for field
+    ['V','I','R'].forEach(f => {
+      const inp = document.getElementById('inp-'+f);
+      if(f === target) {
+        inp.classList.add('solve-for');
+        inp.value = '';
+        inp.placeholder = 'calculated automatically';
+        inp.readOnly = true;
+      } else {
+        inp.classList.remove('solve-for');
+        inp.readOnly = false;
+        inp.placeholder = f==='V'?'e.g. 12':f==='I'?'e.g. 0.02':'e.g. 330';
+      }
+    });
+    hideResult();
+  }
+
+  function hideResult() {
+    document.getElementById('result-box').classList.remove('show');
+    document.getElementById('error-box').classList.remove('show');
+  }
+
+  function autoCalc() { calculate(true); }
+
+  function calculate(silent) {
+    const vEl = document.getElementById('inp-V');
+    const iEl = document.getElementById('inp-I');
+    const rEl = document.getElementById('inp-R');
+    const V = parseFloat(vEl.value);
+    const I = parseFloat(iEl.value);
+    const R = parseFloat(rEl.value);
+
+    let result, label, unit, formula;
+
+    if(solveFor === 'V') {
+      if(!isFinite(I) || !isFinite(R) || I < 0 || R < 0) { showError(silent); return; }
+      result = I * R; label = 'Voltage'; unit = 'V'; formula = `V = ${fmt(I)} A × ${fmt(R)} Ω`;
+    } else if(solveFor === 'I') {
+      if(!isFinite(V) || !isFinite(R) || R <= 0) { showError(silent); return; }
+      result = V / R; label = 'Current'; unit = 'A'; formula = `I = ${fmt(V)} V ÷ ${fmt(R)} Ω`;
+    } else {
+      if(!isFinite(V) || !isFinite(I) || I <= 0) { showError(silent); return; }
+      result = V / I; label = 'Resistance'; unit = 'Ω'; formula = `R = ${fmt(V)} V ÷ ${fmt(I)} A`;
+    }
+
+    showResult(result, label, unit, formula);
+  }
+
+  function fmt(n) {
+    if(Math.abs(n) >= 1000) return (n/1000).toPrecision(4) + 'k';
+    if(Math.abs(n) < 0.01 && n !== 0) return (n*1000).toPrecision(4) + 'm';
+    return parseFloat(n.toPrecision(4)).toString();
+  }
+
+  function fmtResult(n, unit) {
+    if(unit === 'A') {
+      if(Math.abs(n) < 0.001) return { v: (n*1000000).toPrecision(4), u: 'µA' };
+      if(Math.abs(n) < 1) return { v: (n*1000).toPrecision(4), u: 'mA' };
+      return { v: n.toPrecision(4), u: 'A' };
+    }
+    if(unit === 'Ω') {
+      if(Math.abs(n) >= 1e6) return { v: (n/1e6).toPrecision(4), u: 'MΩ' };
+      if(Math.abs(n) >= 1000) return { v: (n/1000).toPrecision(4), u: 'kΩ' };
+      return { v: n.toPrecision(4), u: 'Ω' };
+    }
+    return { v: n.toPrecision(4), u: unit };
+  }
+
+  function showResult(result, label, unit, formula) {
+    const r = fmtResult(result, unit);
+    document.getElementById('result-label').textContent = label;
+    document.getElementById('result-value').textContent = r.v;
+    document.getElementById('result-unit').textContent = ' ' + r.u;
+    document.getElementById('result-formula').textContent = formula;
+    document.getElementById('result-box').classList.add('show');
+    document.getElementById('error-box').classList.remove('show');
+  }
+
+  function showError(silent) {
+    if(silent) { hideResult(); return; }
+    document.getElementById('result-box').classList.remove('show');
+    document.getElementById('error-box').classList.add('show');
+  }
+
+  function toggleFaq(el) {
+    const answer = el.nextElementSibling;
+    const arrow = el.querySelector('.faq-arrow');
+    answer.classList.toggle('open');
+    arrow.classList.toggle('open');
+  }
+
+  // Default: solve for Voltage
+  setSolve('V');
+  document.querySelector('.solve-btn').classList.add('active');
+</script>
+
+</body>
+</html>
