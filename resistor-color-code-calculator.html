@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resistor Color Code Calculator — 4-Band & 5-Band Decoder</title>
+  <meta name="description" content="Free resistor color code calculator. Decode 4-band and 5-band resistors instantly. Select colors to find resistance value, or enter a value to get color bands. Tolerance and E-series lookup included." />
+  <link rel="canonical" href="https://ausdiema.github.io/eletronic-calculator/resistor-color-code-calculator.html" />
+  <meta name="google-site-verification" content="r2n8xqMBLu0F4SN8om9s2pMB6gzBUaX1Sa_D7vTRwF0" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Resistor Color Code Calculator",
+        "url": "https://ausdiema.github.io/eletronic-calculator/resistor-color-code-calculator.html",
+        "description": "Decode 4-band and 5-band resistor color codes. Supports reverse lookup from value to color bands.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do I read a resistor color code?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hold the resistor so the tolerance band (gold or silver) is on the right. Read bands from left to right. For a 4-band resistor: Band 1 and 2 are digits, Band 3 is the multiplier (power of 10), Band 4 is tolerance. For a 5-band resistor: Band 1, 2, 3 are digits, Band 4 is multiplier, Band 5 is tolerance."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What do the resistor color code colors mean?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Black=0, Brown=1, Red=2, Orange=3, Yellow=4, Green=5, Blue=6, Violet=7, Grey=8, White=9. For multiplier: Gold=0.1, Silver=0.01. For tolerance: Gold=±5%, Silver=±10%, Brown=±1%, Red=±2%."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between 4-band and 5-band resistors?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "4-band resistors have 2 significant digits, giving values like 47Ω, 1kΩ, 10kΩ. 5-band resistors have 3 significant digits for higher precision, giving values like 475Ω, 1.00kΩ, 10.2kΩ. 5-band resistors are typically precision resistors with 1% or 2% tolerance."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does a 4-band resistor with colors Brown Black Red Gold mean?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Brown=1, Black=0, Red=×100 multiplier, Gold=±5% tolerance. Value = 10 × 100 = 1000Ω = 1 kΩ ±5%."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I find the color code for a specific resistance value?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Use the 'Value → Colors' tab on our calculator. Enter the resistance in ohms and select 4-band or 5-band. The calculator will show you the exact color bands needed."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { background: #1e293b; padding: 0 24px; display: flex; align-items: center; gap: 8px; height: 52px; }
+    nav a { color: #94a3b8; font-size: 14px; }
+    nav a:hover { color: #fff; text-decoration: none; }
+    nav span { color: #475569; font-size: 14px; }
+    nav .brand { color: #fff; font-weight: 600; font-size: 15px; margin-right: auto; }
+
+    .page { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+    .subtitle { font-size: 1.05rem; color: #475569; margin-bottom: 40px; }
+
+    .calc-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .calc-card h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 20px; color: #0f172a; }
+
+    /* mode tabs */
+    .mode-tabs { display: flex; gap: 8px; margin-bottom: 28px; }
+    .mode-btn { padding: 8px 20px; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; font-size: 14px; font-weight: 500; color: #475569; cursor: pointer; transition: all .15s; }
+    .mode-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .mode-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+    /* band selector */
+    .band-toggle { display: flex; gap: 8px; margin-bottom: 24px; align-items: center; }
+    .band-toggle span { font-size: 13px; font-weight: 600; color: #64748b; margin-right: 4px; }
+    .band-btn { padding: 5px 14px; border: 1.5px solid #e2e8f0; border-radius: 20px; background: #fff; font-size: 13px; color: #475569; cursor: pointer; transition: all .15s; font-weight: 500; }
+    .band-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .band-btn.active { background: #0f172a; border-color: #0f172a; color: #fff; }
+
+    /* visual resistor */
+    .resistor-visual { margin: 0 0 28px; display: flex; justify-content: center; }
+    .res-wrap { display: flex; align-items: center; gap: 0; }
+    .res-lead { width: 40px; height: 3px; background: #94a3b8; border-radius: 2px; }
+    .res-body { height: 36px; border-radius: 8px; background: #d4c5a9; display: flex; align-items: center; padding: 0 8px; gap: 0; position: relative; min-width: 160px; justify-content: space-around; border: 1.5px solid #b8a88a; }
+    .res-band { width: 14px; height: 36px; border-radius: 2px; transition: background .2s; }
+    .res-gap { width: 8px; }
+
+    /* color dropdowns */
+    .bands-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .band-field { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .band-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .04em; }
+    .color-select {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100px;
+      padding: 8px 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .color-select:focus { border-color: #2563eb; }
+
+    /* value→color input */
+    .val-input-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
+    .val-input-row .field { flex: 1; min-width: 160px; }
+    .val-input-row label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .input-wrap { position: relative; }
+    .input-wrap input { width: 100%; padding: 10px 52px 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; color: #0f172a; background: #fff; transition: border-color .15s; outline: none; }
+    .input-wrap input:focus { border-color: #2563eb; }
+    .unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; color: #94a3b8; pointer-events: none; }
+
+    .calc-btn { padding: 11px 28px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .15s; white-space: nowrap; }
+    .calc-btn:hover { background: #1d4ed8; }
+    .calc-btn.full { width: 100%; margin-top: 4px; padding: 13px; font-size: 15px; }
+
+    /* result */
+    .result-box { margin-top: 20px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 20px 24px; display: none; }
+    .result-box.show { display: block; }
+    .result-main { font-size: 1.9rem; font-weight: 700; color: #1d4ed8; }
+    .result-sub { font-size: 0.95rem; color: #3b82f6; margin-top: 4px; }
+    .result-bands-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+    .result-band-chip { display: flex; align-items: center; gap: 6px; background: #fff; border-radius: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; }
+    .chip-dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); flex-shrink: 0; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; }
+
+    /* color reference table */
+    .color-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .color-table th { background: #f1f5f9; padding: 8px 12px; text-align: left; font-weight: 600; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .color-table td { padding: 7px 12px; border-bottom: 1px solid #f1f5f9; }
+    .color-table tr:hover td { background: #f8fafc; }
+    .color-swatch { display: inline-block; width: 18px; height: 18px; border-radius: 4px; border: 1px solid rgba(0,0,0,.2); vertical-align: middle; margin-right: 8px; }
+
+    section { margin-bottom: 48px; }
+    section h2 { font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    section p { color: #475569; margin-bottom: 12px; }
+
+    .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .faq-q { padding: 15px 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #0f172a; background: #fff; }
+    .faq-q:hover { background: #f8fafc; }
+    .faq-q .arrow { color: #94a3b8; transition: transform .2s; font-size: 18px; }
+    .faq-q.open .arrow { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 20px 15px; color: #475569; font-size: 0.9rem; line-height: 1.6; }
+    .faq-a.show { display: block; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
+    .related-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #0f172a; transition: all .15s; }
+    .related-card:hover { border-color: #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,.12); text-decoration: none; }
+    .related-icon { font-size: 22px; }
+    .related-name { font-size: 14px; font-weight: 600; }
+    .related-desc { font-size: 12px; color: #94a3b8; }
+
+    footer { text-align: center; padding: 32px 20px; color: #94a3b8; font-size: 13px; border-top: 1px solid #e2e8f0; }
+
+    @media(max-width:500px){
+      .bands-row { gap: 6px; }
+      .color-select { width: 80px; font-size: 11px; padding: 6px 6px; }
+      .band-label { font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ ElectroCalc</span>
+  <a href="https://ausdiema.github.io/eletronic-calculator/">Home</a>
+  <span>›</span>
+  <span style="color:#cbd5e1">Resistor Color Code</span>
+</nav>
+
+<div class="page">
+
+  <h1>Resistor Color Code Calculator</h1>
+  <p class="subtitle">Decode any 4-band or 5-band resistor instantly — or enter a value to find the color bands. Includes tolerance and E-series reference.</p>
+
+  <div class="calc-card">
+    <h2>Decode / Encode</h2>
+
+    <!-- mode -->
+    <div class="mode-tabs">
+      <button class="mode-btn active" onclick="setMode('decode',this)">🎨 Colors → Value</button>
+      <button class="mode-btn" onclick="setMode('encode',this)">🔢 Value → Colors</button>
+    </div>
+
+    <!-- band count -->
+    <div class="band-toggle">
+      <span>Bands:</span>
+      <button class="band-btn active" id="btn4" onclick="setBands(4)">4-band</button>
+      <button class="band-btn" id="btn5" onclick="setBands(5)">5-band</button>
+    </div>
+
+    <!-- visual resistor -->
+    <div class="resistor-visual">
+      <div class="res-wrap">
+        <div class="res-lead"></div>
+        <div class="res-body" id="resBands">
+          <div class="res-band" id="vband1"></div>
+          <div class="res-band" id="vband2"></div>
+          <div class="res-band" id="vband3" style="display:none"></div>
+          <div class="res-band" id="vband4"></div>
+          <div class="res-band" id="vband5"></div>
+        </div>
+        <div class="res-lead"></div>
+      </div>
+    </div>
+
+    <!-- DECODE UI -->
+    <div id="decodeUI">
+      <div class="bands-row" id="bandsRow"></div>
+      <button class="calc-btn full" onclick="decode()">Read Resistor →</button>
+    </div>
+
+    <!-- ENCODE UI -->
+    <div id="encodeUI" style="display:none">
+      <div class="val-input-row">
+        <div class="field">
+          <label for="encVal">Resistance Value</label>
+          <div class="input-wrap">
+            <input type="number" id="encVal" placeholder="e.g. 4700" min="0" step="1" />
+            <span class="unit">Ω</span>
+          </div>
+        </div>
+        <button class="calc-btn" onclick="encode()">Find Colors →</button>
+      </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-main" id="resultMain"></div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="result-bands-row" id="resultBands"></div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- ── Color reference table ── -->
+  <section>
+    <h2>Color Code Reference Table</h2>
+    <p>Quick reference for all band colors, their digit values, multipliers and tolerances:</p>
+    <table class="color-table">
+      <thead>
+        <tr>
+          <th>Color</th>
+          <th>Digit</th>
+          <th>Multiplier</th>
+          <th>Tolerance</th>
+        </tr>
+      </thead>
+      <tbody id="colorTableBody"></tbody>
+    </table>
+  </section>
+
+  <!-- ── How to read ── -->
+  <section>
+    <h2>How to Read a Resistor Color Code</h2>
+
+    <h3>Step 1 — Find the tolerance band</h3>
+    <p>Gold or silver bands are always the tolerance (last) band. Hold the resistor so this band is on the right. The remaining bands are read left to right.</p>
+
+    <h3>Step 2 — Read the digit bands</h3>
+    <p><strong>4-band:</strong> Bands 1 and 2 are the two significant digits.<br>
+    <strong>5-band:</strong> Bands 1, 2 and 3 are three significant digits (higher precision).</p>
+
+    <h3>Step 3 — Apply the multiplier</h3>
+    <p>The multiplier band (Band 3 for 4-band, Band 4 for 5-band) is a power of 10. Multiply the digit value by this number to get the resistance in ohms.</p>
+
+    <h3>Step 4 — Note the tolerance</h3>
+    <p>The last band shows the tolerance. Gold = ±5%, Silver = ±10%, Brown = ±1%, Red = ±2%. This means a 1 kΩ ±5% resistor can be anywhere from 950 Ω to 1050 Ω.</p>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section>
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I read a resistor color code?<span class="arrow">▾</span></div>
+      <div class="faq-a">Hold the resistor so the gold or silver tolerance band is on the right. Read the remaining bands from left to right. For 4-band: digit, digit, multiplier, tolerance. For 5-band: digit, digit, digit, multiplier, tolerance.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What do the colors mean?<span class="arrow">▾</span></div>
+      <div class="faq-a">
+        The color-to-digit mapping follows the rainbow order plus black and white:<br><br>
+        Black=0, Brown=1, Red=2, Orange=3, Yellow=4, Green=5, Blue=6, Violet=7, Grey=8, White=9<br><br>
+        A memory aid: <strong>B</strong>ig <strong>B</strong>rown <strong>R</strong>abbits <strong>O</strong>ften <strong>Y</strong>ield <strong>G</strong>reat <strong>B</strong>ig <strong>V</strong>ocal <strong>G</strong>rowls <strong>W</strong>hen
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the difference between 4-band and 5-band resistors?<span class="arrow">▾</span></div>
+      <div class="faq-a">4-band resistors give 2 significant digits (e.g. 47 Ω, 1.0 kΩ) and are the most common type, typically ±5% or ±10% tolerance. 5-band resistors give 3 significant digits (e.g. 475 Ω, 1.00 kΩ) and are precision resistors, usually ±1% or ±2% tolerance.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What does Brown Black Red Gold mean?<span class="arrow">▾</span></div>
+      <div class="faq-a">Brown=1, Black=0, Red=×100 multiplier, Gold=±5%.<br>Value = 10 × 100 = <strong>1000 Ω = 1 kΩ ±5%</strong>.<br>Actual range: 950 Ω to 1050 Ω.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What does a 5-band Brown Black Black Brown Brown mean?<span class="arrow">▾</span></div>
+      <div class="faq-a">Brown=1, Black=0, Black=0, Brown=×10 multiplier, Brown=±1%.<br>Value = 100 × 10 = <strong>1000 Ω = 1 kΩ ±1%</strong>.<br>Actual range: 990 Ω to 1010 Ω.</div>
+    </div>
+  </section>
+
+  <!-- ── Related ── -->
+  <section>
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a class="related-card" href="ohms-law-calculator.html">
+        <span class="related-icon">⚡</span>
+        <div><div class="related-name">Ohm's Law</div><div class="related-desc">Solve V, I or R</div></div>
+      </a>
+      <a class="related-card" href="led-resistor-calculator.html">
+        <span class="related-icon">💡</span>
+        <div><div class="related-name">LED Resistor</div><div class="related-desc">Current-limiting resistor</div></div>
+      </a>
+      <a class="related-card" href="voltage-divider-calculator.html">
+        <span class="related-icon">🔀</span>
+        <div><div class="related-name">Voltage Divider</div><div class="related-desc">Two-resistor divider</div></div>
+      </a>
+      <a class="related-card" href="https://ausdiema.github.io/eletronic-calculator/">
+        <span class="related-icon">🔋</span>
+        <div><div class="related-name">All Calculators</div><div class="related-desc">Full toolset</div></div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2025 ElectroCalc · Free electronics calculators · <a href="https://ausdiema.github.io/eletronic-calculator/">Home</a></p>
+</footer>
+
+<script>
+/* ── Color data ── */
+const COLORS = [
+  { name:'Black',  hex:'#1a1a1a', digit:0,  mult:1,      tol:null  },
+  { name:'Brown',  hex:'#8B4513', digit:1,  mult:10,     tol:'±1%' },
+  { name:'Red',    hex:'#CC0000', digit:2,  mult:100,    tol:'±2%' },
+  { name:'Orange', hex:'#FF8C00', digit:3,  mult:1e3,    tol:null  },
+  { name:'Yellow', hex:'#FFD700', digit:4,  mult:1e4,    tol:null  },
+  { name:'Green',  hex:'#228B22', digit:5,  mult:1e5,    tol:'±0.5%'},
+  { name:'Blue',   hex:'#0055CC', digit:6,  mult:1e6,    tol:'±0.25%'},
+  { name:'Violet', hex:'#8B008B', digit:7,  mult:1e7,    tol:'±0.1%'},
+  { name:'Grey',   hex:'#808080', digit:8,  mult:1e8,    tol:'±0.05%'},
+  { name:'White',  hex:'#f0f0f0', digit:9,  mult:1e9,    tol:null  },
+  { name:'Gold',   hex:'#CFB53B', digit:null,mult:0.1,   tol:'±5%' },
+  { name:'Silver', hex:'#C0C0C0', digit:null,mult:0.01,  tol:'±10%'},
+  { name:'None',   hex:'transparent', digit:null, mult:null, tol:'±20%'},
+];
+
+const DIGIT_COLORS = COLORS.filter(c => c.digit !== null);
+const MULT_COLORS  = COLORS.filter(c => c.mult  !== null && c.name !== 'None');
+const TOL_COLORS   = COLORS.filter(c => c.tol   !== null);
+
+let numBands = 4;
+let appMode  = 'decode';
+
+/* ── Build color table ── */
+function buildColorTable() {
+  const tbody = document.getElementById('colorTableBody');
+  COLORS.filter(c => c.name !== 'None').forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="color-swatch" style="background:${c.hex}"></span>${c.name}</td>
+      <td>${c.digit !== null ? c.digit : '—'}</td>
+      <td>${c.mult !== null ? fmtR(c.mult) : '—'}</td>
+      <td>${c.tol || '—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ── Format helpers ── */
+function fmtR(v) {
+  if (v >= 1e9) return (v/1e9).toPrecision(4).replace(/\.?0+$/,'') + ' GΩ';
+  if (v >= 1e6) return (v/1e6).toPrecision(4).replace(/\.?0+$/,'') + ' MΩ';
+  if (v >= 1e3) return (v/1e3).toPrecision(4).replace(/\.?0+$/,'') + ' kΩ';
+  return v.toPrecision(4).replace(/\.?0+$/,'') + ' Ω';
+}
+
+/* ── Build band dropdowns ── */
+function buildBands() {
+  const row = document.getElementById('bandsRow');
+  row.innerHTML = '';
+
+  const bands = numBands === 4
+    ? ['Band 1','Band 2','Multiplier','Tolerance']
+    : ['Band 1','Band 2','Band 3','Multiplier','Tolerance'];
+
+  bands.forEach((lbl, i) => {
+    const isDigit = (numBands === 4) ? i < 2 : i < 3;
+    const isMult  = (numBands === 4) ? i === 2 : i === 3;
+    const isTol   = i === numBands - 1;
+    const colorSet = isTol ? TOL_COLORS : isMult ? MULT_COLORS : DIGIT_COLORS;
+
+    const div = document.createElement('div');
+    div.className = 'band-field';
+
+    const sel = document.createElement('select');
+    sel.className = 'color-select';
+    sel.id = 'band' + i;
+    sel.onchange = () => updateVisual();
+
+    colorSet.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+
+    // defaults
+    if (isDigit && i === 0) sel.value = 'Brown';
+    if (isDigit && i === 1) sel.value = 'Black';
+    if (isDigit && i === 2 && numBands === 5) sel.value = 'Black';
+    if (isMult)  sel.value = 'Red';
+    if (isTol)   sel.value = 'Gold';
+
+    styleSelect(sel);
+    sel.onchange = () => { styleSelect(sel); updateVisual(); };
+
+    div.innerHTML = `<div class="band-label">${lbl}</div>`;
+    div.appendChild(sel);
+    row.appendChild(div);
+  });
+
+  updateVisual();
+}
+
+function styleSelect(sel) {
+  const c = COLORS.find(x => x.name === sel.value);
+  if (!c) return;
+  const isLight = ['Yellow','White','Gold','Silver','Grey'].includes(c.name);
+  sel.style.background = c.hex;
+  sel.style.color = isLight ? '#1a1a1a' : '#fff';
+  sel.style.borderColor = c.hex === 'transparent' ? '#e2e8f0' : c.hex;
+}
+
+/* ── Update visual resistor ── */
+function updateVisual() {
+  const bandIds = ['vband1','vband2','vband3','vband4','vband5'];
+  bandIds.forEach((id,i) => {
+    document.getElementById(id).style.display = 'none';
+  });
+
+  for (let i = 0; i < numBands; i++) {
+    const sel = document.getElementById('band' + i);
+    if (!sel) continue;
+    const c = COLORS.find(x => x.name === sel.value);
+    const vb = document.getElementById('vband' + (i+1));
+    if (vb && c) {
+      vb.style.display = 'block';
+      vb.style.background = c.hex;
+      vb.style.border = c.hex === 'transparent' ? '1px dashed #ccc' : 'none';
+    }
+  }
+}
+
+/* ── Decode ── */
+function decode() {
+  const box    = document.getElementById('resultBox');
+  const mainEl = document.getElementById('resultMain');
+  const subEl  = document.getElementById('resultSub');
+  const bandsEl= document.getElementById('resultBands');
+  const errEl  = document.getElementById('errorMsg');
+  box.classList.add('show');
+  errEl.textContent = ''; bandsEl.innerHTML = ''; mainEl.textContent = ''; subEl.textContent = '';
+
+  const vals = [];
+  for (let i = 0; i < numBands; i++) {
+    const sel = document.getElementById('band' + i);
+    if (!sel) { errEl.textContent = 'Select all bands.'; return; }
+    vals.push(sel.value);
+  }
+
+  let digits, multName, tolName;
+  if (numBands === 4) {
+    digits  = [vals[0], vals[1]];
+    multName = vals[2];
+    tolName  = vals[3];
+  } else {
+    digits  = [vals[0], vals[1], vals[2]];
+    multName = vals[3];
+    tolName  = vals[4];
+  }
+
+  const digitVals = digits.map(n => COLORS.find(c=>c.name===n));
+  if (digitVals.some(c => !c || c.digit === null)) { errEl.textContent = 'Invalid digit band color.'; return; }
+
+  const multC = COLORS.find(c=>c.name===multName);
+  const tolC  = COLORS.find(c=>c.name===tolName);
+  if (!multC || multC.mult === null) { errEl.textContent = 'Invalid multiplier band.'; return; }
+  if (!tolC  || tolC.tol  === null) { errEl.textContent = 'Invalid tolerance band.'; return; }
+
+  const digitNum = parseInt(digitVals.map(c=>c.digit).join(''));
+  const resistance = digitNum * multC.mult;
+  const tol = tolC.tol;
+  const tolPct = parseFloat(tol.replace('±','').replace('%','')) / 100;
+  const min = resistance * (1 - tolPct);
+  const max = resistance * (1 + tolPct);
+
+  mainEl.textContent = fmtR(resistance) + ' ' + tol;
+  subEl.textContent  = `Range: ${fmtR(min)} — ${fmtR(max)}`;
+
+  // show band chips
+  vals.forEach((name, i) => {
+    const c = COLORS.find(x=>x.name===name);
+    const lbl = numBands===4
+      ? ['Band 1','Band 2','Mult','Tol'][i]
+      : ['Band 1','Band 2','Band 3','Mult','Tol'][i];
+    const isLight = ['Yellow','White','Gold','Silver','Grey'].includes(name);
+    bandsEl.innerHTML += `<div class="result-band-chip">
+      <div class="chip-dot" style="background:${c.hex}"></div>
+      <span style="color:#64748b;font-weight:500;font-size:11px">${lbl}:</span>
+      <span>${name}</span>
+    </div>`;
+  });
+}
+
+/* ── Encode (value → colors) ── */
+function encode() {
+  const box    = document.getElementById('resultBox');
+  const mainEl = document.getElementById('resultMain');
+  const subEl  = document.getElementById('resultSub');
+  const bandsEl= document.getElementById('resultBands');
+  const errEl  = document.getElementById('errorMsg');
+  box.classList.add('show');
+  errEl.textContent=''; bandsEl.innerHTML=''; mainEl.textContent=''; subEl.textContent='';
+
+  const val = parseFloat(document.getElementById('encVal').value);
+  if (isNaN(val) || val <= 0) { errEl.textContent='Enter a positive resistance value in ohms.'; return; }
+
+  // find multiplier exponent
+  const sigFigs = numBands === 4 ? 2 : 3;
+  let bestResult = null;
+
+  MULT_COLORS.forEach(mc => {
+    const divided = val / mc.mult;
+    const rounded = Math.round(divided);
+    const digits  = rounded.toString().padStart(sigFigs, '0');
+    if (digits.length !== sigFigs) return;
+    const dCols = digits.split('').map(d => DIGIT_COLORS.find(c=>c.digit===parseInt(d)));
+    if (dCols.some(c=>!c)) return;
+    const reconstructed = parseInt(digits) * mc.mult;
+    if (Math.abs(reconstructed - val) / val < 0.005) {
+      bestResult = { dCols, mc, digits, reconstructed };
+    }
+  });
+
+  if (!bestResult) {
+    // try nearest
+    const exp = Math.floor(Math.log10(val)) - (sigFigs - 1);
+    const mult = Math.pow(10, exp);
+    const mc = MULT_COLORS.reduce((best, c) => {
+      return Math.abs(c.mult - mult) < Math.abs(best.mult - mult) ? c : best;
+    });
+    const divided = val / mc.mult;
+    const rounded = Math.round(divided);
+    const digits = rounded.toString().padStart(sigFigs,'0').slice(0, sigFigs);
+    const dCols = digits.split('').map(d => DIGIT_COLORS.find(c=>c.digit===parseInt(d)));
+    if (dCols.some(c=>!c)) { errEl.textContent='Value out of range for '+numBands+'-band resistor.'; return; }
+    bestResult = { dCols, mc, digits, reconstructed: parseInt(digits)*mc.mult };
+  }
+
+  const { dCols, mc, reconstructed } = bestResult;
+  const tolC = TOL_COLORS.find(c=>c.name==='Gold');
+
+  mainEl.textContent = fmtR(reconstructed) + ' ±5%';
+  subEl.textContent  = 'Nearest standard value for ' + numBands + '-band resistor';
+
+  const allBands = [...dCols, mc, tolC];
+  const labels4 = ['Band 1','Band 2','Mult','Tol'];
+  const labels5 = ['Band 1','Band 2','Band 3','Mult','Tol'];
+  const labels = numBands === 4 ? labels4 : labels5;
+
+  allBands.forEach((c, i) => {
+    const isLight = ['Yellow','White','Gold','Silver','Grey'].includes(c.name);
+    bandsEl.innerHTML += `<div class="result-band-chip">
+      <div class="chip-dot" style="background:${c.hex}"></div>
+      <span style="color:#64748b;font-weight:500;font-size:11px">${labels[i]}:</span>
+      <span>${c.name}</span>
+    </div>`;
+  });
+
+  // update visual
+  allBands.forEach((c, i) => {
+    const vb = document.getElementById('vband'+(i+1));
+    if (vb) { vb.style.display='block'; vb.style.background=c.hex; }
+  });
+}
+
+/* ── Mode / band switches ── */
+function setMode(m, btn) {
+  appMode = m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('decodeUI').style.display = m==='decode' ? '' : 'none';
+  document.getElementById('encodeUI').style.display = m==='encode' ? '' : 'none';
+  document.getElementById('resultBox').classList.remove('show');
+}
+
+function setBands(n) {
+  numBands = n;
+  document.getElementById('btn4').classList.toggle('active', n===4);
+  document.getElementById('btn5').classList.toggle('active', n===5);
+  document.getElementById('resultBox').classList.remove('show');
+  if (appMode === 'decode') buildBands();
+  else updateVisual();
+}
+
+function toggleFaq(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('show');
+}
+
+/* ── Init ── */
+buildColorTable();
+buildBands();
+</script>
+</body>
+</html>
