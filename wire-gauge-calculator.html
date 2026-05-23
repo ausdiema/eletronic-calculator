@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWG Wire Gauge Calculator — Diameter, mm², Resistance &amp; Ampacity</title>
+  <meta name="description" content="Convert AWG wire gauge to diameter (mm &amp; inch), cross-section area (mm²), resistance per metre, and max current. Reverse-lookup AWG from mm² or diameter." />
+  <link rel="canonical" href="https://electronics-calc.com/wire-gauge-calculator.html" />
+  <meta name="google-site-verification" content="miH9b5abkKUBm5JfTS3vTU6B1TrSRIQG3IjDfTy4RaA" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "AWG Wire Gauge Calculator",
+        "url": "https://electronics-calc.com/wire-gauge-calculator.html",
+        "description": "Convert AWG to mm, mm², resistance and ampacity. Reverse-lookup AWG from diameter or area.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is AWG (American Wire Gauge)?",
+            "acceptedAnswer": { "@type": "Answer", "text": "AWG is a standardised wire gauge system used mainly in North America. A lower AWG number means a thicker wire with higher current capacity. AWG 0000 (4/0) is the thickest common gauge; AWG 40 is extremely thin hair-like wire." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I convert AWG to mm²?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Calculate the diameter in mm using d = 0.127 × 92^((36−AWG)/39), then compute area = π/4 × d². For example AWG 14 ≈ 2.08 mm²." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the current rating of AWG 14 wire?",
+            "acceptedAnswer": { "@type": "Answer", "text": "AWG 14 copper wire is typically rated for 15 A in conduit (NEC) or up to 32 A in free air at 60 °C insulation." }
+          },
+          {
+            "@type": "Question",
+            "name": "What AWG is 1.5 mm² wire?",
+            "acceptedAnswer": { "@type": "Answer", "text": "1.5 mm² (common in European wiring) is closest to AWG 15 or AWG 16. For practical substitution AWG 14 (2.08 mm²) is used as the next standard size up." }
+          },
+          {
+            "@type": "Question",
+            "name": "Does a higher AWG number mean thicker or thinner wire?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Higher AWG means thinner wire. AWG 30 is much thinner than AWG 10. The number represents how many times the wire was drawn through a die — more draws = thinner wire." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { background: #1e293b; padding: 0 24px; display: flex; align-items: center; gap: 8px; height: 52px; }
+    nav a { color: #94a3b8; font-size: 14px; }
+    nav a:hover { color: #fff; text-decoration: none; }
+    nav span { color: #475569; font-size: 14px; }
+    nav .brand { color: #fff; font-weight: 600; font-size: 15px; margin-right: auto; }
+
+    .page { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+    .subtitle { font-size: 1.05rem; color: #475569; margin-bottom: 40px; }
+
+    .calc-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .calc-card h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; color: #0f172a; }
+    .calc-card .card-sub { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+    /* mode tabs */
+    .tab-row { display: flex; gap: 8px; margin-bottom: 28px; }
+    .tab-btn { flex: 1; padding: 10px 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; background: #fff; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; transition: all .15s; text-align: center; }
+    .tab-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .tab-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+    /* inputs */
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .input-row { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+    .input-wrap { position: relative; flex: 1; min-width: 140px; }
+    .input-wrap input, .input-wrap select { width: 100%; padding: 10px 52px 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; color: #0f172a; background: #fff; transition: border-color .15s; outline: none; appearance: none; }
+    .input-wrap select { padding-right: 14px; }
+    .input-wrap input:focus, .input-wrap select:focus { border-color: #2563eb; }
+    .unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; color: #94a3b8; pointer-events: none; }
+
+    .calc-btn { width: 100%; padding: 13px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; margin-top: 4px; }
+    .calc-btn:hover { background: #1d4ed8; }
+
+    /* result */
+    .result-box { margin-top: 22px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 20px 24px; display: none; }
+    .result-box.show { display: block; }
+    .result-main { font-size: 1.9rem; font-weight: 700; color: #1d4ed8; }
+    .result-sub { font-size: 0.9rem; color: #3b82f6; margin-top: 4px; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-top: 16px; }
+    .res-item { background: #fff; border-radius: 8px; padding: 10px 14px; }
+    .res-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+    .res-value { font-size: 1rem; font-weight: 600; color: #0f172a; margin-top: 2px; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; }
+
+    /* AWG reference table */
+    section { margin-bottom: 48px; }
+    section h2 { font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    section p { color: #475569; margin-bottom: 12px; }
+
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
+    thead tr { background: #1e293b; color: #fff; }
+    thead th { padding: 11px 14px; text-align: right; font-weight: 600; font-size: 12px; letter-spacing: .03em; white-space: nowrap; }
+    thead th:first-child { text-align: center; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:hover { background: #eff6ff; }
+    tbody td { padding: 9px 14px; text-align: right; color: #374151; border-bottom: 1px solid #f1f5f9; }
+    tbody td:first-child { text-align: center; font-weight: 700; color: #1e293b; }
+    .amp-high { color: #059669; font-weight: 600; }
+    .amp-med  { color: #d97706; font-weight: 600; }
+    .amp-low  { color: #6b7280; }
+
+    /* FAQ */
+    .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .faq-q { padding: 15px 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #0f172a; background: #fff; }
+    .faq-q:hover { background: #f8fafc; }
+    .faq-q .arrow { color: #94a3b8; transition: transform .2s; font-size: 18px; }
+    .faq-q.open .arrow { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 20px 15px; color: #475569; font-size: 0.9rem; line-height: 1.6; }
+    .faq-a.show { display: block; }
+
+    /* related */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
+    .related-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #0f172a; transition: all .15s; }
+    .related-card:hover { border-color: #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,.12); text-decoration: none; }
+    .related-icon { font-size: 22px; }
+    .related-name { font-size: 14px; font-weight: 600; }
+    .related-desc { font-size: 12px; color: #94a3b8; }
+
+    footer { text-align: center; padding: 32px 20px; color: #94a3b8; font-size: 13px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ ElectroCalc</span>
+  <a href="https://electronics-calc.com/">Home</a>
+  <span>›</span>
+  <span style="color:#cbd5e1">Wire Gauge Calculator</span>
+</nav>
+
+<div class="page">
+
+  <h1>AWG Wire Gauge Calculator</h1>
+  <p class="subtitle">Convert AWG to diameter (mm &amp; inch), cross-section area (mm²), resistance per metre and maximum current — or reverse-lookup the AWG from mm² or diameter.</p>
+
+  <div class="calc-card">
+    <h2>Calculate</h2>
+    <p class="card-sub">Choose a mode and enter a value.</p>
+
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-awg" onclick="setMode('awg',this)">AWG → Specs</button>
+      <button class="tab-btn" id="tab-mm2" onclick="setMode('mm2',this)">mm² → AWG</button>
+      <button class="tab-btn" id="tab-dia" onclick="setMode('dia',this)">Diameter → AWG</button>
+    </div>
+
+    <!-- AWG → Specs -->
+    <div id="panel-awg">
+      <div class="field">
+        <label for="inp-awg">AWG Number</label>
+        <div class="input-wrap" style="max-width:200px">
+          <select id="inp-awg"></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- mm² → AWG -->
+    <div id="panel-mm2" style="display:none">
+      <div class="field">
+        <label for="inp-mm2">Cross-section area</label>
+        <div class="input-wrap" style="max-width:200px">
+          <input type="number" id="inp-mm2" placeholder="e.g. 1.5" min="0" step="any" />
+          <span class="unit">mm²</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diameter → AWG -->
+    <div id="panel-dia" style="display:none">
+      <div class="field">
+        <label for="inp-dia">Wire diameter</label>
+        <div class="input-row">
+          <div class="input-wrap" style="max-width:180px">
+            <input type="number" id="inp-dia" placeholder="e.g. 1.63" min="0" step="any" />
+            <span class="unit" id="dia-unit">mm</span>
+          </div>
+          <div class="input-wrap" style="max-width:120px; flex:0">
+            <select id="inp-dia-unit" onchange="document.getElementById('dia-unit').textContent=this.value" style="padding-right:10px">
+              <option value="mm">mm</option>
+              <option value="in">inch</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate →</button>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-main" id="resultMain"></div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- Reference Table -->
+  <section>
+    <h2>AWG Reference Table</h2>
+    <p>Copper wire at 20 °C. Ampacity based on NEC Table 310.16 (60 °C insulation, in conduit) and free-air ratings.</p>
+    <div class="table-wrap">
+      <table id="awg-table">
+        <thead>
+          <tr>
+            <th>AWG</th>
+            <th>Diameter (mm)</th>
+            <th>Diameter (in)</th>
+            <th>Area (mm²)</th>
+            <th>Resistance (Ω/m)</th>
+            <th>Ampacity (conduit)</th>
+            <th>Ampacity (free air)</th>
+          </tr>
+        </thead>
+        <tbody id="awg-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    <div id="faq-container">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What is AWG (American Wire Gauge)? <span class="arrow">▾</span></div>
+        <div class="faq-a">AWG is a standardised wire gauge system used mainly in North America. A lower AWG number means a thicker wire with higher current capacity. AWG 0000 (4/0) is the thickest common gauge, while AWG 40 is extremely thin hair-like wire used in precision coils.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I convert AWG to mm²? <span class="arrow">▾</span></div>
+        <div class="faq-a">The formula is: diameter (mm) = 0.127 × 92^((36 − AWG) / 39), then area (mm²) = π / 4 × diameter². For example, AWG 12 has a diameter of 2.053 mm and an area of 3.31 mm².</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What AWG is 2.5 mm² wire (common in EU)? <span class="arrow">▾</span></div>
+        <div class="faq-a">2.5 mm² (standard European socket circuit wire) is closest to AWG 13 (2.63 mm²). The nearest standard US size is AWG 12 (3.31 mm²), which is the usual substitute and is rated for 20 A circuits.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Does higher AWG mean thicker or thinner wire? <span class="arrow">▾</span></div>
+        <div class="faq-a">Higher AWG = thinner wire. AWG 30 is much thinner than AWG 10. The number reflects how many times the wire was drawn through a progressively smaller die — more draws produces a thinner wire.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What is the maximum current for AWG 12 wire? <span class="arrow">▾</span></div>
+        <div class="faq-a">AWG 12 copper wire is rated for 20 A in conduit (NEC, 60 °C insulation) and up to 41 A in free air. It is the standard wire for 20 A household branch circuits in North America.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section>
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a class="related-card" href="https://electronics-calc.com/ohms-law-calculator.html">
+        <span class="related-icon">⚡</span>
+        <div><div class="related-name">Ohm's Law</div><div class="related-desc">Solve V, I or R</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/power-calculator.html">
+        <span class="related-icon">🔋</span>
+        <div><div class="related-name">Power Calculator</div><div class="related-desc">Watts, volts, amps</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/voltage-divider-calculator.html">
+        <span class="related-icon">🔁</span>
+        <div><div class="related-name">Voltage Divider</div><div class="related-desc">R1, R2, Vout</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/">
+        <span class="related-icon">🔌</span>
+        <div><div class="related-name">All Calculators</div><div class="related-desc">Full toolset</div></div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2025 ElectroCalc · Free electronics calculators · <a href="https://electronics-calc.com/">Home</a></p>
+</footer>
+
+<script>
+// ── AWG data ──────────────────────────────────────────────────────────────────
+// AWG number, conduit ampacity (A), free-air ampacity (A)
+const AWG_AMP = {
+  '-3': [230, 360], '-2': [195, 310], '-1': [165, 260], '0': [150, 245],
+  '1': [130, 211], '2': [115, 181], '3': [100, 158], '4': [85, 135],
+  '6': [65, 101], '8': [50, 73], '10': [30, 55], '12': [20, 41],
+  '14': [15, 32], '16': [13, 22], '18': [10, 16], '20': [null, 11],
+  '22': [null, 7], '24': [null, 3.5], '26': [null, 2.2], '28': [null, 0.83],
+  '30': [null, 0.52], '32': [null, 0.32], '34': [null, 0.18], '36': [null, 0.10],
+  '38': [null, 0.06], '40': [null, 0.04]
+};
+
+const AWG_LIST = [
+  -3, -2, -1, 0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40
+];
+
+function awgLabel(n) {
+  if (n === -3) return '0000 (4/0)';
+  if (n === -2) return '000 (3/0)';
+  if (n === -1) return '00 (2/0)';
+  if (n === 0)  return '0 (1/0)';
+  return String(n);
+}
+
+function awgDiamInch(n) {
+  return 0.005 * Math.pow(92, (36 - n) / 39);
+}
+
+function awgSpecs(n) {
+  const dIn  = awgDiamInch(n);
+  const dMm  = dIn * 25.4;
+  const aMm2 = Math.PI / 4 * dMm * dMm;
+  const rOhm = 0.017241 / aMm2 * 1000; // Ω per 1000 m → per m
+  const amp  = AWG_AMP[String(n)] || [null, null];
+  return { dIn, dMm, aMm2, rOhm, ampConduit: amp[0], ampFree: amp[1] };
+}
+
+// ── Populate AWG select ───────────────────────────────────────────────────────
+const sel = document.getElementById('inp-awg');
+AWG_LIST.forEach(n => {
+  const opt = document.createElement('option');
+  opt.value = n;
+  opt.textContent = 'AWG ' + awgLabel(n);
+  if (n === 14) opt.selected = true;
+  sel.appendChild(opt);
+});
+
+// ── Populate reference table ──────────────────────────────────────────────────
+const tbody = document.getElementById('awg-tbody');
+AWG_LIST.forEach(n => {
+  const s = awgSpecs(n);
+  const ampCls = s.ampConduit >= 100 ? 'amp-high' : s.ampConduit >= 20 ? 'amp-med' : 'amp-low';
+  const conduit = s.ampConduit ? `<span class="${ampCls}">${s.ampConduit} A</span>` : '—';
+  const free = s.ampFree ? `${s.ampFree} A` : '—';
+  tbody.innerHTML += `<tr>
+    <td>AWG ${awgLabel(n)}</td>
+    <td>${s.dMm.toFixed(3)}</td>
+    <td>${s.dIn.toFixed(4)}</td>
+    <td>${s.aMm2.toFixed(3)}</td>
+    <td>${s.rOhm < 0.01 ? s.rOhm.toFixed(5) : s.rOhm.toFixed(4)}</td>
+    <td>${conduit}</td>
+    <td>${free}</td>
+  </tr>`;
+});
+
+// ── Mode switching ────────────────────────────────────────────────────────────
+let currentMode = 'awg';
+
+function setMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-awg').style.display = mode === 'awg' ? '' : 'none';
+  document.getElementById('panel-mm2').style.display = mode === 'mm2' ? '' : 'none';
+  document.getElementById('panel-dia').style.display = mode === 'dia' ? '' : 'none';
+  hideResult();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function fmt(v, dec) { return v.toFixed(dec); }
+
+function fmtRes(ohm) {
+  if (ohm < 0.001) return (ohm * 1000000).toFixed(2) + ' µΩ/m';
+  if (ohm < 1)     return (ohm * 1000).toFixed(3) + ' mΩ/m';
+  return ohm.toFixed(4) + ' Ω/m';
+}
+
+function showSpecs(n) {
+  const s = awgSpecs(n);
+  document.getElementById('resultMain').textContent = 'AWG ' + awgLabel(n);
+  document.getElementById('resultSub').textContent = 'Copper wire specifications at 20 °C';
+  document.getElementById('resultGrid').innerHTML = `
+    <div class="res-item"><div class="res-label">Diameter</div><div class="res-value">${fmt(s.dMm,3)} mm</div></div>
+    <div class="res-item"><div class="res-label">Diameter</div><div class="res-value">${fmt(s.dIn,4)} in</div></div>
+    <div class="res-item"><div class="res-label">Area</div><div class="res-value">${fmt(s.aMm2,3)} mm²</div></div>
+    <div class="res-item"><div class="res-label">Resistance</div><div class="res-value">${fmtRes(s.rOhm)}</div></div>
+    <div class="res-item"><div class="res-label">Amp (conduit)</div><div class="res-value">${s.ampConduit ? s.ampConduit + ' A' : '—'}</div></div>
+    <div class="res-item"><div class="res-label">Amp (free air)</div><div class="res-value">${s.ampFree ? s.ampFree + ' A' : '—'}</div></div>
+  `;
+  document.getElementById('errorMsg').textContent = '';
+  const box = document.getElementById('resultBox');
+  box.classList.add('show');
+}
+
+function showNearestAWG(n, matchDesc) {
+  const s = awgSpecs(n);
+  document.getElementById('resultMain').textContent = 'AWG ' + awgLabel(n);
+  document.getElementById('resultSub').textContent = matchDesc;
+  document.getElementById('resultGrid').innerHTML = `
+    <div class="res-item"><div class="res-label">Diameter</div><div class="res-value">${fmt(s.dMm,3)} mm</div></div>
+    <div class="res-item"><div class="res-label">Diameter</div><div class="res-value">${fmt(s.dIn,4)} in</div></div>
+    <div class="res-item"><div class="res-label">Area</div><div class="res-value">${fmt(s.aMm2,3)} mm²</div></div>
+    <div class="res-item"><div class="res-label">Resistance</div><div class="res-value">${fmtRes(s.rOhm)}</div></div>
+    <div class="res-item"><div class="res-label">Amp (conduit)</div><div class="res-value">${s.ampConduit ? s.ampConduit + ' A' : '—'}</div></div>
+    <div class="res-item"><div class="res-label">Amp (free air)</div><div class="res-value">${s.ampFree ? s.ampFree + ' A' : '—'}</div></div>
+  `;
+  document.getElementById('errorMsg').textContent = '';
+  document.getElementById('resultBox').classList.add('show');
+}
+
+function showError(msg) {
+  document.getElementById('resultMain').textContent = '';
+  document.getElementById('resultSub').textContent = '';
+  document.getElementById('resultGrid').innerHTML = '';
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('resultBox').classList.add('show');
+}
+
+function hideResult() {
+  document.getElementById('resultBox').classList.remove('show');
+}
+
+// Search all integer AWG values (-3 to 40) for best reverse match
+const ALL_AWG = Array.from({length: 44}, (_, i) => i - 3); // -3 … 40
+
+function nearestByArea(targetMm2) {
+  let best = 14, bestDiff = Infinity;
+  ALL_AWG.forEach(n => {
+    const diff = Math.abs(awgSpecs(n).aMm2 - targetMm2);
+    if (diff < bestDiff) { bestDiff = diff; best = n; }
+  });
+  return best;
+}
+
+function nearestByDiam(targetMm) {
+  let best = 14, bestDiff = Infinity;
+  ALL_AWG.forEach(n => {
+    const diff = Math.abs(awgSpecs(n).dMm - targetMm);
+    if (diff < bestDiff) { bestDiff = diff; best = n; }
+  });
+  return best;
+}
+
+// ── Main calculate ────────────────────────────────────────────────────────────
+function calculate() {
+  if (currentMode === 'awg') {
+    const n = parseInt(document.getElementById('inp-awg').value);
+    showSpecs(n);
+    return;
+  }
+
+  if (currentMode === 'mm2') {
+    const val = parseFloat(document.getElementById('inp-mm2').value);
+    if (isNaN(val) || val <= 0) { showError('Please enter a valid area in mm².'); return; }
+    const n = nearestByArea(val);
+    const s = awgSpecs(n);
+    showNearestAWG(n, `Nearest AWG to ${val} mm² (exact area: ${fmt(s.aMm2,3)} mm²)`);
+    return;
+  }
+
+  if (currentMode === 'dia') {
+    let val = parseFloat(document.getElementById('inp-dia').value);
+    const unit = document.getElementById('inp-dia-unit').value;
+    if (isNaN(val) || val <= 0) { showError('Please enter a valid diameter.'); return; }
+    if (unit === 'in') val *= 25.4;
+    const n = nearestByDiam(val);
+    const s = awgSpecs(n);
+    showNearestAWG(n, `Nearest AWG to ⌀${fmt(val,3)} mm (exact: ${fmt(s.dMm,3)} mm)`);
+  }
+}
+
+// allow Enter key
+document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+
+// ── FAQ toggle ────────────────────────────────────────────────────────────────
+function toggleFaq(el) {
+  const ans = el.nextElementSibling;
+  el.classList.toggle('open');
+  ans.classList.toggle('show');
+}
+</script>
+</body>
+</html>
