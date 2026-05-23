@@ -341,8 +341,7 @@
 
 <script>
   let solveFor = 'V';
-
-  function setSolve(target) {
+function setSolve(target, event) {
     solveFor = target;
     document.querySelectorAll('.solve-btn').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
