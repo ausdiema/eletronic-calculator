@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Series & Parallel Resistor Calculator — Total Resistance</title>
+  <meta name="description" content="Free series and parallel resistor calculator. Add up to 10 resistors in series or parallel and instantly calculate total resistance, current and power. Formula and examples included." />
+  <link rel="canonical" href="https://electronics-calc.com/series-parallel-resistor-calculator.html" />
+  <meta name="google-site-verification" content="r2n8xqMBLu0F4SN8om9s2pMB6gzBUaX1Sa_D7vTRwF0" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Series and Parallel Resistor Calculator",
+        "url": "https://electronics-calc.com/series-parallel-resistor-calculator.html",
+        "description": "Calculate total resistance for resistors in series or parallel. Supports up to 10 resistors.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do you calculate resistors in series?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For resistors in series, simply add all resistance values: R_total = R1 + R2 + R3 + ... The total resistance is always greater than the largest individual resistor."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you calculate resistors in parallel?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For resistors in parallel: 1/R_total = 1/R1 + 1/R2 + 1/R3 + ... The total resistance is always less than the smallest individual resistor. For two resistors: R_total = (R1 × R2) / (R1 + R2)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between series and parallel resistors?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In series, resistors share the same current — total resistance increases. In parallel, resistors share the same voltage — total resistance decreases. Series is used for current limiting; parallel for load sharing or achieving non-standard resistance values."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is two equal resistors in parallel?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Two equal resistors R in parallel give R/2. For example, two 1 kΩ resistors in parallel give 500 Ω. This is a quick way to get a non-standard resistor value from standard parts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why would I put resistors in parallel?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Common reasons: (1) achieve a resistance value not available as a standard part, (2) share power dissipation across multiple resistors to avoid overheating, (3) reduce output impedance in a circuit."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { background: #1e293b; padding: 0 24px; display: flex; align-items: center; gap: 8px; height: 52px; }
+    nav a { color: #94a3b8; font-size: 14px; }
+    nav a:hover { color: #fff; text-decoration: none; }
+    nav span { color: #475569; font-size: 14px; }
+    nav .brand { color: #fff; font-weight: 600; font-size: 15px; margin-right: auto; }
+
+    .page { max-width: 780px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+    .subtitle { font-size: 1.05rem; color: #475569; margin-bottom: 40px; }
+
+    .calc-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .calc-card h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 20px; color: #0f172a; }
+
+    /* mode tabs */
+    .mode-tabs { display: flex; gap: 8px; margin-bottom: 28px; }
+    .mode-btn { padding: 10px 24px; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #fff; font-size: 14px; font-weight: 600; color: #475569; cursor: pointer; transition: all .15s; }
+    .mode-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .mode-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+    /* circuit diagrams */
+    .diagram-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    @media(max-width:500px){ .diagram-row { grid-template-columns: 1fr; } }
+    .diagram-card { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; transition: all .15s; }
+    .diagram-card:hover { border-color: #2563eb; }
+    .diagram-card.active { border-color: #2563eb; background: #eff6ff; }
+    .diagram-card svg { width: 100%; max-width: 160px; height: 80px; }
+    .diagram-label { font-size: 13px; font-weight: 600; color: #475569; margin-top: 8px; }
+    .diagram-card.active .diagram-label { color: #2563eb; }
+
+    /* resistor inputs */
+    .resistors-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .res-row { display: flex; align-items: center; gap: 10px; }
+    .res-label { font-size: 13px; font-weight: 700; color: #64748b; min-width: 28px; }
+    .res-input-wrap { position: relative; flex: 1; }
+    .res-input-wrap input { width: 100%; padding: 9px 44px 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; color: #0f172a; outline: none; transition: border-color .15s; }
+    .res-input-wrap input:focus { border-color: #2563eb; }
+    .res-unit { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: 600; color: #94a3b8; pointer-events: none; }
+    .res-remove { width: 28px; height: 28px; border: none; background: #fee2e2; color: #ef4444; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background .15s; flex-shrink: 0; }
+    .res-remove:hover { background: #fecaca; }
+
+    .add-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1.5px dashed #cbd5e1; border-radius: 8px; background: transparent; color: #64748b; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; width: 100%; justify-content: center; margin-bottom: 20px; }
+    .add-btn:hover { border-color: #2563eb; color: #2563eb; }
+
+    /* voltage input */
+    .voltage-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; }
+    .voltage-row label { font-size: 13px; font-weight: 600; color: #64748b; flex-shrink: 0; }
+    .voltage-row .res-input-wrap { max-width: 160px; }
+    .voltage-hint { font-size: 12px; color: #94a3b8; }
+
+    .calc-btn { width: 100%; padding: 13px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .calc-btn:hover { background: #1d4ed8; }
+
+    /* result */
+    .result-box { margin-top: 20px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 20px 24px; display: none; }
+    .result-box.show { display: block; }
+    .result-main { font-size: 2rem; font-weight: 700; color: #1d4ed8; }
+    .result-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-top: 16px; }
+    .detail-item { background: #fff; border-radius: 8px; padding: 10px 14px; }
+    .detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+    .detail-value { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin-top: 2px; }
+    .breakdown-list { margin-top: 14px; }
+    .breakdown-item { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px solid #dbeafe; color: #475569; }
+    .breakdown-item:last-child { border-bottom: none; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; }
+
+    section { margin-bottom: 48px; }
+    section h2 { font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    section h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 20px 0 8px; }
+    section p { color: #475569; margin-bottom: 12px; }
+
+    .formula-box { background: #0f172a; color: #e2e8f0; border-radius: 12px; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 1rem; text-align: center; margin: 16px 0; letter-spacing: .02em; line-height: 2; }
+    .formula-box .hl { color: #60a5fa; font-weight: 700; }
+
+    .examples-grid { display: grid; gap: 16px; }
+    @media(min-width:580px){ .examples-grid { grid-template-columns: 1fr 1fr; } }
+    .example-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; }
+    .ex-title { font-weight: 600; color: #0f172a; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ex-badge { background: #dbeafe; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .ex-line { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; border-bottom: 1px solid #f1f5f9; color: #475569; }
+    .ex-line:last-child { border-bottom: none; font-weight: 700; color: #1d4ed8; font-size: 14px; }
+
+    .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .faq-q { padding: 15px 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #0f172a; background: #fff; }
+    .faq-q:hover { background: #f8fafc; }
+    .faq-q .arrow { color: #94a3b8; transition: transform .2s; font-size: 18px; }
+    .faq-q.open .arrow { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 20px 15px; color: #475569; font-size: 0.9rem; line-height: 1.6; }
+    .faq-a.show { display: block; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
+    .related-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #0f172a; transition: all .15s; }
+    .related-card:hover { border-color: #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,.12); text-decoration: none; }
+    .related-icon { font-size: 22px; }
+    .related-name { font-size: 14px; font-weight: 600; }
+    .related-desc { font-size: 12px; color: #94a3b8; }
+
+    footer { text-align: center; padding: 32px 20px; color: #94a3b8; font-size: 13px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ ElectroCalc</span>
+  <a href="https://electronics-calc.com/">Home</a>
+  <span>›</span>
+  <span style="color:#cbd5e1">Series / Parallel Resistor</span>
+</nav>
+
+<div class="page">
+
+  <h1>Series & Parallel Resistor Calculator</h1>
+  <p class="subtitle">Calculate total resistance for up to 10 resistors in series or parallel. Optionally enter a supply voltage to see current and power dissipation per resistor.</p>
+
+  <div class="calc-card">
+    <h2>Calculate Total Resistance</h2>
+
+    <!-- mode selector -->
+    <div class="mode-tabs">
+      <button class="mode-btn active" id="btnSeries" onclick="setMode('series')">━━ Series</button>
+      <button class="mode-btn" id="btnParallel" onclick="setMode('parallel')">⫸ Parallel</button>
+    </div>
+
+    <!-- resistor inputs -->
+    <div class="resistors-list" id="resList"></div>
+    <button class="add-btn" onclick="addResistor()">+ Add Resistor</button>
+
+    <!-- optional voltage -->
+    <div class="voltage-row">
+      <label>Supply Voltage (optional)</label>
+      <div class="res-input-wrap">
+        <input type="number" id="voltage" placeholder="e.g. 12" min="0" step="0.1" />
+        <span class="res-unit">V</span>
+      </div>
+      <span class="voltage-hint">For current & power calculation</span>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate →</button>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-main" id="resultMain"></div>
+      <div class="result-details" id="resultDetails"></div>
+      <div class="breakdown-list" id="breakdownList"></div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- ── Formula ── -->
+  <section>
+    <h2>Formulas</h2>
+
+    <h3>Resistors in Series</h3>
+    <p>The total resistance is the sum of all individual resistances. The same current flows through every resistor.</p>
+    <div class="formula-box">
+      <span class="hl">R<sub>total</sub></span> = R1 + R2 + R3 + … + Rn
+    </div>
+
+    <h3>Resistors in Parallel</h3>
+    <p>The reciprocal of the total resistance equals the sum of reciprocals. The same voltage appears across every resistor.</p>
+    <div class="formula-box">
+      1 / <span class="hl">R<sub>total</sub></span> = 1/R1 + 1/R2 + 1/R3 + … + 1/Rn<br>
+      <span style="font-size:.85rem;color:#94a3b8">Two resistors: R<sub>total</sub> = (R1 × R2) / (R1 + R2)</span>
+    </div>
+  </section>
+
+  <!-- ── Examples ── -->
+  <section>
+    <h2>Worked Examples</h2>
+    <div class="examples-grid">
+
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">1</span> 3 resistors in series</div>
+        <div class="ex-line"><span>R1</span><span>100 Ω</span></div>
+        <div class="ex-line"><span>R2</span><span>220 Ω</span></div>
+        <div class="ex-line"><span>R3</span><span>470 Ω</span></div>
+        <div class="ex-line"><span>R<sub>total</sub> = 100+220+470</span><span>790 Ω</span></div>
+      </div>
+
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">2</span> 2 resistors in parallel</div>
+        <div class="ex-line"><span>R1</span><span>1 kΩ</span></div>
+        <div class="ex-line"><span>R2</span><span>1 kΩ</span></div>
+        <div class="ex-line"><span>R<sub>total</sub> = (1k×1k)/(1k+1k)</span><span>500 Ω</span></div>
+      </div>
+
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">3</span> 3 resistors in parallel</div>
+        <div class="ex-line"><span>R1</span><span>100 Ω</span></div>
+        <div class="ex-line"><span>R2</span><span>200 Ω</span></div>
+        <div class="ex-line"><span>R3</span><span>300 Ω</span></div>
+        <div class="ex-line"><span>R<sub>total</sub></span><span>54.5 Ω</span></div>
+      </div>
+
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">4</span> Series + 12 V supply</div>
+        <div class="ex-line"><span>R1</span><span>560 Ω</span></div>
+        <div class="ex-line"><span>R2</span><span>440 Ω</span></div>
+        <div class="ex-line"><span>R<sub>total</sub></span><span>1000 Ω</span></div>
+        <div class="ex-line"><span>Current = 12V / 1000Ω</span><span>12 mA</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section>
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do you calculate resistors in series?<span class="arrow">▾</span></div>
+      <div class="faq-a">Add all resistor values: <strong>R<sub>total</sub> = R1 + R2 + R3 + …</strong><br><br>The total is always larger than the biggest individual resistor. The same current flows through every resistor. Voltage is divided across them proportionally to their values.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do you calculate resistors in parallel?<span class="arrow">▾</span></div>
+      <div class="faq-a">Use the reciprocal formula: <strong>1/R<sub>total</sub> = 1/R1 + 1/R2 + …</strong><br><br>The total is always smaller than the smallest individual resistor. The same voltage appears across every resistor. Current splits between them inversely proportional to their values.<br><br>Shortcut for two resistors: R<sub>total</sub> = (R1 × R2) / (R1 + R2)</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the result of two equal resistors in parallel?<span class="arrow">▾</span></div>
+      <div class="faq-a">Two identical resistors R in parallel always give <strong>R/2</strong>. Example: two 470 Ω resistors in parallel = 235 Ω. This is a practical trick to get non-standard values from common parts.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">When should I use series vs parallel?<span class="arrow">▾</span></div>
+      <div class="faq-a">
+        <strong>Use series when:</strong> you need to increase total resistance, limit current, or create a voltage divider.<br><br>
+        <strong>Use parallel when:</strong> you need to decrease resistance, share power across multiple resistors, or achieve a non-standard resistance value from standard parts.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Why put resistors in parallel to share power?<span class="arrow">▾</span></div>
+      <div class="faq-a">Each resistor dissipates power P = V²/R (parallel) or P = I²×R (series). If one resistor would exceed its power rating, you can split it into two parallel resistors of double the value — each dissipates half the power. This is common in high-current circuits where high-wattage resistors are hard to source.</div>
+    </div>
+  </section>
+
+  <!-- ── Related ── -->
+  <section>
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a class="related-card" href="ohms-law-calculator.html">
+        <span class="related-icon">⚡</span>
+        <div><div class="related-name">Ohm's Law</div><div class="related-desc">Solve V, I or R</div></div>
+      </a>
+      <a class="related-card" href="resistor-color-code-calculator.html">
+        <span class="related-icon">🎨</span>
+        <div><div class="related-name">Color Code</div><div class="related-desc">Decode resistor bands</div></div>
+      </a>
+      <a class="related-card" href="voltage-divider-calculator.html">
+        <span class="related-icon">🔀</span>
+        <div><div class="related-name">Voltage Divider</div><div class="related-desc">Two-resistor divider</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/">
+        <span class="related-icon">🔋</span>
+        <div><div class="related-name">All Calculators</div><div class="related-desc">Full toolset</div></div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2025 ElectroCalc · Free electronics calculators · <a href="https://electronics-calc.com/">Home</a></p>
+</footer>
+
+<script>
+  let mode = 'series';
+  let resCount = 0;
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById('btnSeries').classList.toggle('active', m === 'series');
+    document.getElementById('btnParallel').classList.toggle('active', m === 'parallel');
+    document.getElementById('resultBox').classList.remove('show');
+  }
+
+  function addResistor(val = '') {
+    resCount++;
+    const list = document.getElementById('resList');
+    const row = document.createElement('div');
+    row.className = 'res-row';
+    row.id = 'row' + resCount;
+    row.innerHTML = `
+      <span class="res-label">R${resCount}</span>
+      <div class="res-input-wrap">
+        <input type="number" id="r${resCount}" placeholder="e.g. 1000" min="0" step="1" value="${val}" />
+        <span class="res-unit">Ω</span>
+      </div>
+      <button class="res-remove" onclick="removeResistor(${resCount})">×</button>
+    `;
+    list.appendChild(row);
+  }
+
+  function removeResistor(id) {
+    const row = document.getElementById('row' + id);
+    if (row) row.remove();
+    document.getElementById('resultBox').classList.remove('show');
+  }
+
+  function fmtR(v) {
+    if (v >= 1e6) return (v/1e6).toPrecision(4).replace(/\.?0+$/,'') + ' MΩ';
+    if (v >= 1e3) return (v/1e3).toPrecision(4).replace(/\.?0+$/,'') + ' kΩ';
+    return v.toPrecision(4).replace(/\.?0+$/,'') + ' Ω';
+  }
+  function fmtI(I) {
+    if (I < 1e-3) return (I*1e6).toPrecision(3) + ' µA';
+    if (I < 1)    return (I*1e3).toPrecision(3) + ' mA';
+    return I.toPrecision(3) + ' A';
+  }
+  function fmtP(P) {
+    if (P < 1e-3) return (P*1e6).toPrecision(3) + ' µW';
+    if (P < 1)    return (P*1e3).toPrecision(3) + ' mW';
+    return P.toPrecision(3) + ' W';
+  }
+
+  function calculate() {
+    const box    = document.getElementById('resultBox');
+    const mainEl = document.getElementById('resultMain');
+    const detEl  = document.getElementById('resultDetails');
+    const brkEl  = document.getElementById('breakdownList');
+    const errEl  = document.getElementById('errorMsg');
+
+    box.classList.add('show');
+    errEl.textContent = ''; detEl.innerHTML = ''; brkEl.innerHTML = ''; mainEl.textContent = '';
+
+    // collect resistor values
+    const rows = document.querySelectorAll('.res-row');
+    const values = [];
+    for (const row of rows) {
+      const input = row.querySelector('input[type="number"]');
+      const v = parseFloat(input.value);
+      if (isNaN(v) || v <= 0) { errEl.textContent = 'All resistor values must be positive numbers.'; return; }
+      values.push(v);
+    }
+
+    if (values.length < 2) { errEl.textContent = 'Please add at least 2 resistors.'; return; }
+
+    let Rtotal;
+    if (mode === 'series') {
+      Rtotal = values.reduce((a, b) => a + b, 0);
+    } else {
+      Rtotal = 1 / values.reduce((a, b) => a + 1/b, 0);
+    }
+
+    mainEl.textContent = 'Rₜₒₜₐₗ = ' + fmtR(Rtotal);
+
+    const Vin = parseFloat(document.getElementById('voltage').value);
+    const hasVoltage = !isNaN(Vin) && Vin > 0;
+
+    if (hasVoltage) {
+      const I_total = Vin / Rtotal;
+      const P_total = Vin * I_total;
+      detEl.innerHTML = `
+        <div class="detail-item"><div class="detail-label">Total Resistance</div><div class="detail-value">${fmtR(Rtotal)}</div></div>
+        <div class="detail-item"><div class="detail-label">Total Current</div><div class="detail-value">${fmtI(I_total)}</div></div>
+        <div class="detail-item"><div class="detail-label">Total Power</div><div class="detail-value">${fmtP(P_total)}</div></div>
+        <div class="detail-item"><div class="detail-label">Supply Voltage</div><div class="detail-value">${Vin} V</div></div>
+      `;
+
+      // per-resistor breakdown
+      brkEl.innerHTML = '<div style="font-size:13px;font-weight:700;color:#475569;margin-bottom:6px;margin-top:4px">Per-Resistor Breakdown</div>';
+      values.forEach((R, i) => {
+        let V_r, I_r, P_r;
+        if (mode === 'series') {
+          I_r = I_total;
+          V_r = I_r * R;
+          P_r = I_r * I_r * R;
+        } else {
+          V_r = Vin;
+          I_r = V_r / R;
+          P_r = V_r * V_r / R;
+        }
+        brkEl.innerHTML += `<div class="breakdown-item">
+          <span style="font-weight:600">R${i+1} = ${fmtR(R)}</span>
+          <span>${fmtR(R)} · ${fmtI(I_r)} · ${fmtP(P_r)}</span>
+        </div>`;
+      });
+    } else {
+      detEl.innerHTML = `
+        <div class="detail-item"><div class="detail-label">Total Resistance</div><div class="detail-value">${fmtR(Rtotal)}</div></div>
+        <div class="detail-item"><div class="detail-label">Resistors</div><div class="detail-value">${values.length}</div></div>
+        <div class="detail-item"><div class="detail-label">Mode</div><div class="detail-value">${mode === 'series' ? 'Series' : 'Parallel'}</div></div>
+        <div class="detail-item"><div class="detail-label">Min / Max</div><div class="detail-value">${fmtR(Math.min(...values))} / ${fmtR(Math.max(...values))}</div></div>
+      `;
+    }
+  }
+
+  function toggleFaq(el) {
+    el.classList.toggle('open');
+    el.nextElementSibling.classList.toggle('show');
+  }
+
+  // init with 3 resistors
+  addResistor(100);
+  addResistor(220);
+  addResistor(470);
+</script>
+</body>
+</html>
