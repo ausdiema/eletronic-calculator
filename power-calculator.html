@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Power Calculator — Solve for Watts, Voltage, Current or Resistance</title>
+  <meta name="description" content="Free electrical power calculator. Enter any two values to instantly solve for power (W), voltage (V), current (A) or resistance (Ω). All 12 power formulas included." />
+  <link rel="canonical" href="https://electronics-calc.com/power-calculator.html" />
+  <meta name="google-site-verification" content="r2n8xqMBLu0F4SN8om9s2pMB6gzBUaX1Sa_D7vTRwF0" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Electrical Power Calculator",
+        "url": "https://electronics-calc.com/power-calculator.html",
+        "description": "Calculate electrical power, voltage, current or resistance from any two known values using P=VI, P=I²R and P=V²/R formulas.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the formula for electrical power?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The three main power formulas are: P = V × I (power equals voltage times current), P = I² × R (power equals current squared times resistance), and P = V² / R (power equals voltage squared divided by resistance). All three are equivalent and derived from Ohm's Law."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I calculate watts from volts and amps?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Multiply volts by amps: P (watts) = V (volts) × I (amps). For example, a 12V device drawing 2A consumes 24W."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I calculate amps from watts and volts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Divide watts by volts: I (amps) = P (watts) / V (volts). For example, a 60W light bulb on 230V draws 60/230 = 0.26A."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is 1 watt in volts and amps?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "1 watt equals 1 volt × 1 ampere. So 1W = 1V × 1A. Power, voltage and current are related by P = V × I."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I calculate resistor wattage?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Use P = I² × R or P = V² / R. For example, a 100Ω resistor with 50mA flowing through it dissipates P = (0.05)² × 100 = 0.25W. Always choose a resistor rated at least twice the calculated power."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { background: #1e293b; padding: 0 24px; display: flex; align-items: center; gap: 8px; height: 52px; }
+    nav a { color: #94a3b8; font-size: 14px; }
+    nav a:hover { color: #fff; text-decoration: none; }
+    nav span { color: #475569; font-size: 14px; }
+    nav .brand { color: #fff; font-weight: 600; font-size: 15px; margin-right: auto; }
+
+    .page { max-width: 780px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+    .subtitle { font-size: 1.05rem; color: #475569; margin-bottom: 40px; }
+
+    .calc-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .calc-card h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; color: #0f172a; }
+    .calc-card .card-sub { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+    /* solve-for buttons */
+    .solve-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 28px; }
+    @media(max-width:480px){ .solve-grid { grid-template-columns: repeat(2,1fr); } }
+    .solve-btn { padding: 10px 6px; border: 1.5px solid #e2e8f0; border-radius: 10px; background: #fff; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; transition: all .15s; text-align: center; }
+    .solve-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .solve-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .solve-btn .sym { font-size: 20px; display: block; margin-bottom: 2px; }
+
+    /* inputs */
+    .input-grid { display: grid; gap: 16px; }
+    @media(min-width:520px){ .input-grid { grid-template-columns: 1fr 1fr; } }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .input-wrap { position: relative; }
+    .input-wrap input { width: 100%; padding: 10px 52px 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; color: #0f172a; background: #fff; transition: border-color .15s; outline: none; }
+    .input-wrap input:focus { border-color: #2563eb; }
+    .input-wrap input:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
+    .unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; color: #94a3b8; pointer-events: none; }
+    .solve-badge { display: inline-block; background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+
+    .calc-btn { margin-top: 20px; width: 100%; padding: 13px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .calc-btn:hover { background: #1d4ed8; }
+
+    .result-box { margin-top: 20px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 20px 24px; display: none; }
+    .result-box.show { display: block; }
+    .result-main { font-size: 2rem; font-weight: 700; color: #1d4ed8; }
+    .result-formula { font-size: 0.9rem; color: #3b82f6; margin-top: 4px; font-family: monospace; }
+    .result-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 10px; margin-top: 16px; }
+    .detail-item { background: #fff; border-radius: 8px; padding: 10px 14px; }
+    .detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+    .detail-value { font-size: 1rem; font-weight: 600; color: #0f172a; margin-top: 2px; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; }
+
+    /* formula wheel */
+    .formula-wheel { background: #0f172a; border-radius: 16px; padding: 28px; margin: 20px 0; }
+    .wheel-title { color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; text-align: center; margin-bottom: 20px; }
+    .wheel-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+    @media(min-width:540px){ .wheel-grid { grid-template-columns: repeat(4,1fr); } }
+    .wheel-cell { background: #1e293b; border-radius: 10px; padding: 14px 10px; text-align: center; }
+    .wheel-solve { font-size: 11px; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .wheel-formula { font-family: monospace; font-size: 13px; color: #e2e8f0; line-height: 1.8; }
+
+    section { margin-bottom: 48px; }
+    section h2 { font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    section p { color: #475569; margin-bottom: 12px; }
+
+    .examples-grid { display: grid; gap: 16px; }
+    @media(min-width:560px){ .examples-grid { grid-template-columns: 1fr 1fr; } }
+    .example-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; }
+    .ex-title { font-weight: 600; color: #0f172a; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ex-badge { background: #dbeafe; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .ex-line { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; border-bottom: 1px solid #f1f5f9; color: #475569; }
+    .ex-line:last-child { border-bottom: none; font-weight: 700; color: #1d4ed8; font-size: 14px; }
+
+    .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .faq-q { padding: 15px 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #0f172a; background: #fff; }
+    .faq-q:hover { background: #f8fafc; }
+    .faq-q .arrow { color: #94a3b8; transition: transform .2s; font-size: 18px; }
+    .faq-q.open .arrow { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 20px 15px; color: #475569; font-size: 0.9rem; line-height: 1.6; }
+    .faq-a.show { display: block; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
+    .related-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #0f172a; transition: all .15s; }
+    .related-card:hover { border-color: #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,.12); text-decoration: none; }
+    .related-icon { font-size: 22px; }
+    .related-name { font-size: 14px; font-weight: 600; }
+    .related-desc { font-size: 12px; color: #94a3b8; }
+
+    footer { text-align: center; padding: 32px 20px; color: #94a3b8; font-size: 13px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ ElectroCalc</span>
+  <a href="https://electronics-calc.com/">Home</a>
+  <span>›</span>
+  <span style="color:#cbd5e1">Power Calculator</span>
+</nav>
+
+<div class="page">
+
+  <h1>Electrical Power Calculator</h1>
+  <p class="subtitle">Solve for power (W), voltage (V), current (A) or resistance (Ω) — enter any two known values and calculate the rest instantly.</p>
+
+  <div class="calc-card">
+    <h2>Calculate</h2>
+    <p class="card-sub">Select what you want to solve for, then enter the two known values.</p>
+
+    <!-- solve-for selector -->
+    <div class="solve-grid">
+      <button class="solve-btn active" id="btn-P" onclick="setSolve('P',this)">
+        <span class="sym">⚡</span>Power P
+      </button>
+      <button class="solve-btn" id="btn-V" onclick="setSolve('V',this)">
+        <span class="sym">🔋</span>Voltage V
+      </button>
+      <button class="solve-btn" id="btn-I" onclick="setSolve('I',this)">
+        <span class="sym">〰️</span>Current I
+      </button>
+      <button class="solve-btn" id="btn-R" onclick="setSolve('R',this)">
+        <span class="sym">〽️</span>Resistance R
+      </button>
+    </div>
+
+    <!-- inputs -->
+    <div class="input-grid" id="inputGrid"></div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate →</button>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-main" id="resultMain"></div>
+      <div class="result-formula" id="resultFormula"></div>
+      <div class="result-details" id="resultDetails"></div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- formula wheel -->
+  <section>
+    <h2>All 12 Power Formulas</h2>
+    <p>Every combination of P, V, I and R — derived from P = V·I and Ohm's Law (V = I·R):</p>
+    <div class="formula-wheel">
+      <div class="wheel-title">Power Triangle — solve for any variable</div>
+      <div class="wheel-grid">
+        <div class="wheel-cell">
+          <div class="wheel-solve">Solve P</div>
+          <div class="wheel-formula">P = V × I<br>P = I² × R<br>P = V² / R</div>
+        </div>
+        <div class="wheel-cell">
+          <div class="wheel-solve">Solve V</div>
+          <div class="wheel-formula">V = P / I<br>V = I × R<br>V = √(P × R)</div>
+        </div>
+        <div class="wheel-cell">
+          <div class="wheel-solve">Solve I</div>
+          <div class="wheel-formula">I = P / V<br>I = V / R<br>I = √(P / R)</div>
+        </div>
+        <div class="wheel-cell">
+          <div class="wheel-solve">Solve R</div>
+          <div class="wheel-formula">R = V / I<br>R = V² / P<br>R = P / I²</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- examples -->
+  <section>
+    <h2>Worked Examples</h2>
+    <div class="examples-grid">
+
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">1</span> Light bulb power</div>
+        <div class="ex-line"><span>Voltage V</span><span>230 V</span></div>
+        <div class="ex-line"><span>Current I</span><span>0.26 A</span></div>
+        <div class="ex-line"><span>P = V × I</span><span>≈ 60 W</span></div>
+      </div>
+
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">2</span> Resistor dissipation</div>
+        <div class="ex-line"><span>Current I</span><span>50 mA</span></div>
+        <div class="ex-line"><span>Resistance R</span><span>100 Ω</span></div>
+        <div class="ex-line"><span>P = I² × R</span><span>0.25 W</span></div>
+      </div>
+
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">3</span> Find current from power</div>
+        <div class="ex-line"><span>Power P</span><span>100 W</span></div>
+        <div class="ex-line"><span>Voltage V</span><span>12 V</span></div>
+        <div class="ex-line"><span>I = P / V</span><span>8.33 A</span></div>
+      </div>
+
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">4</span> Find resistance from P & V</div>
+        <div class="ex-line"><span>Power P</span><span>25 W</span></div>
+        <div class="ex-line"><span>Voltage V</span><span>5 V</span></div>
+        <div class="ex-line"><span>R = V² / P</span><span>1 Ω</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the formula for electrical power?<span class="arrow">▾</span></div>
+      <div class="faq-a">The fundamental formula is <strong>P = V × I</strong> (watts = volts × amps). Combined with Ohm's Law (V = I × R) you get two more: <strong>P = I² × R</strong> and <strong>P = V² / R</strong>. All three give the same result — use whichever matches your known values.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I calculate watts from volts and amps?<span class="arrow">▾</span></div>
+      <div class="faq-a">Multiply volts by amps: <strong>P = V × I</strong>. Example: 12 V × 2 A = 24 W. This works for DC circuits and for AC circuits where you use RMS voltage and current values.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I calculate amps from watts and volts?<span class="arrow">▾</span></div>
+      <div class="faq-a">Divide watts by volts: <strong>I = P / V</strong>. Example: a 60 W bulb on 230 V draws 60 / 230 = 0.26 A. This is useful for sizing fuses and cable ratings.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I calculate resistor power rating?<span class="arrow">▾</span></div>
+      <div class="faq-a">Use <strong>P = I² × R</strong> or <strong>P = V² / R</strong>. Always choose a resistor rated at least twice the calculated dissipation for a safety margin. Standard ratings: 1/8 W, 1/4 W, 1/2 W, 1 W, 2 W.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the difference between watts and volt-amps (VA)?<span class="arrow">▾</span></div>
+      <div class="faq-a">In DC circuits, watts and VA are identical. In AC circuits, watts (W) is real power that does actual work, while volt-amps (VA) is apparent power. The ratio W/VA is the power factor. For resistive loads (heaters, incandescent bulbs) power factor = 1, so W = VA. For motors and capacitors, power factor &lt; 1.</div>
+    </div>
+  </section>
+
+  <!-- related -->
+  <section>
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a class="related-card" href="ohms-law-calculator.html">
+        <span class="related-icon">⚡</span>
+        <div><div class="related-name">Ohm's Law</div><div class="related-desc">Solve V, I or R</div></div>
+      </a>
+      <a class="related-card" href="led-resistor-calculator.html">
+        <span class="related-icon">💡</span>
+        <div><div class="related-name">LED Resistor</div><div class="related-desc">Current-limiting resistor</div></div>
+      </a>
+      <a class="related-card" href="series-parallel-resistor-calculator.html">
+        <span class="related-icon">〽️</span>
+        <div><div class="related-name">Series / Parallel</div><div class="related-desc">Total resistance</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/">
+        <span class="related-icon">🔋</span>
+        <div><div class="related-name">All Calculators</div><div class="related-desc">Full toolset</div></div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2025 ElectroCalc · Free electronics calculators · <a href="https://electronics-calc.com/">Home</a></p>
+</footer>
+
+<script>
+  let solveFor = 'P';
+
+  const FIELDS = {
+    P: { label: 'Power (P)', unit: 'W',  id: 'inp-P' },
+    V: { label: 'Voltage (V)', unit: 'V', id: 'inp-V' },
+    I: { label: 'Current (I)', unit: 'A', id: 'inp-I' },
+    R: { label: 'Resistance (R)', unit: 'Ω', id: 'inp-R' },
+  };
+
+  // combinations: given two known → formula
+  const FORMULAS = {
+    'P': {
+      'VI': { fn: (V,I)=>V*I,         str: 'P = V × I' },
+      'IR': { fn: (I,R)=>I*I*R,       str: 'P = I² × R' },
+      'VR': { fn: (V,R)=>V*V/R,       str: 'P = V² / R' },
+    },
+    'V': {
+      'PI': { fn: (P,I)=>P/I,         str: 'V = P / I' },
+      'IR': { fn: (I,R)=>I*R,         str: 'V = I × R' },
+      'PR': { fn: (P,R)=>Math.sqrt(P*R), str: 'V = √(P × R)' },
+    },
+    'I': {
+      'PV': { fn: (P,V)=>P/V,         str: 'I = P / V' },
+      'VR': { fn: (V,R)=>V/R,         str: 'I = V / R' },
+      'PR': { fn: (P,R)=>Math.sqrt(P/R), str: 'I = √(P / R)' },
+    },
+    'R': {
+      'VI': { fn: (V,I)=>V/I,         str: 'R = V / I' },
+      'PV': { fn: (P,V)=>V*V/P,       str: 'R = V² / P' },
+      'PI': { fn: (P,I)=>P/(I*I),     str: 'R = P / I²' },
+    },
+  };
+
+  function fmt(v, unit) {
+    if (unit === 'W') {
+      if (v >= 1e6) return (v/1e6).toPrecision(4).replace(/\.?0+$/,'') + ' MW';
+      if (v >= 1e3) return (v/1e3).toPrecision(4).replace(/\.?0+$/,'') + ' kW';
+      if (v < 1)    return (v*1e3).toPrecision(4).replace(/\.?0+$/,'') + ' mW';
+      return v.toPrecision(4).replace(/\.?0+$/,'') + ' W';
+    }
+    if (unit === 'A') {
+      if (v < 1e-3) return (v*1e6).toPrecision(4).replace(/\.?0+$/,'') + ' µA';
+      if (v < 1)    return (v*1e3).toPrecision(4).replace(/\.?0+$/,'') + ' mA';
+      return v.toPrecision(4).replace(/\.?0+$/,'') + ' A';
+    }
+    if (unit === 'Ω') {
+      if (v >= 1e6) return (v/1e6).toPrecision(4).replace(/\.?0+$/,'') + ' MΩ';
+      if (v >= 1e3) return (v/1e3).toPrecision(4).replace(/\.?0+$/,'') + ' kΩ';
+      return v.toPrecision(4).replace(/\.?0+$/,'') + ' Ω';
+    }
+    return v.toPrecision(4).replace(/\.?0+$/,'') + ' ' + unit;
+  }
+
+  function buildInputs() {
+    const grid = document.getElementById('inputGrid');
+    grid.innerHTML = '';
+    const others = ['P','V','I','R'].filter(k => k !== solveFor);
+    others.forEach(k => {
+      const f = FIELDS[k];
+      const div = document.createElement('div');
+      div.className = 'field';
+      div.innerHTML = `
+        <label for="${f.id}">${f.label}</label>
+        <div class="input-wrap">
+          <input type="number" id="${f.id}" placeholder="enter value" min="0" step="any" />
+          <span class="unit">${f.unit}</span>
+        </div>`;
+      grid.appendChild(div);
+    });
+    // solve-for field (disabled)
+    const sf = FIELDS[solveFor];
+    const div = document.createElement('div');
+    div.className = 'field';
+    div.innerHTML = `
+      <label for="${sf.id}">${sf.label} <span class="solve-badge">SOLVE</span></label>
+      <div class="input-wrap">
+        <input type="number" id="${sf.id}" placeholder="calculated" disabled />
+        <span class="unit">${sf.unit}</span>
+      </div>`;
+    grid.appendChild(div);
+  }
+
+  function setSolve(s, btn) {
+    solveFor = s;
+    document.querySelectorAll('.solve-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    buildInputs();
+    document.getElementById('resultBox').classList.remove('show');
+  }
+
+  function calculate() {
+    const box    = document.getElementById('resultBox');
+    const mainEl = document.getElementById('resultMain');
+    const fmlEl  = document.getElementById('resultFormula');
+    const detEl  = document.getElementById('resultDetails');
+    const errEl  = document.getElementById('errorMsg');
+
+    box.classList.add('show');
+    errEl.textContent = ''; detEl.innerHTML = ''; mainEl.textContent = ''; fmlEl.textContent = '';
+
+    // read known values
+    const known = {};
+    ['P','V','I','R'].filter(k => k !== solveFor).forEach(k => {
+      const el = document.getElementById(FIELDS[k].id);
+      if (el) known[k] = parseFloat(el.value);
+    });
+
+    const knownKeys = Object.keys(known).filter(k => !isNaN(known[k]) && known[k] > 0);
+    if (knownKeys.length < 2) { errEl.textContent = 'Please enter at least two values.'; return; }
+
+    // find matching formula
+    const fmls = FORMULAS[solveFor];
+    let result = null, formulaStr = '';
+    for (const combo of Object.keys(fmls)) {
+      const keys = combo.split('');
+      if (keys.every(k => knownKeys.includes(k))) {
+        const args = keys.map(k => known[k]);
+        result = fmls[combo].fn(...args);
+        formulaStr = fmls[combo].str;
+        break;
+      }
+    }
+
+    if (result === null || isNaN(result) || !isFinite(result) || result <= 0) {
+      errEl.textContent = 'Could not calculate — check your input values.';
+      return;
+    }
+
+    const sf = FIELDS[solveFor];
+    mainEl.textContent = fmt(result, sf.unit);
+    fmlEl.textContent  = formulaStr;
+
+    // fill all four values for details
+    const all = { ...known, [solveFor]: result };
+    // derive any missing
+    if (!all.P && all.V && all.I) all.P = all.V * all.I;
+    if (!all.R && all.V && all.I) all.R = all.V / all.I;
+    if (!all.V && all.P && all.I) all.V = all.P / all.I;
+    if (!all.I && all.P && all.V) all.I = all.P / all.V;
+
+    detEl.innerHTML = ['P','V','I','R'].map(k => {
+      const f = FIELDS[k];
+      const v = all[k];
+      return `<div class="detail-item">
+        <div class="detail-label">${f.label}</div>
+        <div class="detail-value">${v && isFinite(v) ? fmt(v, f.unit) : '—'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleFaq(el) {
+    el.classList.toggle('open');
+    el.nextElementSibling.classList.toggle('show');
+  }
+
+  buildInputs();
+</script>
+</body>
+</html>
