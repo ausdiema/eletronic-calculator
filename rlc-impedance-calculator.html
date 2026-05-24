@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RLC Impedance Calculator — Series &amp; Parallel, Resonance, Q Factor</title>
+  <meta name="description" content="Calculate RLC circuit impedance, reactance, phase angle, resonant frequency and Q factor for series and parallel RLC circuits. Instant results." />
+  <link rel="canonical" href="https://electronics-calc.com/rlc-impedance-calculator.html" />
+  <meta name="google-site-verification" content="miH9b5abkKUBm5JfTS3vTU6B1TrSRIQG3IjDfTy4RaA" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "RLC Impedance Calculator",
+        "url": "https://electronics-calc.com/rlc-impedance-calculator.html",
+        "description": "Calculate impedance, reactance, phase angle, resonant frequency and Q factor for series and parallel RLC circuits.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do I calculate RLC impedance?",
+            "acceptedAnswer": { "@type": "Answer", "text": "For a series RLC circuit: Z = √(R² + (XL − XC)²), where XL = 2πfL is inductive reactance and XC = 1/(2πfC) is capacitive reactance. The phase angle is φ = arctan((XL − XC) / R)." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the resonant frequency of an RLC circuit?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The resonant frequency is f₀ = 1 / (2π√(LC)). At resonance XL = XC, so net reactance is zero. In a series circuit impedance is minimum (= R); in a parallel circuit impedance is maximum." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the Q factor of an RLC circuit?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The quality factor Q indicates how selective (sharp) a resonant circuit is. For series RLC: Q = (1/R)√(L/C). For parallel RLC: Q = R√(C/L). Higher Q means a narrower bandwidth." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between series and parallel RLC impedance?",
+            "acceptedAnswer": { "@type": "Answer", "text": "In a series RLC circuit at resonance, impedance is minimum (= R) and current is maximum. In a parallel RLC circuit at resonance, impedance is maximum (= R for ideal components) and current is minimum. Both have the same resonant frequency f₀ = 1/(2π√(LC))." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is inductive reactance?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Inductive reactance XL = 2πfL (in ohms) is the opposition of an inductor to AC current. It increases with frequency. At DC (f=0), XL = 0 (inductor is a short circuit). At very high frequencies, XL becomes very large (open circuit)." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { background: #1e293b; padding: 0 24px; display: flex; align-items: center; gap: 8px; height: 52px; }
+    nav a { color: #94a3b8; font-size: 14px; }
+    nav a:hover { color: #fff; text-decoration: none; }
+    nav span { color: #475569; font-size: 14px; }
+    nav .brand { color: #fff; font-weight: 600; font-size: 15px; margin-right: auto; }
+
+    .page { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+    .subtitle { font-size: 1.05rem; color: #475569; margin-bottom: 40px; }
+
+    .calc-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .calc-card h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; color: #0f172a; }
+    .calc-card .card-sub { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+    .tab-row { display: flex; gap: 8px; margin-bottom: 28px; }
+    .tab-btn { flex: 1; padding: 11px 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; background: #fff; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; transition: all .15s; text-align: center; }
+    .tab-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .tab-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+    .input-grid { display: grid; gap: 16px; }
+    @media(min-width:520px){ .input-grid { grid-template-columns: 1fr 1fr; } }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .field .hint { font-size: 11px; color: #94a3b8; font-weight: 400; margin-left: 4px; }
+    .field-row { display: flex; gap: 8px; }
+    .input-wrap { position: relative; flex: 1; }
+    .input-wrap input { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; color: #0f172a; background: #fff; transition: border-color .15s; outline: none; }
+    .input-wrap input:focus { border-color: #2563eb; }
+    .unit-sel { padding: 10px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; color: #475569; background: #f8fafc; cursor: pointer; outline: none; flex-shrink: 0; appearance: none; text-align: center; min-width: 60px; }
+    .unit-sel:focus { border-color: #2563eb; }
+
+    .calc-btn { margin-top: 20px; width: 100%; padding: 13px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .calc-btn:hover { background: #1d4ed8; }
+
+    .result-box { margin-top: 22px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 20px 24px; display: none; }
+    .result-box.show { display: block; }
+    .result-main { font-size: 2rem; font-weight: 700; color: #1d4ed8; }
+    .result-sub  { font-size: 0.88rem; color: #3b82f6; margin-top: 4px; font-family: monospace; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-top: 16px; }
+    .res-item { background: #fff; border-radius: 8px; padding: 10px 14px; }
+    .res-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+    .res-value { font-size: 1rem; font-weight: 600; color: #0f172a; margin-top: 2px; }
+    .res-value.highlight { color: #1d4ed8; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; }
+
+    /* phasor diagram */
+    .phasor-wrap { margin-top: 18px; background: #fff; border-radius: 10px; padding: 16px; text-align: center; }
+    .phasor-label { font-size: 12px; color: #64748b; margin-bottom: 10px; font-weight: 600; }
+
+    /* formula card */
+    .info-card { background: #0f172a; border-radius: 14px; padding: 24px 28px; margin: 8px 0 28px; }
+    .info-title { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+    .formula-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; }
+    .f-item { background: #1e293b; border-radius: 8px; padding: 12px 14px; }
+    .f-label { font-size: 11px; color: #60a5fa; font-weight: 600; margin-bottom: 4px; }
+    .f-formula { font-family: monospace; font-size: 13px; color: #e2e8f0; line-height: 1.6; }
+
+    section { margin-bottom: 48px; }
+    section h2 { font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    section p { color: #475569; margin-bottom: 12px; }
+
+    .examples-grid { display: grid; gap: 16px; }
+    @media(min-width:560px){ .examples-grid { grid-template-columns: 1fr 1fr; } }
+    .example-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; }
+    .ex-title { font-weight: 600; color: #0f172a; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ex-badge { background: #dbeafe; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .ex-line { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; border-bottom: 1px solid #f1f5f9; color: #475569; }
+    .ex-line:last-child { border-bottom: none; font-weight: 700; color: #1d4ed8; font-size: 14px; }
+
+    .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .faq-q { padding: 15px 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #0f172a; background: #fff; }
+    .faq-q:hover { background: #f8fafc; }
+    .faq-q .arrow { color: #94a3b8; transition: transform .2s; font-size: 18px; }
+    .faq-q.open .arrow { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 20px 15px; color: #475569; font-size: 0.9rem; line-height: 1.6; }
+    .faq-a.show { display: block; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
+    .related-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #0f172a; transition: all .15s; }
+    .related-card:hover { border-color: #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,.12); text-decoration: none; }
+    .related-icon { font-size: 22px; }
+    .related-name { font-size: 14px; font-weight: 600; }
+    .related-desc { font-size: 12px; color: #94a3b8; }
+
+    footer { text-align: center; padding: 32px 20px; color: #94a3b8; font-size: 13px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ ElectroCalc</span>
+  <a href="https://electronics-calc.com/">Home</a>
+  <span>›</span>
+  <span style="color:#cbd5e1">RLC Impedance Calculator</span>
+</nav>
+
+<div class="page">
+
+  <h1>RLC Impedance Calculator</h1>
+  <p class="subtitle">Calculate impedance (Z), reactance, phase angle, resonant frequency and Q factor for series and parallel RLC circuits.</p>
+
+  <div class="calc-card">
+    <h2>Calculate</h2>
+    <p class="card-sub">Select circuit topology, enter component values and frequency.</p>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="setMode('series',this)">Series RLC</button>
+      <button class="tab-btn" onclick="setMode('parallel',this)">Parallel RLC</button>
+    </div>
+
+    <div class="input-grid">
+      <div class="field">
+        <label>Resistance (R) <span class="hint">0 = pure LC</span></label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="inp-R" placeholder="e.g. 10" min="0" step="any" value="10" /></div>
+          <select class="unit-sel" id="unit-R">
+            <option value="1">Ω</option>
+            <option value="1e3">kΩ</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Inductance (L) <span class="hint">0 = no inductor</span></label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="inp-L" placeholder="e.g. 10" min="0" step="any" value="10" /></div>
+          <select class="unit-sel" id="unit-L">
+            <option value="1e-6">µH</option>
+            <option value="1e-3" selected>mH</option>
+            <option value="1">H</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Capacitance (C) <span class="hint">0 = no capacitor</span></label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="inp-C" placeholder="e.g. 100" min="0" step="any" value="100" /></div>
+          <select class="unit-sel" id="unit-C">
+            <option value="1e-12">pF</option>
+            <option value="1e-9">nF</option>
+            <option value="1e-6" selected>µF</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Frequency (f)</label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="inp-f" placeholder="e.g. 1" min="0" step="any" value="1" /></div>
+          <select class="unit-sel" id="unit-f">
+            <option value="1">Hz</option>
+            <option value="1e3" selected>kHz</option>
+            <option value="1e6">MHz</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate →</button>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-main" id="resultMain"></div>
+      <div class="result-sub"  id="resultSub"></div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="error-msg"   id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- Formulas -->
+  <section>
+    <h2>RLC Circuit Formulas</h2>
+    <p>Key equations for series and parallel RLC circuits:</p>
+    <div class="info-card">
+      <div class="info-title">Series RLC</div>
+      <div class="formula-list" style="margin-bottom:16px">
+        <div class="f-item"><div class="f-label">Inductive Reactance</div><div class="f-formula">XL = 2π × f × L</div></div>
+        <div class="f-item"><div class="f-label">Capacitive Reactance</div><div class="f-formula">XC = 1 / (2π × f × C)</div></div>
+        <div class="f-item"><div class="f-label">Impedance</div><div class="f-formula">Z = √(R² + (XL−XC)²)</div></div>
+        <div class="f-item"><div class="f-label">Phase Angle</div><div class="f-formula">φ = arctan((XL−XC)/R)</div></div>
+        <div class="f-item"><div class="f-label">Resonant Frequency</div><div class="f-formula">f₀ = 1 / (2π√(LC))</div></div>
+        <div class="f-item"><div class="f-label">Q Factor</div><div class="f-formula">Q = (1/R) × √(L/C)</div></div>
+      </div>
+      <div class="info-title">Parallel RLC</div>
+      <div class="formula-list">
+        <div class="f-item"><div class="f-label">Admittance</div><div class="f-formula">Y = √((1/R)² + (1/XC−1/XL)²)</div></div>
+        <div class="f-item"><div class="f-label">Impedance</div><div class="f-formula">Z = 1 / Y</div></div>
+        <div class="f-item"><div class="f-label">Resonant Frequency</div><div class="f-formula">f₀ = 1 / (2π√(LC))</div></div>
+        <div class="f-item"><div class="f-label">Q Factor</div><div class="f-formula">Q = R × √(C/L)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Examples -->
+  <section>
+    <h2>Worked Examples</h2>
+    <div class="examples-grid">
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">1</span>Series RLC at 1 kHz</div>
+        <div class="ex-line"><span>R = 10 Ω, L = 10 mH, C = 100 µF</span></div>
+        <div class="ex-line"><span>XL = 2π×1k×0.01</span><span>62.83 Ω</span></div>
+        <div class="ex-line"><span>XC = 1/(2π×1k×100µ)</span><span>1.59 Ω</span></div>
+        <div class="ex-line"><span>Z = √(10²+61.24²)</span><span>≈ 61.9 Ω</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">2</span>Resonant frequency</div>
+        <div class="ex-line"><span>L = 10 mH, C = 100 µF</span></div>
+        <div class="ex-line"><span>f₀ = 1/(2π√(LC))</span><span>≈ 159 Hz</span></div>
+        <div class="ex-line"><span>At f₀: XL = XC</span><span>Z = R = 10 Ω</span></div>
+        <div class="ex-line"><span>Q = (1/10)×√(0.01/100µ)</span><span>≈ 1.0</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">3</span>Inductive circuit</div>
+        <div class="ex-line"><span>R = 50 Ω, L = 100 mH, C = 0</span></div>
+        <div class="ex-line"><span>f = 500 Hz</span></div>
+        <div class="ex-line"><span>XL = 2π×500×0.1</span><span>314.2 Ω</span></div>
+        <div class="ex-line"><span>Z = √(50²+314.2²)</span><span>≈ 318 Ω</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">4</span>Capacitive circuit</div>
+        <div class="ex-line"><span>R = 100 Ω, L = 0, C = 10 µF</span></div>
+        <div class="ex-line"><span>f = 1 kHz</span></div>
+        <div class="ex-line"><span>XC = 1/(2π×1k×10µ)</span><span>15.92 Ω</span></div>
+        <div class="ex-line"><span>Z = √(100²+15.92²)</span><span>≈ 101.3 Ω</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I calculate RLC impedance? <span class="arrow">▾</span></div>
+      <div class="faq-a">For series RLC: Z = √(R² + (XL − XC)²), where XL = 2πfL and XC = 1/(2πfC). For parallel: Z = 1 / √((1/R)² + (1/XC − 1/XL)²). The phase angle is φ = arctan((XL−XC)/R).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the resonant frequency of an RLC circuit? <span class="arrow">▾</span></div>
+      <div class="faq-a">f₀ = 1 / (2π√(LC)). At resonance, XL = XC and net reactance is zero. Series RLC has minimum impedance (= R); parallel RLC has maximum impedance.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What does a positive or negative phase angle mean? <span class="arrow">▾</span></div>
+      <div class="faq-a">Positive φ means the circuit is inductive (XL &gt; XC) — voltage leads current. Negative φ means capacitive (XC &gt; XL) — current leads voltage. At resonance φ = 0° (purely resistive).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is Q factor and why does it matter? <span class="arrow">▾</span></div>
+      <div class="faq-a">Q (quality factor) indicates how selective a resonant circuit is. High Q = narrow bandwidth = sharper resonance peak. Bandwidth BW = f₀ / Q. For series RLC: Q = (1/R)√(L/C).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the difference between impedance and resistance? <span class="arrow">▾</span></div>
+      <div class="faq-a">Resistance (R) opposes current in DC and AC circuits and dissipates energy as heat. Impedance (Z) is the total opposition to AC current, combining resistance and reactance. Z = √(R² + X²). Unlike R, impedance depends on frequency.</div>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section>
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a class="related-card" href="https://electronics-calc.com/ohms-law-calculator.html">
+        <span class="related-icon">⚡</span>
+        <div><div class="related-name">Ohm's Law</div><div class="related-desc">Solve V, I or R</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/capacitor-charge-calculator.html">
+        <span class="related-icon">🔋</span>
+        <div><div class="related-name">Capacitor Charge</div><div class="related-desc">RC time constant</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/voltage-divider-calculator.html">
+        <span class="related-icon">🔁</span>
+        <div><div class="related-name">Voltage Divider</div><div class="related-desc">R1, R2, Vout</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/">
+        <span class="related-icon">🔌</span>
+        <div><div class="related-name">All Calculators</div><div class="related-desc">Full toolset</div></div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2025 ElectroCalc · Free electronics calculators · <a href="https://electronics-calc.com/">Home</a></p>
+</footer>
+
+<script>
+let mode = 'series';
+
+function setMode(m, btn) {
+  mode = m;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('resultBox').classList.remove('show');
+}
+
+function fmtOhm(v) {
+  const a = Math.abs(v);
+  if (a < 0.001)  return v.toExponential(3) + ' Ω';
+  if (a < 1)      return (v * 1000).toFixed(3) + ' mΩ';
+  if (a < 1000)   return v.toFixed(4) + ' Ω';
+  return (v / 1000).toFixed(4) + ' kΩ';
+}
+
+function fmtFreq(f) {
+  if (f < 1)      return (f * 1000).toFixed(2) + ' mHz';
+  if (f < 1000)   return f.toFixed(3) + ' Hz';
+  if (f < 1e6)    return (f / 1000).toFixed(4) + ' kHz';
+  return (f / 1e6).toFixed(4) + ' MHz';
+}
+
+function getVal(id, uid) {
+  return parseFloat(document.getElementById(id).value) * parseFloat(document.getElementById(uid).value);
+}
+
+function calculate() {
+  const R = getVal('inp-R', 'unit-R');
+  const L = getVal('inp-L', 'unit-L');
+  const C = getVal('inp-C', 'unit-C');
+  const f = getVal('inp-f', 'unit-f');
+
+  if (isNaN(f) || f <= 0) { showError('Enter a valid frequency.'); return; }
+  if (isNaN(R) || R < 0)  { showError('Enter a valid resistance (0 or more).'); return; }
+
+  const omega = 2 * Math.PI * f;
+  const XL = (L > 0) ? omega * L : 0;
+  const XC = (C > 0) ? 1 / (omega * C) : 0;
+  const X  = XL - XC;
+
+  let Z, phi, items;
+
+  if (mode === 'series') {
+    Z   = Math.sqrt(R * R + X * X);
+    phi = Math.atan2(X, R) * 180 / Math.PI;
+  } else {
+    // parallel admittance
+    const G  = (R > 0) ? 1 / R : 0;
+    const BL = (XL > 0) ? 1 / XL : 0;
+    const BC = (XC > 0) ? 1 / XC : 0;
+    const B  = BC - BL;
+    const Y  = Math.sqrt(G * G + B * B);
+    Z   = (Y > 0) ? 1 / Y : Infinity;
+    phi = Math.atan2(-B, G) * 180 / Math.PI;
+  }
+
+  // Resonant frequency
+  let f0 = null, Q = null, BW = null;
+  if (L > 0 && C > 0) {
+    f0 = 1 / (2 * Math.PI * Math.sqrt(L * C));
+    if (mode === 'series') {
+      Q = (R > 0) ? (1 / R) * Math.sqrt(L / C) : Infinity;
+    } else {
+      Q = (R > 0) ? R * Math.sqrt(C / L) : Infinity;
+    }
+    BW = (Q > 0 && isFinite(Q)) ? f0 / Q : 0;
+  }
+
+  const charType = X > 0.001 ? 'Inductive (XL > XC)' : X < -0.001 ? 'Capacitive (XC > XL)' : 'Resistive (resonance)';
+
+  items = [
+    { label: 'Impedance |Z|', value: fmtOhm(Z), highlight: true },
+    { label: 'Phase Angle φ', value: phi.toFixed(2) + '°' },
+    { label: 'XL (inductive)', value: fmtOhm(XL) },
+    { label: 'XC (capacitive)', value: fmtOhm(XC) },
+    { label: 'Net Reactance X', value: fmtOhm(X) },
+    { label: 'Circuit type', value: charType },
+  ];
+
+  if (f0 !== null) {
+    items.push({ label: 'Resonant f₀', value: fmtFreq(f0) });
+    items.push({ label: 'Q Factor', value: isFinite(Q) ? Q.toFixed(3) : '∞' });
+    if (BW > 0) items.push({ label: 'Bandwidth', value: fmtFreq(BW) });
+  }
+
+  document.getElementById('resultMain').textContent = fmtOhm(Z);
+  document.getElementById('resultSub').textContent  =
+    `Z = ${fmtOhm(Z)},  φ = ${phi.toFixed(2)}°,  XL = ${fmtOhm(XL)},  XC = ${fmtOhm(XC)}`;
+  document.getElementById('resultGrid').innerHTML = items.map(i =>
+    `<div class="res-item"><div class="res-label">${i.label}</div><div class="res-value${i.highlight?' highlight':''}">${i.value}</div></div>`
+  ).join('');
+  document.getElementById('errorMsg').textContent = '';
+  document.getElementById('resultBox').classList.add('show');
+}
+
+function showError(msg) {
+  document.getElementById('resultMain').textContent = '';
+  document.getElementById('resultSub').textContent  = '';
+  document.getElementById('resultGrid').innerHTML   = '';
+  document.getElementById('errorMsg').textContent   = msg;
+  document.getElementById('resultBox').classList.add('show');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+
+function toggleFaq(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('show');
+}
+</script>
+</body>
+</html>
