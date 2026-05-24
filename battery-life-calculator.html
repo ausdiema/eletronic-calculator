@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Battery Life Calculator — Runtime from mAh &amp; Current Draw</title>
+  <meta name="description" content="Calculate battery runtime from capacity (mAh), current draw (mA), voltage and efficiency. Find out how long your battery will last for any device or project." />
+  <link rel="canonical" href="https://electronics-calc.com/battery-life-calculator.html" />
+  <meta name="google-site-verification" content="miH9b5abkKUBm5JfTS3vTU6B1TrSRIQG3IjDfTy4RaA" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Battery Life Calculator",
+        "url": "https://electronics-calc.com/battery-life-calculator.html",
+        "description": "Calculate battery runtime from capacity (mAh), average current draw, voltage and efficiency factor.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do I calculate battery life?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Battery life (hours) = Battery capacity (mAh) ÷ Average current draw (mA). For example, a 2000 mAh battery powering a 100 mA device lasts 2000 ÷ 100 = 20 hours. In practice multiply by an efficiency factor (typically 0.7–0.9) to account for real-world losses." }
+          },
+          {
+            "@type": "Question",
+            "name": "What does mAh mean for a battery?",
+            "acceptedAnswer": { "@type": "Answer", "text": "mAh stands for milliampere-hours. It measures the total charge a battery can deliver. A 2000 mAh battery can supply 2000 mA for 1 hour, or 200 mA for 10 hours, or 100 mA for 20 hours." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is depth of discharge (DoD)?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Depth of discharge is the percentage of the battery capacity that has been used. Lithium-ion batteries last longest when kept between 20–80% charge (60% DoD). Fully discharging Li-ion batteries regularly reduces their lifespan." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I convert mAh to Wh?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Watt-hours = mAh × Voltage ÷ 1000. For example, a 3000 mAh battery at 3.7 V stores 3000 × 3.7 ÷ 1000 = 11.1 Wh." }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is real battery life shorter than calculated?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Real battery life is shorter due to: voltage sag under load, temperature effects, aging, DC-DC converter losses (typically 5–20%), and the fact that batteries can't be fully depleted in practice. A correction factor of 0.7–0.85 is typical for embedded systems." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { background: #1e293b; padding: 0 24px; display: flex; align-items: center; gap: 8px; height: 52px; }
+    nav a { color: #94a3b8; font-size: 14px; }
+    nav a:hover { color: #fff; text-decoration: none; }
+    nav span { color: #475569; font-size: 14px; }
+    nav .brand { color: #fff; font-weight: 600; font-size: 15px; margin-right: auto; }
+
+    .page { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+    .subtitle { font-size: 1.05rem; color: #475569; margin-bottom: 40px; }
+
+    .calc-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .calc-card h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; color: #0f172a; }
+    .calc-card .card-sub { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+    .input-grid { display: grid; gap: 16px; }
+    @media(min-width:520px){ .input-grid { grid-template-columns: 1fr 1fr; } }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .field-row { display: flex; gap: 8px; }
+    .input-wrap { position: relative; flex: 1; }
+    .input-wrap input { width: 100%; padding: 10px 60px 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; color: #0f172a; background: #fff; transition: border-color .15s; outline: none; }
+    .input-wrap input:focus { border-color: #2563eb; }
+    .unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; color: #94a3b8; pointer-events: none; }
+    .unit-sel { padding: 10px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; color: #475569; background: #f8fafc; cursor: pointer; outline: none; flex-shrink: 0; appearance: none; text-align: center; min-width: 64px; }
+
+    /* slider */
+    .slider-wrap { margin-top: 4px; }
+    .slider-wrap input[type=range] { width: 100%; accent-color: #2563eb; height: 4px; }
+    .slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .slider-val { text-align: center; font-size: 14px; font-weight: 700; color: #2563eb; margin-bottom: 4px; }
+
+    .calc-btn { margin-top: 20px; width: 100%; padding: 13px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .calc-btn:hover { background: #1d4ed8; }
+
+    /* result */
+    .result-box { margin-top: 22px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 20px 24px; display: none; }
+    .result-box.show { display: block; }
+    .result-main { font-size: 2.4rem; font-weight: 700; color: #1d4ed8; }
+    .result-sub  { font-size: 0.88rem; color: #3b82f6; margin-top: 4px; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-top: 16px; }
+    .res-item { background: #fff; border-radius: 8px; padding: 10px 14px; }
+    .res-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+    .res-value { font-size: 1rem; font-weight: 600; color: #0f172a; margin-top: 2px; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; }
+
+    /* battery bar */
+    .batt-visual { margin-top: 18px; }
+    .batt-label { font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600; }
+    .batt-bar { background: #e2e8f0; border-radius: 6px; height: 22px; overflow: hidden; }
+    .batt-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg,#2563eb,#60a5fa); transition: width .5s; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: 700; color: #fff; }
+
+    /* reference table */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
+    thead tr { background: #1e293b; color: #fff; }
+    thead th { padding: 11px 14px; text-align: left; font-weight: 600; font-size: 12px; white-space: nowrap; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:hover { background: #eff6ff; }
+    tbody td { padding: 9px 14px; color: #374151; border-bottom: 1px solid #f1f5f9; }
+
+    section { margin-bottom: 48px; }
+    section h2 { font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    section p { color: #475569; margin-bottom: 12px; }
+
+    .examples-grid { display: grid; gap: 16px; }
+    @media(min-width:560px){ .examples-grid { grid-template-columns: 1fr 1fr; } }
+    .example-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; }
+    .ex-title { font-weight: 600; color: #0f172a; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ex-badge { background: #dbeafe; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .ex-line { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; border-bottom: 1px solid #f1f5f9; color: #475569; }
+    .ex-line:last-child { border-bottom: none; font-weight: 700; color: #1d4ed8; font-size: 14px; }
+
+    .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .faq-q { padding: 15px 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #0f172a; background: #fff; }
+    .faq-q:hover { background: #f8fafc; }
+    .faq-q .arrow { color: #94a3b8; transition: transform .2s; font-size: 18px; }
+    .faq-q.open .arrow { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 20px 15px; color: #475569; font-size: 0.9rem; line-height: 1.6; }
+    .faq-a.show { display: block; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
+    .related-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #0f172a; transition: all .15s; }
+    .related-card:hover { border-color: #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,.12); text-decoration: none; }
+    .related-icon { font-size: 22px; }
+    .related-name { font-size: 14px; font-weight: 600; }
+    .related-desc { font-size: 12px; color: #94a3b8; }
+
+    footer { text-align: center; padding: 32px 20px; color: #94a3b8; font-size: 13px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ ElectroCalc</span>
+  <a href="https://electronics-calc.com/">Home</a>
+  <span>›</span>
+  <span style="color:#cbd5e1">Battery Life Calculator</span>
+</nav>
+
+<div class="page">
+
+  <h1>Battery Life Calculator</h1>
+  <p class="subtitle">Estimate how long your battery will last based on capacity (mAh), average current draw, voltage, and real-world efficiency.</p>
+
+  <div class="calc-card">
+    <h2>Calculate Runtime</h2>
+    <p class="card-sub">Enter battery capacity, current draw and optional parameters.</p>
+
+    <div class="input-grid">
+
+      <div class="field">
+        <label>Battery Capacity</label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="capacity" placeholder="e.g. 2000" min="0" step="any" /></div>
+          <select class="unit-sel" id="cap-unit">
+            <option value="1">mAh</option>
+            <option value="1000">Ah</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Average Current Draw</label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="current" placeholder="e.g. 100" min="0" step="any" /></div>
+          <select class="unit-sel" id="cur-unit">
+            <option value="1">mA</option>
+            <option value="1000">A</option>
+            <option value="0.001">µA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Nominal Voltage <span style="font-weight:400;color:#94a3b8">(optional)</span></label>
+        <div class="input-wrap"><input type="number" id="voltage" placeholder="e.g. 3.7" min="0" step="any" style="padding-right:36px" /><span class="unit" style="right:10px">V</span></div>
+      </div>
+
+      <div class="field">
+        <label>Load Power <span style="font-weight:400;color:#94a3b8">(optional, overrides I)</span></label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="power" placeholder="e.g. 0.5" min="0" step="any" /></div>
+          <select class="unit-sel" id="pwr-unit">
+            <option value="1">W</option>
+            <option value="0.001">mW</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" style="grid-column:1/-1">
+        <label>Efficiency / DoD factor</label>
+        <div class="slider-val" id="eff-val">85%</div>
+        <div class="slider-wrap">
+          <input type="range" id="efficiency" min="10" max="100" value="85" oninput="document.getElementById('eff-val').textContent=this.value+'%'" />
+          <div class="slider-labels"><span>10% (poor)</span><span>70% (typical)</span><span>100% (ideal)</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate →</button>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-main" id="resultMain"></div>
+      <div class="result-sub"  id="resultSub"></div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="batt-visual" id="battVisual" style="display:none">
+        <div class="batt-label">Usable capacity (after efficiency/DoD)</div>
+        <div class="batt-bar"><div class="batt-fill" id="battFill"></div></div>
+      </div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- Reference table -->
+  <section>
+    <h2>Typical Battery Capacities</h2>
+    <p>Common battery types and their approximate capacities for reference.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Battery / Device</th><th>Capacity</th><th>Voltage</th><th>Energy (Wh)</th><th>Typical Use</th></tr></thead>
+        <tbody>
+          <tr><td>AAA Alkaline</td><td>1200 mAh</td><td>1.5 V</td><td>1.8 Wh</td><td>Remote controls, small devices</td></tr>
+          <tr><td>AA Alkaline</td><td>2700 mAh</td><td>1.5 V</td><td>4.1 Wh</td><td>Flashlights, toys, clocks</td></tr>
+          <tr><td>CR2032 Coin Cell</td><td>220 mAh</td><td>3.0 V</td><td>0.66 Wh</td><td>Watches, IoT sensors</td></tr>
+          <tr><td>18650 Li-Ion</td><td>3000 mAh</td><td>3.7 V</td><td>11.1 Wh</td><td>Laptops, power banks, EVs</td></tr>
+          <tr><td>Smartphone (typical)</td><td>4500 mAh</td><td>3.7 V</td><td>16.7 Wh</td><td>Mobile phones</td></tr>
+          <tr><td>9V Block (Alkaline)</td><td>550 mAh</td><td>9 V</td><td>5.0 Wh</td><td>Multimeters, alarms</td></tr>
+          <tr><td>LiPo 500 mAh</td><td>500 mAh</td><td>3.7 V</td><td>1.85 Wh</td><td>Drones, RC models</td></tr>
+          <tr><td>Lead-Acid 7 Ah</td><td>7000 mAh</td><td>12 V</td><td>84 Wh</td><td>UPS, alarm systems</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Examples -->
+  <section>
+    <h2>Worked Examples</h2>
+    <div class="examples-grid">
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">1</span>Arduino + sensor node</div>
+        <div class="ex-line"><span>Battery</span><span>2× AA = 3000 mAh</span></div>
+        <div class="ex-line"><span>Current draw</span><span>15 mA average</span></div>
+        <div class="ex-line"><span>Efficiency</span><span>80%</span></div>
+        <div class="ex-line"><span>Runtime</span><span>≈ 160 h (6.7 days)</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">2</span>ESP32 IoT device</div>
+        <div class="ex-line"><span>Battery</span><span>18650 — 3000 mAh</span></div>
+        <div class="ex-line"><span>Current draw</span><span>80 mA average</span></div>
+        <div class="ex-line"><span>Efficiency</span><span>85%</span></div>
+        <div class="ex-line"><span>Runtime</span><span>≈ 31.9 h</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">3</span>LED torch</div>
+        <div class="ex-line"><span>Battery</span><span>3× AAA = 1200 mAh</span></div>
+        <div class="ex-line"><span>LED current</span><span>300 mA</span></div>
+        <div class="ex-line"><span>Efficiency</span><span>90%</span></div>
+        <div class="ex-line"><span>Runtime</span><span>≈ 3.6 h</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">4</span>Deep-sleep sensor</div>
+        <div class="ex-line"><span>Battery</span><span>CR2032 — 220 mAh</span></div>
+        <div class="ex-line"><span>Avg current</span><span>5 µA</span></div>
+        <div class="ex-line"><span>Efficiency</span><span>90%</span></div>
+        <div class="ex-line"><span>Runtime</span><span>≈ 5 years</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I calculate battery life? <span class="arrow">▾</span></div>
+      <div class="faq-a">Battery life (h) = Capacity (mAh) ÷ Current (mA) × efficiency. For a 2000 mAh battery drawing 100 mA at 85% efficiency: 2000 ÷ 100 × 0.85 = 17 hours.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What does mAh mean? <span class="arrow">▾</span></div>
+      <div class="faq-a">mAh (milliampere-hours) is a unit of electric charge. A 2000 mAh battery can supply 2000 mA for 1 hour, 1000 mA for 2 hours, or 100 mA for 20 hours. To convert to Wh: Wh = mAh × V ÷ 1000.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What efficiency factor should I use? <span class="arrow">▾</span></div>
+      <div class="faq-a">Use 85–90% for simple direct battery connections. Use 70–80% for systems with a DC-DC converter or boost regulator. Use 50–65% for Li-ion cells in applications where you want to preserve longevity (20–80% DoD).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I convert mAh to Wh? <span class="arrow">▾</span></div>
+      <div class="faq-a">Wh = mAh × V ÷ 1000. A 3000 mAh Li-ion cell at 3.7 V = 11.1 Wh. Airlines use Wh to determine if a battery is allowed as carry-on (limit is typically 100 Wh).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Why is actual battery life shorter than the rated mAh? <span class="arrow">▾</span></div>
+      <div class="faq-a">Several factors reduce real runtime: voltage sag under load, temperature (cold reduces capacity), aging, DC-DC converter losses, and the fact that batteries cannot be fully depleted. Always apply a 0.7–0.85 efficiency factor for practical estimates.</div>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section>
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a class="related-card" href="https://electronics-calc.com/power-calculator.html">
+        <span class="related-icon">🔋</span>
+        <div><div class="related-name">Power Calculator</div><div class="related-desc">Watts, volts, amps</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/ohms-law-calculator.html">
+        <span class="related-icon">⚡</span>
+        <div><div class="related-name">Ohm's Law</div><div class="related-desc">Solve V, I or R</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/led-resistor-calculator.html">
+        <span class="related-icon">💡</span>
+        <div><div class="related-name">LED Resistor</div><div class="related-desc">Current-limiting resistor</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/">
+        <span class="related-icon">🔌</span>
+        <div><div class="related-name">All Calculators</div><div class="related-desc">Full toolset</div></div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2025 ElectroCalc · Free electronics calculators · <a href="https://electronics-calc.com/">Home</a></p>
+</footer>
+
+<script>
+function fmtTime(h) {
+  if (h < 1/60)       return (h * 3600).toFixed(1) + ' s';
+  if (h < 1)          return (h * 60).toFixed(1) + ' min';
+  if (h < 24)         return h.toFixed(2) + ' h';
+  if (h < 24 * 365)   return (h / 24).toFixed(2) + ' days (' + h.toFixed(1) + ' h)';
+  return (h / 8760).toFixed(2) + ' years';
+}
+
+function calculate() {
+  const capRaw  = parseFloat(document.getElementById('capacity').value);
+  const capUnit = parseFloat(document.getElementById('cap-unit').value);
+  const curRaw  = parseFloat(document.getElementById('current').value);
+  const curUnit = parseFloat(document.getElementById('cur-unit').value);
+  const volt    = parseFloat(document.getElementById('voltage').value);
+  const pwrRaw  = parseFloat(document.getElementById('power').value);
+  const pwrUnit = parseFloat(document.getElementById('pwr-unit').value);
+  const eff     = parseInt(document.getElementById('efficiency').value) / 100;
+
+  if (isNaN(capRaw) || capRaw <= 0) { showError('Enter a valid battery capacity.'); return; }
+
+  const capMah = capRaw * capUnit; // always in mAh
+
+  // Determine current in mA
+  let curMa;
+  if (!isNaN(pwrRaw) && pwrRaw > 0 && !isNaN(volt) && volt > 0) {
+    // Power mode: P = V × I → I = P / V
+    curMa = (pwrRaw * pwrUnit) / volt * 1000;
+  } else if (!isNaN(curRaw) && curRaw > 0) {
+    curMa = curRaw * curUnit;
+  } else {
+    showError('Enter either current draw or load power (with voltage).');
+    return;
+  }
+
+  const usableMah = capMah * eff;
+  const hours = usableMah / curMa;
+
+  // Energy calculations
+  let energyWh = null, powerW = null;
+  if (!isNaN(volt) && volt > 0) {
+    energyWh = capMah * volt / 1000;
+    powerW   = curMa / 1000 * volt;
+  }
+
+  const items = [
+    { label: 'Runtime',        value: fmtTime(hours) },
+    { label: 'Usable Capacity',value: usableMah.toFixed(0) + ' mAh' },
+    { label: 'Current Draw',   value: curMa < 1 ? (curMa*1000).toFixed(2)+' µA' : curMa >= 1000 ? (curMa/1000).toFixed(3)+' A' : curMa.toFixed(2)+' mA' },
+    { label: 'Efficiency',     value: (eff*100).toFixed(0) + '%' },
+  ];
+  if (energyWh) items.push({ label: 'Battery Energy', value: energyWh.toFixed(2) + ' Wh' });
+  if (powerW)   items.push({ label: 'Load Power',     value: powerW < 1 ? (powerW*1000).toFixed(1)+' mW' : powerW.toFixed(3)+' W' });
+
+  document.getElementById('resultMain').textContent = fmtTime(hours);
+  document.getElementById('resultSub').textContent  = `${usableMah.toFixed(0)} mAh ÷ ${curMa.toFixed(2)} mA = ${hours.toFixed(2)} h`;
+  document.getElementById('resultGrid').innerHTML = items.map(i =>
+    `<div class="res-item"><div class="res-label">${i.label}</div><div class="res-value">${i.value}</div></div>`
+  ).join('');
+
+  // Battery bar
+  const pct = Math.min(100, eff * 100);
+  document.getElementById('battFill').style.width = pct + '%';
+  document.getElementById('battFill').textContent = pct.toFixed(0) + '%';
+  document.getElementById('battVisual').style.display = '';
+
+  document.getElementById('errorMsg').textContent = '';
+  document.getElementById('resultBox').classList.add('show');
+}
+
+function showError(msg) {
+  document.getElementById('resultMain').textContent = '';
+  document.getElementById('resultSub').textContent  = '';
+  document.getElementById('resultGrid').innerHTML   = '';
+  document.getElementById('battVisual').style.display = 'none';
+  document.getElementById('errorMsg').textContent   = msg;
+  document.getElementById('resultBox').classList.add('show');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+
+function toggleFaq(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('show');
+}
+</script>
+</body>
+</html>
