@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Op-Amp Calculator – Inverting, Non-Inverting, Summing, Difference | Electronics-Calc</title>
+  <meta name="description" content="Free op-amp gain calculator. Calculate output voltage and gain for inverting, non-inverting, summing, difference, and voltage follower op-amp configurations.">
+  <link rel="canonical" href="https://electronics-calc.com/op-amp-calculator.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RKW4WPS5TY');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b}
+    nav{background:#1e293b;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    nav a.brand{color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;padding:14px 0}
+    nav a{color:#94a3b8;font-size:.85rem;text-decoration:none;padding:14px 6px}
+    nav a:hover{color:#fff}
+    .hero{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:#fff;padding:36px 24px 28px;text-align:center}
+    .hero h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:700;margin-bottom:8px}
+    .hero p{color:#94a3b8;font-size:.95rem;max-width:580px;margin:0 auto}
+    main{max-width:820px;margin:0 auto;padding:24px 16px 48px}
+    .tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+    .tab-btn{padding:8px 14px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;font-size:.85rem;font-weight:600;cursor:pointer;color:#475569;transition:all .15s}
+    .tab-btn.active{background:#2563eb;border-color:#2563eb;color:#fff}
+    .tab-btn:hover:not(.active){border-color:#2563eb;color:#2563eb}
+    .card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:20px}
+    .card h2{font-size:1rem;font-weight:700;margin-bottom:16px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+    @media(max-width:540px){.form-grid{grid-template-columns:1fr}}
+    .full-width{grid-column:1/-1}
+    .form-group label{display:block;font-size:.8rem;font-weight:600;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+    .input-row{display:flex;gap:6px}
+    .input-row input{flex:1;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;outline:none;transition:border-color .15s}
+    .input-row input:focus{border-color:#2563eb}
+    .input-row select{padding:10px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;background:#f8fafc;cursor:pointer;outline:none}
+    .calc-btn{width:100%;padding:13px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s;margin-top:4px}
+    .calc-btn:hover{background:#1d4ed8}
+    .result-box{background:#f0f9ff;border:2px solid #bae6fd;border-radius:12px;padding:20px;margin-bottom:20px;display:none}
+    .result-main{font-size:2rem;font-weight:800;color:#1e293b;font-family:'Courier New',monospace;text-align:center}
+    .result-sub{font-size:.88rem;color:#64748b;margin-top:6px;text-align:center;font-family:'Courier New',monospace}
+    .result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-top:16px}
+    .res-item{background:#fff;border-radius:8px;padding:10px 14px;border:1px solid #e2e8f0}
+    .res-label{font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:2px}
+    .res-value{font-size:1rem;font-weight:700;color:#1e293b;font-family:'Courier New',monospace}
+    .error-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:.9rem;margin-bottom:16px;display:none}
+    .warn-box{background:#fffbeb;border:2px solid #fde68a;border-radius:10px;padding:14px;color:#92400e;font-size:.9rem;margin-bottom:16px;display:none}
+    .panel{display:none}.panel.active{display:block}
+    .info-box{background:#f8fafc;border-left:4px solid #2563eb;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:16px;font-size:.88rem;color:#475569;line-height:1.6}
+    .info-box strong{color:#1e293b}
+    .formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:6px}
+    .formula-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px}
+    .formula-card h3{font-size:.85rem;font-weight:700;color:#2563eb;margin-bottom:8px}
+    .formula-card p{font-size:.82rem;color:#475569;line-height:1.7;font-family:'Courier New',monospace}
+    details{border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px}
+    summary{padding:12px 16px;cursor:pointer;font-weight:600;font-size:.9rem;color:#1e293b}
+    details p{padding:0 16px 14px;font-size:.88rem;color:#475569;line-height:1.65}
+    details[open] summary{color:#2563eb}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/">⚡ Electronics-Calc</a>
+  <a href="/ohms-law-calculator.html">Ohm's Law</a>
+  <a href="/555-timer-calculator.html">555 Timer</a>
+  <a href="/lm317-calculator.html">LM317</a>
+  <a href="/zener-regulator-calculator.html">Zener</a>
+</nav>
+<div class="hero">
+  <h1>Op-Amp Calculator</h1>
+  <p>Calculate voltage gain and output voltage for all standard operational amplifier configurations.</p>
+</div>
+<main>
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('inv',this)">➖ Inverting</button>
+    <button class="tab-btn" onclick="switchTab('noninv',this)">➕ Non-Inverting</button>
+    <button class="tab-btn" onclick="switchTab('follower',this)">🔁 Follower</button>
+    <button class="tab-btn" onclick="switchTab('sum',this)">∑ Summing</button>
+    <button class="tab-btn" onclick="switchTab('diff',this)">± Difference</button>
+  </div>
+
+  <!-- INVERTING -->
+  <div class="panel active" id="panel-inv">
+    <div class="card">
+      <h2>Inverting Amplifier</h2>
+      <div class="info-box">
+        Input is applied to the <strong>inverting (−) input</strong> via R_in. Output is phase-inverted.<br>
+        <strong>Gain A = −R_f / R_in</strong>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>R_in (input resistor)</label>
+          <div class="input-row"><input type="number" id="inv-Rin" value="10" step="any" min="0">
+          <select id="inv-Rinu"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>R_f (feedback resistor)</label>
+          <div class="input-row"><input type="number" id="inv-Rf" value="100" step="any" min="0">
+          <select id="inv-Rfu"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>Input Voltage V_in</label>
+          <div class="input-row"><input type="number" id="inv-Vin" value="1" step="any">
+          <select id="inv-Vinu"><option value="1e-3">mV</option><option value="1" selected>V</option></select></div></div>
+        <div class="form-group"><label>Supply Voltage ±V_s (optional)</label>
+          <div class="input-row"><input type="number" id="inv-Vs" value="15" step="any" min="0" placeholder="e.g. 15">
+          <select id="inv-Vsu"><option value="1" selected>V</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcInv()">Calculate →</button>
+    </div>
+    <div class="error-box" id="inv-error"></div>
+    <div class="warn-box" id="inv-warn"></div>
+    <div class="result-box" id="inv-result">
+      <div class="result-main" id="inv-main"></div>
+      <div class="result-sub" id="inv-sub"></div>
+      <div class="result-grid" id="inv-grid"></div>
+    </div>
+  </div>
+
+  <!-- NON-INVERTING -->
+  <div class="panel" id="panel-noninv">
+    <div class="card">
+      <h2>Non-Inverting Amplifier</h2>
+      <div class="info-box">
+        Input applied to the <strong>non-inverting (+) input</strong>. Output is in phase with input.<br>
+        <strong>Gain A = 1 + R_f / R_1</strong>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>R_1 (to GND)</label>
+          <div class="input-row"><input type="number" id="ni-R1" value="10" step="any" min="0">
+          <select id="ni-R1u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>R_f (feedback)</label>
+          <div class="input-row"><input type="number" id="ni-Rf" value="90" step="any" min="0">
+          <select id="ni-Rfu"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>Input Voltage V_in</label>
+          <div class="input-row"><input type="number" id="ni-Vin" value="1" step="any">
+          <select id="ni-Vinu"><option value="1e-3">mV</option><option value="1" selected>V</option></select></div></div>
+        <div class="form-group"><label>Supply Voltage ±V_s (optional)</label>
+          <div class="input-row"><input type="number" id="ni-Vs" value="15" step="any" min="0" placeholder="e.g. 15">
+          <select id="ni-Vsu"><option value="1" selected>V</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcNonInv()">Calculate →</button>
+    </div>
+    <div class="error-box" id="ni-error"></div>
+    <div class="warn-box" id="ni-warn"></div>
+    <div class="result-box" id="ni-result">
+      <div class="result-main" id="ni-main"></div>
+      <div class="result-sub" id="ni-sub"></div>
+      <div class="result-grid" id="ni-grid"></div>
+    </div>
+  </div>
+
+  <!-- FOLLOWER -->
+  <div class="panel" id="panel-follower">
+    <div class="card">
+      <h2>Voltage Follower (Buffer)</h2>
+      <div class="info-box">
+        Output follows input exactly: <strong>V_out = V_in, Gain = 1</strong><br>
+        Provides high input impedance and low output impedance — ideal buffer.
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Input Voltage V_in</label>
+          <div class="input-row"><input type="number" id="f-Vin" value="2.5" step="any">
+          <select id="f-Vinu"><option value="1e-3">mV</option><option value="1" selected>V</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcFollower()">Calculate →</button>
+    </div>
+    <div class="result-box" id="f-result">
+      <div class="result-main" id="f-main"></div>
+      <div class="result-sub" id="f-sub"></div>
+      <div class="result-grid" id="f-grid"></div>
+    </div>
+  </div>
+
+  <!-- SUMMING -->
+  <div class="panel" id="panel-sum">
+    <div class="card">
+      <h2>Inverting Summing Amplifier</h2>
+      <div class="info-box">
+        Sums multiple inputs with individual gains.<br>
+        <strong>V_out = −R_f × (V1/R1 + V2/R2 + V3/R3)</strong>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>R_f (feedback)</label>
+          <div class="input-row"><input type="number" id="s-Rf" value="100" step="any" min="0">
+          <select id="s-Rfu"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>Input 1: V1</label>
+          <div class="input-row"><input type="number" id="s-V1" value="1" step="any">
+          <select id="s-V1u"><option value="1e-3">mV</option><option value="1" selected>V</option></select></div></div>
+        <div class="form-group"><label>R1 (input 1 resistor)</label>
+          <div class="input-row"><input type="number" id="s-R1" value="10" step="any" min="0">
+          <select id="s-R1u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>Input 2: V2</label>
+          <div class="input-row"><input type="number" id="s-V2" value="2" step="any">
+          <select id="s-V2u"><option value="1e-3">mV</option><option value="1" selected>V</option></select></div></div>
+        <div class="form-group"><label>R2 (input 2 resistor)</label>
+          <div class="input-row"><input type="number" id="s-R2" value="10" step="any" min="0">
+          <select id="s-R2u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>Input 3: V3 (0 to exclude)</label>
+          <div class="input-row"><input type="number" id="s-V3" value="0" step="any">
+          <select id="s-V3u"><option value="1e-3">mV</option><option value="1" selected>V</option></select></div></div>
+        <div class="form-group"><label>R3 (input 3 resistor)</label>
+          <div class="input-row"><input type="number" id="s-R3" value="10" step="any" min="0">
+          <select id="s-R3u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcSum()">Calculate →</button>
+    </div>
+    <div class="error-box" id="s-error"></div>
+    <div class="result-box" id="s-result">
+      <div class="result-main" id="s-main"></div>
+      <div class="result-sub" id="s-sub"></div>
+      <div class="result-grid" id="s-grid"></div>
+    </div>
+  </div>
+
+  <!-- DIFFERENCE -->
+  <div class="panel" id="panel-diff">
+    <div class="card">
+      <h2>Difference (Subtractor) Amplifier</h2>
+      <div class="info-box">
+        Amplifies the difference between two inputs.<br>
+        <strong>For R1=R3, R2=R4: V_out = (R2/R1) × (V2 − V1)</strong>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>R1 (V1 input resistor)</label>
+          <div class="input-row"><input type="number" id="d-R1" value="10" step="any" min="0">
+          <select id="d-R1u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>R2 (feedback from V1 side)</label>
+          <div class="input-row"><input type="number" id="d-R2" value="100" step="any" min="0">
+          <select id="d-R2u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>R3 (V2 input resistor)</label>
+          <div class="input-row"><input type="number" id="d-R3" value="10" step="any" min="0">
+          <select id="d-R3u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>R4 (V2 to GND resistor)</label>
+          <div class="input-row"><input type="number" id="d-R4" value="100" step="any" min="0">
+          <select id="d-R4u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>Input V1</label>
+          <div class="input-row"><input type="number" id="d-V1" value="2" step="any">
+          <select id="d-V1u"><option value="1e-3">mV</option><option value="1" selected>V</option></select></div></div>
+        <div class="form-group"><label>Input V2</label>
+          <div class="input-row"><input type="number" id="d-V2" value="5" step="any">
+          <select id="d-V2u"><option value="1e-3">mV</option><option value="1" selected>V</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcDiff()">Calculate →</button>
+    </div>
+    <div class="error-box" id="d-error"></div>
+    <div class="result-box" id="d-result">
+      <div class="result-main" id="d-main"></div>
+      <div class="result-sub" id="d-sub"></div>
+      <div class="result-grid" id="d-grid"></div>
+    </div>
+  </div>
+
+  <!-- FORMULAS -->
+  <div class="card">
+    <h2>📐 Op-Amp Configuration Summary</h2>
+    <div class="formula-grid">
+      <div class="formula-card"><h3>Inverting</h3><p>A = −Rf/Rin<br>Vout = A × Vin<br>Input Z ≈ Rin</p></div>
+      <div class="formula-card"><h3>Non-Inverting</h3><p>A = 1 + Rf/R1<br>Vout = A × Vin<br>Input Z ≈ ∞</p></div>
+      <div class="formula-card"><h3>Follower</h3><p>A = 1<br>Vout = Vin<br>Buffer, Z_in ≈ ∞</p></div>
+      <div class="formula-card"><h3>Summing (inv.)</h3><p>Vout = −Rf·(V1/R1<br>+ V2/R2 + V3/R3)</p></div>
+      <div class="formula-card"><h3>Difference</h3><p>Vout = R4/(R3+R4)<br>×(1+R2/R1)×V2<br>−(R2/R1)×V1</p></div>
+    </div>
+  </div>
+
+  <div class="card"><h2>❓ FAQ</h2>
+    <details><summary>What is the difference between inverting and non-inverting amplifiers?</summary><p>The inverting amplifier applies the signal to the negative (−) input, resulting in a phase-inverted output with gain −Rf/Rin. The non-inverting amplifier applies the signal to the positive (+) input, giving an in-phase output with gain 1+Rf/R1 (always ≥ 1).</p></details>
+    <details><summary>Why does output clipping occur?</summary><p>Op-amps cannot output a voltage beyond their supply rails (±Vs). When the calculated Vout exceeds ±Vs, the output saturates (clips) at approximately ±(Vs − 1.5V) for most op-amps, or very close to ±Vs for rail-to-rail op-amps.</p></details>
+    <details><summary>What value should the bias current compensation resistor be?</summary><p>For minimum offset voltage due to bias currents, add a resistor from the (+) input to GND equal to the parallel combination of Rin and Rf (for inverting) or R1 and Rf (for non-inverting). For FET-input op-amps this is usually unnecessary.</p></details>
+  </div>
+</main>
+
+<script>
+function fmtV(v){
+  const a=Math.abs(v);
+  if(a>=1)return v.toPrecision(4)+'V';
+  if(a>=1e-3)return(v*1e3).toPrecision(4)+'mV';
+  if(a>=1e-6)return(v*1e6).toPrecision(4)+'µV';
+  return v.toPrecision(4)+'V';
+}
+function fmtR(r){
+  if(r>=1e6)return(r/1e6).toPrecision(4)+'MΩ';
+  if(r>=1e3)return(r/1e3).toPrecision(4)+'kΩ';
+  return r.toPrecision(4)+'Ω';
+}
+function fmtGain(g){return g.toPrecision(4)+' ('+( 20*Math.log10(Math.abs(g))).toFixed(2)+' dB)';}
+function showErr(id,msg){document.getElementById(id).textContent=msg;document.getElementById(id).style.display='block';}
+function hideErr(id){document.getElementById(id).style.display='none';}
+function showWarn(id,msg){document.getElementById(id).textContent=msg;document.getElementById(id).style.display='block';}
+function hideWarn(id){document.getElementById(id).style.display='none';}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function g(id){return parseFloat(document.getElementById(id).value);}
+function gu(id,uid){return g(id)*parseFloat(document.getElementById(uid).value);}
+function showRes(prefix,vout,gain,extra,vin,vs){
+  let clipped=false;
+  if(vs&&Math.abs(vout)>vs){vout=Math.sign(vout)*vs;clipped=true;}
+  document.getElementById(prefix+'-result').style.display='block';
+  document.getElementById(prefix+'-main').textContent=fmtV(vout);
+  document.getElementById(prefix+'-sub').textContent='Gain = '+fmtGain(gain)+(clipped?' ⚠ OUTPUT CLIPPED':'');
+  if(prefix==='inv'||prefix==='ni'){
+    if(vs&&Math.abs(vin*gain)>vs)showWarn(prefix+'-warn','⚠ Calculated output exceeds ±'+vs+'V supply — output will clip at ≈±'+(vs-1.5).toFixed(1)+'V for standard op-amp.');
+    else hideWarn(prefix+'-warn');
+  }
+  document.getElementById(prefix+'-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">V_out</div><div class="res-value">${fmtV(vout)}</div></div>
+    <div class="res-item"><div class="res-label">Voltage Gain A</div><div class="res-value">${gain.toPrecision(4)}</div></div>
+    <div class="res-item"><div class="res-label">Gain (dB)</div><div class="res-value">${(20*Math.log10(Math.abs(gain))).toFixed(2)} dB</div></div>
+    ${extra||''}
+  `;
+}
+
+function calcInv(){
+  hideErr('inv-error'); hideWarn('inv-warn');
+  const Rin=gu('inv-Rin','inv-Rinu'),Rf=gu('inv-Rf','inv-Rfu'),Vin=gu('inv-Vin','inv-Vinu'),Vs=gu('inv-Vs','inv-Vsu');
+  if([Rin,Rf,Vin].some(isNaN)||Rin<=0||Rf<=0)return showErr('inv-error','Enter valid positive resistor values.');
+  const gain=-Rf/Rin;
+  const vout=gain*Vin;
+  showRes('inv',vout,gain,`
+    <div class="res-item"><div class="res-label">V_in</div><div class="res-value">${fmtV(Vin)}</div></div>
+    <div class="res-item"><div class="res-label">R_in</div><div class="res-value">${fmtR(Rin)}</div></div>
+    <div class="res-item"><div class="res-label">R_f</div><div class="res-value">${fmtR(Rf)}</div></div>
+    <div class="res-item"><div class="res-label">Input Impedance</div><div class="res-value">${fmtR(Rin)}</div></div>
+  `,Vin,Vs||Infinity);
+}
+
+function calcNonInv(){
+  hideErr('ni-error'); hideWarn('ni-warn');
+  const R1=gu('ni-R1','ni-R1u'),Rf=gu('ni-Rf','ni-Rfu'),Vin=gu('ni-Vin','ni-Vinu'),Vs=gu('ni-Vs','ni-Vsu');
+  if([R1,Rf,Vin].some(isNaN)||R1<=0||Rf<0)return showErr('ni-error','Enter valid positive resistor values.');
+  const gain=1+Rf/R1;
+  const vout=gain*Vin;
+  showRes('ni',vout,gain,`
+    <div class="res-item"><div class="res-label">V_in</div><div class="res-value">${fmtV(Vin)}</div></div>
+    <div class="res-item"><div class="res-label">R_1</div><div class="res-value">${fmtR(R1)}</div></div>
+    <div class="res-item"><div class="res-label">R_f</div><div class="res-value">${fmtR(Rf)}</div></div>
+    <div class="res-item"><div class="res-label">Input Impedance</div><div class="res-value">≈ ∞ (MΩ+)</div></div>
+  `,Vin,Vs||Infinity);
+}
+
+function calcFollower(){
+  const Vin=gu('f-Vin','f-Vinu');
+  document.getElementById('f-result').style.display='block';
+  document.getElementById('f-main').textContent=fmtV(Vin);
+  document.getElementById('f-sub').textContent='Gain = 1 (0 dB) — output equals input';
+  document.getElementById('f-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">V_out</div><div class="res-value">${fmtV(Vin)}</div></div>
+    <div class="res-item"><div class="res-label">Gain</div><div class="res-value">1 (0 dB)</div></div>
+    <div class="res-item"><div class="res-label">Phase shift</div><div class="res-value">0° (in-phase)</div></div>
+    <div class="res-item"><div class="res-label">Input Impedance</div><div class="res-value">≈ ∞</div></div>
+    <div class="res-item"><div class="res-label">Output Impedance</div><div class="res-value">≈ 0 Ω</div></div>
+  `;
+}
+
+function calcSum(){
+  hideErr('s-error');
+  const Rf=gu('s-Rf','s-Rfu');
+  const V1=gu('s-V1','s-V1u'),R1=gu('s-R1','s-R1u');
+  const V2=gu('s-V2','s-V2u'),R2=gu('s-R2','s-R2u');
+  const V3=gu('s-V3','s-V3u'),R3=gu('s-R3','s-R3u');
+  if([Rf,V1,R1,V2,R2,V3,R3].some(isNaN)||Rf<=0||R1<=0||R2<=0||R3<=0)return showErr('s-error','Enter valid positive resistor values.');
+  const sum=V1/R1+V2/R2+(V3!==0?V3/R3:0);
+  const vout=-Rf*sum;
+  const A1=-Rf/R1,A2=-Rf/R2,A3=-Rf/R3;
+  document.getElementById('s-result').style.display='block';
+  document.getElementById('s-main').textContent=fmtV(vout);
+  document.getElementById('s-sub').textContent=`V_out = −Rf×(V1/R1 + V2/R2${V3!==0?'+V3/R3':''})`;
+  document.getElementById('s-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">V_out</div><div class="res-value">${fmtV(vout)}</div></div>
+    <div class="res-item"><div class="res-label">Gain for V1</div><div class="res-value">${A1.toPrecision(4)}</div></div>
+    <div class="res-item"><div class="res-label">Gain for V2</div><div class="res-value">${A2.toPrecision(4)}</div></div>
+    ${V3!==0?`<div class="res-item"><div class="res-label">Gain for V3</div><div class="res-value">${A3.toPrecision(4)}</div></div>`:''}
+    <div class="res-item"><div class="res-label">R_f</div><div class="res-value">${fmtR(Rf)}</div></div>
+  `;
+}
+
+function calcDiff(){
+  hideErr('d-error');
+  const R1=gu('d-R1','d-R1u'),R2=gu('d-R2','d-R2u'),R3=gu('d-R3','d-R3u'),R4=gu('d-R4','d-R4u');
+  const V1=gu('d-V1','d-V1u'),V2=gu('d-V2','d-V2u');
+  if([R1,R2,R3,R4,V1,V2].some(isNaN)||R1<=0||R2<=0||R3<=0||R4<=0)return showErr('d-error','Enter valid positive resistor values.');
+  const vout=(R4/(R3+R4))*(1+R2/R1)*V2-(R2/R1)*V1;
+  const gain_diff=R2/R1; // when balanced
+  const balanced=(Math.abs(R1-R3)<1e-9*R1&&Math.abs(R2-R4)<1e-9*R2);
+  document.getElementById('d-result').style.display='block';
+  document.getElementById('d-main').textContent=fmtV(vout);
+  document.getElementById('d-sub').textContent=balanced?`V_out = (R2/R1)×(V2−V1) = ${gain_diff.toPrecision(3)}×(V2−V1)`:'General formula applied';
+  document.getElementById('d-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">V_out</div><div class="res-value">${fmtV(vout)}</div></div>
+    <div class="res-item"><div class="res-label">V2 − V1</div><div class="res-value">${fmtV(V2-V1)}</div></div>
+    <div class="res-item"><div class="res-label">Diff. Gain R2/R1</div><div class="res-value">${(R2/R1).toPrecision(4)}</div></div>
+    <div class="res-item"><div class="res-label">Balanced?</div><div class="res-value">${balanced?'Yes (R1=R3, R2=R4)':'No — CMRR reduced'}</div></div>
+    <div class="res-item"><div class="res-label">CMRR Note</div><div class="res-value">${balanced?'Optimal CMRR':'Use matched resistors'}</div></div>
+  `;
+}
+
+calcInv();
+</script>
+</body>
+</html>
