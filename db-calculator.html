@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dB Calculator — Decibel Converter for Voltage, Power &amp; Gain</title>
+  <meta name="description" content="Convert between decibels (dB) and voltage or power ratios. Calculate gain, attenuation, dBm, dBV, dBu and dBW. Instant results." />
+  <link rel="canonical" href="https://electronics-calc.com/db-calculator.html" />
+  <meta name="google-site-verification" content="miH9b5abkKUBm5JfTS3vTU6B1TrSRIQG3IjDfTy4RaA" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RKW4WPS5TY');</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"dB Calculator","url":"https://electronics-calc.com/db-calculator.html","description":"Convert between dB and voltage/power ratios. Calculate dBm, dBV, dBu and amplifier gain.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is a decibel (dB)?","acceptedAnswer":{"@type":"Answer","text":"A decibel is a logarithmic unit expressing the ratio of two values. For power: dB = 10 × log₁₀(P₂/P₁). For voltage: dB = 20 × log₁₀(V₂/V₁). The logarithmic scale matches human perception of loudness and signal strength."}},{"@type":"Question","name":"What is the difference between dB for power and voltage?","acceptedAnswer":{"@type":"Answer","text":"Power ratio uses factor 10: dB = 10 × log₁₀(P_out/P_in). Voltage ratio uses factor 20: dB = 20 × log₁₀(V_out/V_in). This is because power is proportional to voltage squared (P = V²/R), and log(V²) = 2×log(V)."}},{"@type":"Question","name":"What is dBm?","acceptedAnswer":{"@type":"Answer","text":"dBm is power relative to 1 milliwatt: dBm = 10 × log₁₀(P/1mW). 0 dBm = 1 mW. +10 dBm = 10 mW. −10 dBm = 0.1 mW. It is widely used in RF, audio and telecommunications."}},{"@type":"Question","name":"How many dB is a factor of 2 in power?","acceptedAnswer":{"@type":"Answer","text":"A factor of 2 in power equals approximately 3 dB (exactly 3.0103 dB). Doubling voltage gives 6 dB. These are the most important dB reference points to remember."}},{"@type":"Question","name":"What is 0 dB gain?","acceptedAnswer":{"@type":"Answer","text":"0 dB gain means the output equals the input — a ratio of 1. No amplification or attenuation. Positive dB = gain (amplification). Negative dB = attenuation (loss)."}}]}]}</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;color:#1e293b;line-height:1.6}
+    a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+    nav{background:#1e293b;padding:0 24px;display:flex;align-items:center;gap:8px;height:52px}
+    nav a{color:#94a3b8;font-size:14px}nav a:hover{color:#fff;text-decoration:none}
+    nav span{color:#475569;font-size:14px}nav .brand{color:#fff;font-weight:600;font-size:15px;margin-right:auto}
+    .page{max-width:820px;margin:0 auto;padding:40px 20px 80px}
+    h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:700;color:#0f172a;margin-bottom:12px}
+    .subtitle{font-size:1.05rem;color:#475569;margin-bottom:40px}
+    .calc-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:32px;margin-bottom:32px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .calc-card h2{font-size:1.15rem;font-weight:600;margin-bottom:8px;color:#0f172a}
+    .card-sub{font-size:13px;color:#94a3b8;margin-bottom:24px}
+    .tab-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:28px}
+    @media(min-width:540px){.tab-row{grid-template-columns:repeat(4,1fr)}}
+    .tab-btn{padding:10px 6px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fff;font-size:12px;font-weight:600;color:#475569;cursor:pointer;transition:all .15s;text-align:center;line-height:1.4}
+    .tab-btn .sym{font-size:17px;display:block;margin-bottom:2px}
+    .tab-btn:hover{border-color:#2563eb;color:#2563eb}.tab-btn.active{background:#2563eb;border-color:#2563eb;color:#fff}
+    .input-grid{display:grid;gap:16px}
+    @media(min-width:520px){.input-grid{grid-template-columns:1fr 1fr}}
+    .field label{display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px}
+    .field-row{display:flex;gap:8px}
+    .input-wrap{position:relative;flex:1}
+    .input-wrap input{width:100%;padding:10px 52px 10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:15px;color:#0f172a;background:#fff;transition:border-color .15s;outline:none}
+    .input-wrap input:focus{border-color:#2563eb}
+    .unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:600;color:#94a3b8;pointer-events:none}
+    .unit-sel{padding:10px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;color:#475569;background:#f8fafc;cursor:pointer;outline:none;flex-shrink:0;appearance:none;text-align:center;min-width:64px}
+    .calc-btn{margin-top:20px;width:100%;padding:13px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s}
+    .calc-btn:hover{background:#1d4ed8}
+    .result-box{margin-top:22px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:20px 24px;display:none}
+    .result-box.show{display:block}
+    .result-main{font-size:2rem;font-weight:700;color:#1d4ed8}
+    .result-sub{font-size:.88rem;color:#3b82f6;margin-top:4px;font-family:monospace}
+    .result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:16px}
+    .res-item{background:#fff;border-radius:8px;padding:10px 14px}
+    .res-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8}
+    .res-value{font-size:1rem;font-weight:600;color:#0f172a;margin-top:2px}
+    .error-msg{color:#ef4444;font-size:13px;margin-top:8px}
+    .info-card{background:#0f172a;border-radius:14px;padding:24px 28px;margin:8px 0 28px}
+    .info-title{color:#94a3b8;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
+    .formula-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+    .f-item{background:#1e293b;border-radius:8px;padding:12px 14px}
+    .f-label{font-size:11px;color:#60a5fa;font-weight:600;margin-bottom:4px}
+    .f-formula{font-family:monospace;font-size:13px;color:#e2e8f0;line-height:1.7}
+    .ref-table{width:100%;border-collapse:collapse;font-size:13px;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0}
+    .ref-table thead tr{background:#1e293b;color:#fff}
+    .ref-table th{padding:10px 14px;text-align:left;font-size:12px;font-weight:600}
+    .ref-table td{padding:8px 14px;border-bottom:1px solid #f1f5f9}
+    .ref-table tr:nth-child(even) td{background:#f8fafc}
+    section{margin-bottom:48px}
+    section h2{font-size:1.35rem;font-weight:700;color:#0f172a;margin-bottom:16px;border-bottom:2px solid #e2e8f0;padding-bottom:8px}
+    section p{color:#475569;margin-bottom:12px}
+    .faq-item{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:10px}
+    .faq-q{padding:15px 20px;font-weight:600;font-size:.95rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;color:#0f172a;background:#fff}
+    .faq-q:hover{background:#f8fafc}
+    .faq-q .arrow{color:#94a3b8;transition:transform .2s;font-size:18px}
+    .faq-q.open .arrow{transform:rotate(180deg)}
+    .faq-a{display:none;padding:0 20px 15px;color:#475569;font-size:.9rem;line-height:1.6}
+    .faq-a.show{display:block}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+    .related-card{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;text-decoration:none;color:#0f172a;transition:all .15s}
+    .related-card:hover{border-color:#2563eb;box-shadow:0 2px 8px rgba(37,99,235,.12);text-decoration:none}
+    .related-icon{font-size:22px}.related-name{font-size:14px;font-weight:600}.related-desc{font-size:12px;color:#94a3b8}
+    footer{text-align:center;padding:32px 20px;color:#94a3b8;font-size:13px;border-top:1px solid #e2e8f0}
+  </style>
+</head>
+<body>
+<nav>
+  <span class="brand">⚡ ElectroCalc</span>
+  <a href="https://electronics-calc.com/">Home</a><span>›</span>
+  <span style="color:#cbd5e1">dB Calculator</span>
+</nav>
+<div class="page">
+  <h1>dB (Decibel) Calculator</h1>
+  <p class="subtitle">Convert between decibels and voltage/power ratios. Calculate amplifier gain, signal attenuation, dBm, dBV and more.</p>
+
+  <div class="calc-card">
+    <h2>Calculate</h2>
+    <p class="card-sub">Select a mode and enter the known value.</p>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="setMode('ratio-to-db',this)"><span class="sym">→</span>Ratio → dB</button>
+      <button class="tab-btn" onclick="setMode('db-to-ratio',this)"><span class="sym">←</span>dB → Ratio</button>
+      <button class="tab-btn" onclick="setMode('gain',this)"><span class="sym">📈</span>Gain (in/out)</button>
+      <button class="tab-btn" onclick="setMode('dbm',this)"><span class="sym">📡</span>Power → dBm</button>
+    </div>
+
+    <div id="panel-ratio-to-db">
+      <div class="input-grid">
+        <div class="field">
+          <label>Ratio type</label>
+          <select class="unit-sel" id="rtd-type" style="width:100%;min-width:0;padding:10px 14px;font-size:14px">
+            <option value="voltage">Voltage ratio (×20)</option>
+            <option value="power">Power ratio (×10)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Ratio value</label>
+          <div class="input-wrap"><input type="number" id="rtd-val" placeholder="e.g. 2" step="any" /><span class="unit" style="right:8px">×</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-db-to-ratio" style="display:none">
+      <div class="input-grid">
+        <div class="field">
+          <label>Ratio type</label>
+          <select class="unit-sel" id="dtr-type" style="width:100%;min-width:0;padding:10px 14px;font-size:14px">
+            <option value="voltage">Voltage (×20)</option>
+            <option value="power">Power (×10)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Decibels (dB)</label>
+          <div class="input-wrap"><input type="number" id="dtr-val" placeholder="e.g. 6" step="any" /><span class="unit">dB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-gain" style="display:none">
+      <div class="input-grid">
+        <div class="field">
+          <label>Signal type</label>
+          <select class="unit-sel" id="gain-type" style="width:100%;min-width:0;padding:10px 14px;font-size:14px">
+            <option value="voltage">Voltage</option>
+            <option value="power">Power</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Input value</label>
+          <div class="input-wrap"><input type="number" id="gain-in" placeholder="e.g. 0.1" min="0" step="any" /></div>
+        </div>
+        <div class="field">
+          <label>Output value</label>
+          <div class="input-wrap"><input type="number" id="gain-out" placeholder="e.g. 5" min="0" step="any" /></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-dbm" style="display:none">
+      <div class="input-grid">
+        <div class="field">
+          <label>Power value</label>
+          <div class="field-row">
+            <div class="input-wrap"><input type="number" id="dbm-val" placeholder="e.g. 10" step="any" /></div>
+            <select class="unit-sel" id="dbm-unit">
+              <option value="1e-3">mW</option>
+              <option value="1">W</option>
+              <option value="1e-6">µW</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Load impedance <span style="font-weight:400;color:#94a3b8">(for dBV)</span></label>
+          <div class="input-wrap"><input type="number" id="dbm-z" placeholder="50" value="50" min="0" step="any" /><span class="unit">Ω</span></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate →</button>
+    <div class="result-box" id="resultBox">
+      <div class="result-main" id="resultMain"></div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <section>
+    <h2>dB Reference Table</h2>
+    <p>Common dB values and their equivalent power and voltage ratios:</p>
+    <table class="ref-table">
+      <thead><tr><th>dB</th><th>Power ratio</th><th>Voltage ratio</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>−20 dB</td><td>×0.01</td><td>×0.1</td><td>−20 dB attenuation</td></tr>
+        <tr><td>−10 dB</td><td>×0.1</td><td>×0.316</td><td>10× power reduction</td></tr>
+        <tr><td>−6 dB</td><td>×0.25</td><td>×0.5</td><td>Half voltage</td></tr>
+        <tr><td>−3 dB</td><td>×0.5</td><td>×0.707</td><td>Half power (filter cutoff)</td></tr>
+        <tr><td>0 dB</td><td>×1</td><td>×1</td><td>No change</td></tr>
+        <tr><td>+3 dB</td><td>×2</td><td>×1.414</td><td>Double power</td></tr>
+        <tr><td>+6 dB</td><td>×4</td><td>×2</td><td>Double voltage</td></tr>
+        <tr><td>+10 dB</td><td>×10</td><td>×3.162</td><td>10× power increase</td></tr>
+        <tr><td>+20 dB</td><td>×100</td><td>×10</td><td>Decade gain</td></tr>
+        <tr><td>+40 dB</td><td>×10 000</td><td>×100</td><td>Typical op-amp open-loop gain</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>dB Formulas</h2>
+    <div class="info-card">
+      <div class="info-title">Key Formulas</div>
+      <div class="formula-list">
+        <div class="f-item"><div class="f-label">Power ratio → dB</div><div class="f-formula">dB = 10 × log₁₀(P₂/P₁)</div></div>
+        <div class="f-item"><div class="f-label">Voltage ratio → dB</div><div class="f-formula">dB = 20 × log₁₀(V₂/V₁)</div></div>
+        <div class="f-item"><div class="f-label">dB → power ratio</div><div class="f-formula">ratio = 10^(dB/10)</div></div>
+        <div class="f-item"><div class="f-label">dB → voltage ratio</div><div class="f-formula">ratio = 10^(dB/20)</div></div>
+        <div class="f-item"><div class="f-label">dBm</div><div class="f-formula">dBm = 10 × log₁₀(P/1mW)</div></div>
+        <div class="f-item"><div class="f-label">dBV</div><div class="f-formula">dBV = 20 × log₁₀(V/1V)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What is a decibel (dB)? <span class="arrow">▾</span></div><div class="faq-a">A decibel is a logarithmic unit for expressing ratios. For power: dB = 10×log₁₀(P₂/P₁). For voltage: dB = 20×log₁₀(V₂/V₁). The factor 20 vs 10 exists because power is proportional to voltage squared.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Why is −3 dB the filter cutoff frequency? <span class="arrow">▾</span></div><div class="faq-a">−3 dB corresponds to half the input power (voltage ratio 0.707). Filter cutoff is defined where the output power drops to half, which equals −3 dB. This is where the frequency response transitions from passband to stopband.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What is dBm and how is it used? <span class="arrow">▾</span></div><div class="faq-a">dBm is power relative to 1 milliwatt: dBm = 10×log₁₀(P/1mW). It is standard in RF engineering, Wi-Fi signal strength (typically −30 to −90 dBm) and audio equipment.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">How many dB is doubling the power? <span class="arrow">▾</span></div><div class="faq-a">Doubling power = +3 dB. Doubling voltage = +6 dB. Multiplying power by 10 = +10 dB. These three reference points cover most practical calculations.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What is the difference between dBV and dBu? <span class="arrow">▾</span></div><div class="faq-a">dBV is voltage relative to 1 V RMS. dBu (formerly dBm in unloaded conditions) is relative to 0.7746 V RMS (the voltage that delivers 1 mW into 600 Ω). Professional audio uses dBu; consumer audio uses dBV.</div></div>
+  </section>
+
+  <section>
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a class="related-card" href="https://electronics-calc.com/ac-power-calculator.html"><span class="related-icon">⚡</span><div><div class="related-name">AC Power</div><div class="related-desc">P, Q, S, power factor</div></div></a>
+      <a class="related-card" href="https://electronics-calc.com/rlc-impedance-calculator.html"><span class="related-icon">〰️</span><div><div class="related-name">RLC Impedance</div><div class="related-desc">Z, phase, Q factor</div></div></a>
+      <a class="related-card" href="https://electronics-calc.com/voltage-divider-calculator.html"><span class="related-icon">🔁</span><div><div class="related-name">Voltage Divider</div><div class="related-desc">R1, R2, Vout</div></div></a>
+      <a class="related-card" href="https://electronics-calc.com/"><span class="related-icon">🔌</span><div><div class="related-name">All Calculators</div><div class="related-desc">Full toolset</div></div></a>
+    </div>
+  </section>
+</div>
+<footer><p>© 2025 ElectroCalc · Free electronics calculators · <a href="https://electronics-calc.com/">Home</a></p></footer>
+<script>
+let mode = 'ratio-to-db';
+function setMode(m,btn){
+  mode=m;
+  ['ratio-to-db','db-to-ratio','gain','dbm'].forEach(p=>document.getElementById('panel-'+p).style.display=p===m?'':'none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('resultBox').classList.remove('show');
+}
+function show(main,sub,items){
+  document.getElementById('resultMain').textContent=main;
+  document.getElementById('resultSub').textContent=sub;
+  document.getElementById('resultGrid').innerHTML=items.map(i=>`<div class="res-item"><div class="res-label">${i.l}</div><div class="res-value">${i.v}</div></div>`).join('');
+  document.getElementById('errorMsg').textContent='';
+  document.getElementById('resultBox').classList.add('show');
+}
+function err(msg){
+  document.getElementById('resultMain').textContent='';
+  document.getElementById('resultSub').textContent='';
+  document.getElementById('resultGrid').innerHTML='';
+  document.getElementById('errorMsg').textContent=msg;
+  document.getElementById('resultBox').classList.add('show');
+}
+function fmtDB(v){return v.toFixed(4)+' dB';}
+function calculate(){
+  if(mode==='ratio-to-db'){
+    const type=document.getElementById('rtd-type').value;
+    const r=parseFloat(document.getElementById('rtd-val').value);
+    if(isNaN(r)||r<=0){err('Enter a valid positive ratio.');return;}
+    const db=type==='voltage'?20*Math.log10(r):10*Math.log10(r);
+    const label=type==='voltage'?'Voltage ratio':'Power ratio';
+    show(fmtDB(db),`${type==='voltage'?20:10} × log₁₀(${r}) = ${db.toFixed(4)} dB`,[
+      {l:'Result',v:fmtDB(db)},{l:label,v:'× '+r},
+      {l:'Type',v:db>=0?'Gain':'Attenuation'},{l:'|dB|',v:Math.abs(db).toFixed(4)+' dB'},
+    ]);
+  } else if(mode==='db-to-ratio'){
+    const type=document.getElementById('dtr-type').value;
+    const db=parseFloat(document.getElementById('dtr-val').value);
+    if(isNaN(db)){err('Enter a valid dB value.');return;}
+    const ratio=type==='voltage'?Math.pow(10,db/20):Math.pow(10,db/10);
+    show('× '+ratio.toFixed(6),`10^(${db}/${type==='voltage'?20:10}) = ${ratio.toFixed(6)}`,[
+      {l:'Ratio',v:'× '+ratio.toFixed(6)},{l:'dB',v:fmtDB(db)},
+      {l:'Type',v:db>=0?'Gain':'Attenuation'},{l:'Inverse ratio',v:'÷ '+(1/ratio).toFixed(4)},
+    ]);
+  } else if(mode==='gain'){
+    const type=document.getElementById('gain-type').value;
+    const vin=parseFloat(document.getElementById('gain-in').value);
+    const vout=parseFloat(document.getElementById('gain-out').value);
+    if(isNaN(vin)||isNaN(vout)||vin<=0||vout<=0){err('Enter valid input and output values.');return;}
+    const ratio=vout/vin;
+    const db=type==='voltage'?20*Math.log10(ratio):10*Math.log10(ratio);
+    show(fmtDB(db),`${type==='voltage'?20:10} × log₁₀(${vout}/${vin}) = ${db.toFixed(4)} dB`,[
+      {l:'Gain',v:fmtDB(db)},{l:'Ratio',v:'× '+ratio.toFixed(4)},
+      {l:'Input',v:vin},{l:'Output',v:vout},
+    ]);
+  } else {
+    const pW=parseFloat(document.getElementById('dbm-val').value)*parseFloat(document.getElementById('dbm-unit').value);
+    const Z=parseFloat(document.getElementById('dbm-z').value)||50;
+    if(isNaN(pW)||pW<=0){err('Enter a valid power value.');return;}
+    const dbm=10*Math.log10(pW/0.001);
+    const V=Math.sqrt(pW*Z);
+    const dbv=20*Math.log10(V);
+    const dbu=20*Math.log10(V/0.7746);
+    show(dbm.toFixed(3)+' dBm',`10 × log₁₀(${pW>=1?(pW+'W'):(pW*1000+'mW')} / 1mW)`,[
+      {l:'dBm',v:dbm.toFixed(3)+' dBm'},{l:'dBW',v:(dbm-30).toFixed(3)+' dBW'},
+      {l:'dBV ('+Z+'Ω)',v:dbv.toFixed(3)+' dBV'},{l:'dBu ('+Z+'Ω)',v:dbu.toFixed(3)+' dBu'},
+      {l:'Voltage',v:V.toFixed(4)+' V'},{l:'Power',v:pW>=1?pW.toFixed(3)+' W':(pW*1000).toFixed(3)+' mW'},
+    ]);
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
+function toggleFaq(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('show');}
+</script>
+</body>
+</html>
