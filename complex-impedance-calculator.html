@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complex Impedance Calculator – Rectangular & Polar Form | Electronics-Calc</title>
+  <meta name="description" content="Free complex impedance calculator. Convert between rectangular (R+jX) and polar (|Z|∠φ) forms, add series and parallel impedances, and calculate RLC impedance at any frequency.">
+  <link rel="canonical" href="https://electronics-calc.com/complex-impedance-calculator.html">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f1f5f9; color: #1e293b; }
+
+    /* NAV */
+    nav { background: #1e293b; padding: 0 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    nav a.brand { color: #fff; font-weight: 700; font-size: 1.1rem; text-decoration: none; padding: 14px 0; }
+    nav a { color: #94a3b8; font-size: 0.85rem; text-decoration: none; padding: 14px 6px; }
+    nav a:hover { color: #fff; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; padding: 36px 24px 28px; text-align: center; }
+    .hero h1 { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 700; margin-bottom: 8px; }
+    .hero p { color: #94a3b8; font-size: 0.95rem; max-width: 560px; margin: 0 auto; }
+
+    /* MAIN */
+    main { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    /* TABS */
+    .tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+    .tab-btn { padding: 8px 16px; border: 2px solid #e2e8f0; border-radius: 8px; background: #fff;
+      font-size: 0.88rem; font-weight: 600; cursor: pointer; color: #475569; transition: all .15s; }
+    .tab-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .tab-btn:hover:not(.active) { border-color: #2563eb; color: #2563eb; }
+
+    /* CARD */
+    .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 20px; }
+    .card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: #1e293b; }
+
+    /* FORM GRID */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    @media(max-width:540px){ .form-grid { grid-template-columns: 1fr; } }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
+    .input-row { display: flex; gap: 6px; }
+    .input-row input { flex: 1; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; outline: none; transition: border-color .15s; }
+    .input-row input:focus { border-color: #2563eb; }
+    .input-row select { padding: 10px 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; background: #f8fafc; cursor: pointer; outline: none; }
+    .input-row select:focus { border-color: #2563eb; }
+    .full-width { grid-column: 1 / -1; }
+
+    /* CALC BUTTON */
+    .calc-btn { width: 100%; padding: 13px; background: #2563eb; color: #fff; border: none;
+      border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .15s; margin-top: 4px; }
+    .calc-btn:hover { background: #1d4ed8; }
+
+    /* RESULT BOX */
+    .result-box { background: #f0f9ff; border: 2px solid #bae6fd; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px; display: none; }
+    .result-main { font-size: 1.8rem; font-weight: 800; color: #1e293b; font-family: 'Courier New', monospace; }
+    .result-sub { font-size: 0.85rem; color: #64748b; margin-top: 6px; font-family: 'Courier New', monospace; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 16px; text-align: left; }
+    .res-item { background: #fff; border-radius: 8px; padding: 10px 14px; border: 1px solid #e2e8f0; }
+    .res-label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
+    .res-value { font-size: 1rem; font-weight: 700; color: #1e293b; font-family: 'Courier New', monospace; }
+    .error-box { background: #fef2f2; border: 2px solid #fca5a5; border-radius: 10px; padding: 14px; color: #dc2626; font-size: 0.9rem; margin-bottom: 16px; display: none; }
+
+    /* PHASOR DIAGRAM */
+    .phasor-wrap { text-align: center; margin-top: 16px; }
+    .phasor-wrap svg { max-width: 100%; }
+    .phasor-label { font-size: 0.8rem; color: #64748b; margin-top: 8px; }
+
+    /* IMPEDANCE ENTRY */
+    .imp-entry { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px; position: relative; }
+    .imp-entry h3 { font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 10px; }
+    .imp-entry .remove-btn { position: absolute; top: 10px; right: 12px; background: none; border: none; color: #94a3b8; font-size: 1.1rem; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+    .imp-entry .remove-btn:hover { background: #fee2e2; color: #dc2626; }
+    .add-btn { background: none; border: 2px dashed #cbd5e1; border-radius: 8px; color: #64748b; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 9px; width: 100%; margin-bottom: 12px; transition: all .15s; }
+    .add-btn:hover { border-color: #2563eb; color: #2563eb; }
+
+    /* MODE ROW inside entry */
+    .mode-row { display: flex; gap: 6px; margin-bottom: 10px; }
+    .mode-btn { flex: 1; padding: 6px 8px; border: 2px solid #e2e8f0; border-radius: 6px; background: #fff;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; color: #475569; transition: all .15s; }
+    .mode-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+    /* INFO BOX */
+    .info-box { background: #f8fafc; border-left: 4px solid #2563eb; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 16px; font-size: 0.88rem; color: #475569; line-height: 1.6; }
+    .info-box strong { color: #1e293b; }
+
+    /* FORMULA CARDS */
+    .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 6px; }
+    .formula-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; }
+    .formula-card h3 { font-size: 0.85rem; font-weight: 700; color: #2563eb; margin-bottom: 8px; }
+    .formula-card p { font-size: 0.82rem; color: #475569; line-height: 1.6; font-family: 'Courier New', monospace; }
+
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { background: #f1f5f9; padding: 8px 12px; text-align: left; font-weight: 700; color: #475569; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-family: 'Courier New', monospace; }
+    tr:hover td { background: #f8fafc; }
+
+    /* PANEL */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* FAQ */
+    details { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; }
+    summary { padding: 12px 16px; cursor: pointer; font-weight: 600; font-size: 0.9rem; color: #1e293b; }
+    details p { padding: 0 16px 14px; font-size: 0.88rem; color: #475569; line-height: 1.65; }
+    details[open] summary { color: #2563eb; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="/">⚡ Electronics-Calc</a>
+  <a href="/ohms-law-calculator.html">Ohm's Law</a>
+  <a href="/rlc-impedance-calculator.html">RLC</a>
+  <a href="/resonance-frequency-calculator.html">Resonance</a>
+  <a href="/filter-designer-calculator.html">Filter</a>
+  <a href="/ac-power-calculator.html">AC Power</a>
+</nav>
+
+<div class="hero">
+  <h1>Complex Impedance Calculator</h1>
+  <p>Convert between rectangular (R+jX) and polar (|Z|∠φ°) forms, combine series/parallel impedances, or calculate from R, L, C at frequency.</p>
+</div>
+
+<main>
+
+  <!-- TAB SELECTOR -->
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('convert')">🔄 Convert Form</button>
+    <button class="tab-btn" onclick="switchTab('series')">➕ Series</button>
+    <button class="tab-btn" onclick="switchTab('parallel')">⚡ Parallel</button>
+    <button class="tab-btn" onclick="switchTab('rlc')">🔧 From R·L·C</button>
+  </div>
+
+  <!-- ─── PANEL: CONVERT ─── -->
+  <div class="panel active" id="panel-convert">
+    <div class="card">
+      <h2>Rectangular ↔ Polar Conversion</h2>
+
+      <div class="mode-row" style="margin-bottom:16px;">
+        <button class="mode-btn active" id="cvt-rect-btn" onclick="setCvtMode('rect')">Enter Rectangular (R + jX)</button>
+        <button class="mode-btn" id="cvt-polar-btn" onclick="setCvtMode('polar')">Enter Polar (|Z|∠φ°)</button>
+      </div>
+
+      <div id="cvt-rect-inputs">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Resistance R (real part)</label>
+            <div class="input-row">
+              <input type="number" id="cvt-R" value="3" step="any">
+              <select id="cvt-R-unit">
+                <option value="1">Ω</option>
+                <option value="1e3">kΩ</option>
+                <option value="1e6">MΩ</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Reactance X (imaginary part)</label>
+            <div class="input-row">
+              <input type="number" id="cvt-X" value="4" step="any">
+              <select id="cvt-X-unit">
+                <option value="1">Ω</option>
+                <option value="1e3">kΩ</option>
+                <option value="1e6">MΩ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cvt-polar-inputs" style="display:none;">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Magnitude |Z|</label>
+            <div class="input-row">
+              <input type="number" id="cvt-mag" value="5" step="any" min="0">
+              <select id="cvt-mag-unit">
+                <option value="1">Ω</option>
+                <option value="1e3">kΩ</option>
+                <option value="1e6">MΩ</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Phase Angle φ (degrees)</label>
+            <div class="input-row">
+              <input type="number" id="cvt-phi" value="53.13" step="any">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcConvert()">Convert →</button>
+    </div>
+
+    <div class="error-box" id="cvt-error"></div>
+    <div class="result-box" id="cvt-result">
+      <div class="result-main" id="cvt-main"></div>
+      <div class="result-sub" id="cvt-sub"></div>
+      <div class="result-grid" id="cvt-grid"></div>
+      <div class="phasor-wrap">
+        <svg id="phasor-svg" width="280" height="280" viewBox="-140 -140 280 280"></svg>
+        <div class="phasor-label" id="phasor-label"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📐 Complex Impedance Forms</h2>
+      <div class="info-box">
+        An impedance <strong>Z</strong> has a real part (resistance <strong>R</strong>) and an imaginary part (reactance <strong>X</strong>).<br>
+        Positive X = inductive (current lags), Negative X = capacitive (current leads).
+      </div>
+      <div class="formula-grid">
+        <div class="formula-card">
+          <h3>Rectangular Form</h3>
+          <p>Z = R + jX<br>R = Re(Z), X = Im(Z)<br>X > 0 → inductive<br>X &lt; 0 → capacitive</p>
+        </div>
+        <div class="formula-card">
+          <h3>Polar Form</h3>
+          <p>Z = |Z|∠φ<br>|Z| = √(R²+X²)<br>φ = arctan(X/R)<br>φ in range (−90°, +90°)</p>
+        </div>
+        <div class="formula-card">
+          <h3>Conversion</h3>
+          <p>R = |Z|·cos(φ)<br>X = |Z|·sin(φ)<br>|Z| = √(R²+X²)<br>φ = atan2(X, R)</p>
+        </div>
+        <div class="formula-card">
+          <h3>Admittance Y = 1/Z</h3>
+          <p>Y = G + jB<br>G = R / |Z|²<br>B = −X / |Z|²<br>|Y| = 1/|Z|, φ_Y = −φ</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── PANEL: SERIES ─── -->
+  <div class="panel" id="panel-series">
+    <div class="card">
+      <h2>Series Impedance: Z_total = Z₁ + Z₂ + …</h2>
+      <div id="series-list"></div>
+      <button class="add-btn" onclick="addImpedance('series')">+ Add Impedance</button>
+      <button class="calc-btn" onclick="calcSeries()">Calculate Series →</button>
+    </div>
+
+    <div class="error-box" id="series-error"></div>
+    <div class="result-box" id="series-result">
+      <div class="result-main" id="series-main"></div>
+      <div class="result-sub" id="series-sub"></div>
+      <div class="result-grid" id="series-grid"></div>
+      <div class="phasor-wrap">
+        <svg id="series-svg" width="280" height="280" viewBox="-140 -140 280 280"></svg>
+        <div class="phasor-label" id="series-phasor-label"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>ℹ️ Series Impedance Rules</h2>
+      <div class="info-box">
+        In <strong>series</strong>, impedances add directly in rectangular form:<br>
+        <strong>Z_total = (R₁+R₂+…) + j(X₁+X₂+…)</strong><br><br>
+        Enter each impedance as rectangular (R+jX) or polar (|Z|∠φ°).
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── PANEL: PARALLEL ─── -->
+  <div class="panel" id="panel-parallel">
+    <div class="card">
+      <h2>Parallel Impedance: 1/Z_total = 1/Z₁ + 1/Z₂ + …</h2>
+      <div id="parallel-list"></div>
+      <button class="add-btn" onclick="addImpedance('parallel')">+ Add Impedance</button>
+      <button class="calc-btn" onclick="calcParallel()">Calculate Parallel →</button>
+    </div>
+
+    <div class="error-box" id="parallel-error"></div>
+    <div class="result-box" id="parallel-result">
+      <div class="result-main" id="parallel-main"></div>
+      <div class="result-sub" id="parallel-sub"></div>
+      <div class="result-grid" id="parallel-grid"></div>
+      <div class="phasor-wrap">
+        <svg id="parallel-svg" width="280" height="280" viewBox="-140 -140 280 280"></svg>
+        <div class="phasor-label" id="parallel-phasor-label"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>ℹ️ Parallel Impedance Rules</h2>
+      <div class="info-box">
+        In <strong>parallel</strong>, add the admittances (Y = 1/Z), then invert:<br>
+        <strong>Y_total = Y₁ + Y₂ + …</strong>&nbsp;&nbsp;→&nbsp;&nbsp;<strong>Z_total = 1/Y_total</strong><br><br>
+        For two impedances: Z = (Z₁ × Z₂) / (Z₁ + Z₂)
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── PANEL: RLC ─── -->
+  <div class="panel" id="panel-rlc">
+    <div class="card">
+      <h2>Calculate Z from R, L, C + Frequency</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Frequency f</label>
+          <div class="input-row">
+            <input type="number" id="rlc-f" value="1" step="any" min="0">
+            <select id="rlc-f-unit">
+              <option value="1">Hz</option>
+              <option value="1e3" selected>kHz</option>
+              <option value="1e6">MHz</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Resistance R</label>
+          <div class="input-row">
+            <input type="number" id="rlc-R" value="10" step="any" min="0">
+            <select id="rlc-R-unit">
+              <option value="1" selected>Ω</option>
+              <option value="1e3">kΩ</option>
+              <option value="1e6">MΩ</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Inductance L (0 to exclude)</label>
+          <div class="input-row">
+            <input type="number" id="rlc-L" value="10" step="any" min="0">
+            <select id="rlc-L-unit">
+              <option value="1e-9">nH</option>
+              <option value="1e-6">µH</option>
+              <option value="1e-3" selected>mH</option>
+              <option value="1">H</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Capacitance C (0 to exclude)</label>
+          <div class="input-row">
+            <input type="number" id="rlc-C" value="100" step="any" min="0">
+            <select id="rlc-C-unit">
+              <option value="1e-12">pF</option>
+              <option value="1e-9" selected>nF</option>
+              <option value="1e-6">µF</option>
+              <option value="1e-3">mF</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label>Circuit Topology</label>
+          <div class="mode-row">
+            <button class="mode-btn active" id="rlc-series-btn" onclick="setRlcMode('series')">Series RLC</button>
+            <button class="mode-btn" id="rlc-parallel-btn" onclick="setRlcMode('parallel')">Parallel RLC</button>
+          </div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcRLC()">Calculate Z →</button>
+    </div>
+
+    <div class="error-box" id="rlc-error"></div>
+    <div class="result-box" id="rlc-result">
+      <div class="result-main" id="rlc-main"></div>
+      <div class="result-sub" id="rlc-sub"></div>
+      <div class="result-grid" id="rlc-grid"></div>
+      <div class="phasor-wrap">
+        <svg id="rlc-svg" width="280" height="280" viewBox="-140 -140 280 280"></svg>
+        <div class="phasor-label" id="rlc-phasor-label"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📐 Series vs Parallel RLC</h2>
+      <div class="formula-grid">
+        <div class="formula-card">
+          <h3>Series RLC</h3>
+          <p>Z = R + j·(XL − XC)<br>XL = 2πfL<br>XC = 1/(2πfC)<br>X = XL − XC</p>
+        </div>
+        <div class="formula-card">
+          <h3>Parallel RLC</h3>
+          <p>Y = G + j·(BC − BL)<br>G = 1/R<br>BL = 1/(2πfL)<br>BC = 2πfC</p>
+        </div>
+        <div class="formula-card">
+          <h3>Magnitude & Phase</h3>
+          <p>|Z| = √(R² + X²)<br>φ = arctan(X/R)<br>inductive: φ > 0°<br>capacitive: φ &lt; 0°</p>
+        </div>
+        <div class="formula-card">
+          <h3>Resonance</h3>
+          <p>At f₀: XL = XC<br>f₀ = 1/(2π√LC)<br>Series: Z = R (min)<br>Parallel: Z = R (max)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="card" style="margin-top:8px;">
+    <h2>❓ FAQ</h2>
+    <details>
+      <summary>What is complex impedance?</summary>
+      <p>Impedance Z is the total opposition to AC current flow, combining resistance (R, real part) and reactance (X, imaginary part): Z = R + jX. The j indicates a 90° phase shift. Impedance is measured in ohms (Ω).</p>
+    </details>
+    <details>
+      <summary>What is the difference between rectangular and polar form?</summary>
+      <p>Rectangular form Z = R + jX directly shows the resistive and reactive components. Polar form Z = |Z|∠φ shows the magnitude (total impedance) and phase angle. Rectangular is easier for addition; polar is easier for multiplication.</p>
+    </details>
+    <details>
+      <summary>How do I combine impedances in series?</summary>
+      <p>In series, add the real parts and imaginary parts separately: Z_total = (R₁+R₂) + j(X₁+X₂). This is straightforward in rectangular form.</p>
+    </details>
+    <details>
+      <summary>How do I combine impedances in parallel?</summary>
+      <p>In parallel, add the reciprocals: 1/Z_total = 1/Z₁ + 1/Z₂ + … It's easier to work with admittances (Y = 1/Z): Y_total = Y₁ + Y₂, then Z_total = 1/Y_total.</p>
+    </details>
+    <details>
+      <summary>What does a positive vs negative phase angle mean?</summary>
+      <p>A positive phase angle (φ > 0°) means the impedance is inductive — voltage leads current. A negative phase angle (φ < 0°) means the impedance is capacitive — current leads voltage.</p>
+    </details>
+    <details>
+      <summary>What is admittance?</summary>
+      <p>Admittance Y = 1/Z is the reciprocal of impedance. Its real part is conductance G = R/|Z|² and imaginary part is susceptance B = −X/|Z|². Admittance is measured in siemens (S).</p>
+    </details>
+  </div>
+
+</main>
+
+<script>
+// ─── COMPLEX NUMBER CLASS ──────────────────────────────────────────
+class Complex {
+  constructor(re, im) { this.re = re; this.im = im; }
+  static fromPolar(mag, degAngle) {
+    const r = degAngle * Math.PI / 180;
+    return new Complex(mag * Math.cos(r), mag * Math.sin(r));
+  }
+  get mag() { return Math.sqrt(this.re * this.re + this.im * this.im); }
+  get phaseDeg() { return Math.atan2(this.im, this.re) * 180 / Math.PI; }
+  add(b) { return new Complex(this.re + b.re, this.im + b.im); }
+  mul(b) { return new Complex(this.re*b.re - this.im*b.im, this.re*b.im + this.im*b.re); }
+  recip() {
+    const d = this.re*this.re + this.im*this.im;
+    if(d === 0) return new Complex(Infinity, 0);
+    return new Complex(this.re/d, -this.im/d);
+  }
+  div(b) { return this.mul(b.recip()); }
+  toString() {
+    const im = Math.abs(this.im);
+    const sign = this.im >= 0 ? '+' : '−';
+    return `${fmtZ(this.re)} ${sign} j${fmtZ(im)}`;
+  }
+}
+
+// ─── FORMATTING ────────────────────────────────────────────────────
+function fmtZ(v, unit='Ω') {
+  if(!isFinite(v)) return '∞';
+  const a = Math.abs(v);
+  if(a === 0) return '0' + unit;
+  if(a >= 1e6)  return (v/1e6).toPrecision(4) + 'M' + unit;
+  if(a >= 1e3)  return (v/1e3).toPrecision(4) + 'k' + unit;
+  if(a >= 1)    return v.toPrecision(4) + unit;
+  if(a >= 1e-3) return (v*1e3).toPrecision(4) + 'm' + unit;
+  return v.toPrecision(4) + unit;
+}
+
+function fmtRect(z) {
+  const re = fmtZ(z.re);
+  const imAbs = fmtZ(Math.abs(z.im));
+  const sign = z.im >= 0 ? '+ j' : '− j';
+  return `${re} ${sign}${imAbs}`;
+}
+
+function fmtPolar(z) {
+  return `${fmtZ(z.mag)} ∠ ${z.phaseDeg.toFixed(2)}°`;
+}
+
+function circuitType(z) {
+  if(Math.abs(z.im) < 1e-9 * z.mag + 1e-9) return 'Resistive';
+  if(z.im > 0) return 'Inductive (voltage leads)';
+  return 'Capacitive (current leads)';
+}
+
+// ─── ADMITTANCE ────────────────────────────────────────────────────
+function admittanceInfo(z) {
+  const y = z.recip();
+  return {
+    G: y.re,
+    B: y.im,
+    magY: y.mag,
+    phaseY: y.phaseDeg
+  };
+}
+
+// ─── PHASOR DIAGRAM ────────────────────────────────────────────────
+function drawPhasor(svgId, z, labelId) {
+  const svg = document.getElementById(svgId);
+  if(!svg) return;
+  const size = 110;
+  const mag = z.mag;
+  if(mag === 0 || !isFinite(mag)) { svg.innerHTML = ''; return; }
+
+  const scale = size / mag;
+  const ex = z.re * scale;
+  const ey = -z.im * scale; // SVG Y flipped
+
+  svg.innerHTML = `
+    <defs>
+      <marker id="arr-${svgId}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#2563eb"/>
+      </marker>
+      <marker id="arr-r-${svgId}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#ef4444"/>
+      </marker>
+      <marker id="arr-x-${svgId}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/>
+      </marker>
+    </defs>
+    <!-- Axes -->
+    <line x1="-120" y1="0" x2="120" y2="0" stroke="#e2e8f0" stroke-width="1"/>
+    <line x1="0" y1="-120" x2="0" y2="120" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="122" y="4" font-size="11" fill="#94a3b8">R</text>
+    <text x="-4" y="-122" font-size="11" fill="#94a3b8">jX</text>
+    <!-- R component -->
+    <line x1="0" y1="0" x2="${ex}" y2="0" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr-r-${svgId})"/>
+    <!-- X component -->
+    <line x1="${ex}" y1="0" x2="${ex}" y2="${ey}" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr-x-${svgId})"/>
+    <!-- Z vector -->
+    <line x1="0" y1="0" x2="${ex}" y2="${ey}" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arr-${svgId})"/>
+    <!-- Angle arc -->
+    <path d="M 20,0 A 20,20 0 ${z.im < 0 ? 0 : 0},${z.im >= 0 ? 0 : 1} ${20*Math.cos(z.phaseDeg*Math.PI/180)},${-20*Math.sin(z.phaseDeg*Math.PI/180)}" fill="none" stroke="#64748b" stroke-width="1.2"/>
+    <!-- Labels -->
+    <text x="${ex/2 - 4}" y="14" font-size="11" fill="#ef4444">R=${fmtZ(z.re)}</text>
+    <text x="${ex + 4}" y="${ey/2}" font-size="11" fill="#f59e0b">X=${fmtZ(z.im)}</text>
+    <text x="${ex/2 + 4}" y="${ey/2 - 8}" font-size="12" fill="#2563eb" font-weight="bold">Z</text>
+  `;
+
+  if(labelId) {
+    document.getElementById(labelId).textContent =
+      `Blue = Z (${fmtPolar(z)})  |  Red = R  |  Orange = jX`;
+  }
+}
+
+// ─── RESULT DISPLAY ────────────────────────────────────────────────
+function showResult(prefix, z, extra) {
+  const y = admittanceInfo(z);
+  document.getElementById(prefix+'-result').style.display = 'block';
+  document.getElementById(prefix+'-error').style.display = 'none';
+  document.getElementById(prefix+'-main').textContent = fmtRect(z);
+  document.getElementById(prefix+'-sub').textContent = `= ${fmtPolar(z)}`;
+  document.getElementById(prefix+'-grid').innerHTML = `
+    <div class="res-item"><div class="res-label">Rectangular</div><div class="res-value">${fmtRect(z)}</div></div>
+    <div class="res-item"><div class="res-label">Polar</div><div class="res-value">${fmtPolar(z)}</div></div>
+    <div class="res-item"><div class="res-label">Magnitude |Z|</div><div class="res-value">${fmtZ(z.mag)}</div></div>
+    <div class="res-item"><div class="res-label">Phase Angle φ</div><div class="res-value">${z.phaseDeg.toFixed(3)}°</div></div>
+    <div class="res-item"><div class="res-label">Resistance R</div><div class="res-value">${fmtZ(z.re)}</div></div>
+    <div class="res-item"><div class="res-label">Reactance X</div><div class="res-value">${fmtZ(z.im)}</div></div>
+    <div class="res-item"><div class="res-label">Circuit Type</div><div class="res-value">${circuitType(z)}</div></div>
+    <div class="res-item"><div class="res-label">Admittance |Y|</div><div class="res-value">${fmtZ(y.magY,'S')}</div></div>
+    <div class="res-item"><div class="res-label">Conductance G</div><div class="res-value">${fmtZ(y.G,'S')}</div></div>
+    <div class="res-item"><div class="res-label">Susceptance B</div><div class="res-value">${fmtZ(y.B,'S')}</div></div>
+    ${extra || ''}
+  `;
+  const svgId = (prefix === 'cvt') ? 'phasor-svg' : prefix+'-svg';
+  const lblId = (prefix === 'cvt') ? 'phasor-label' : prefix+'-phasor-label';
+  drawPhasor(svgId, z, lblId);
+}
+
+function showError(prefix, msg) {
+  document.getElementById(prefix+'-result').style.display = 'none';
+  const e = document.getElementById(prefix+'-error');
+  e.textContent = msg; e.style.display = 'block';
+}
+
+// ─── TAB SWITCHING ─────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ─── CONVERT ───────────────────────────────────────────────────────
+let cvtMode = 'rect';
+function setCvtMode(m) {
+  cvtMode = m;
+  document.getElementById('cvt-rect-inputs').style.display = m === 'rect' ? '' : 'none';
+  document.getElementById('cvt-polar-inputs').style.display = m === 'polar' ? '' : 'none';
+  document.getElementById('cvt-rect-btn').classList.toggle('active', m === 'rect');
+  document.getElementById('cvt-polar-btn').classList.toggle('active', m === 'polar');
+}
+
+function calcConvert() {
+  let z;
+  if(cvtMode === 'rect') {
+    const R = parseFloat(document.getElementById('cvt-R').value) * parseFloat(document.getElementById('cvt-R-unit').value);
+    const X = parseFloat(document.getElementById('cvt-X').value) * parseFloat(document.getElementById('cvt-X-unit').value);
+    if(isNaN(R) || isNaN(X)) return showError('cvt', 'Please enter valid numbers for R and X.');
+    z = new Complex(R, X);
+  } else {
+    const mag = parseFloat(document.getElementById('cvt-mag').value) * parseFloat(document.getElementById('cvt-mag-unit').value);
+    const phi = parseFloat(document.getElementById('cvt-phi').value);
+    if(isNaN(mag) || isNaN(phi)) return showError('cvt', 'Please enter valid magnitude and angle.');
+    if(mag < 0) return showError('cvt', 'Magnitude must be ≥ 0.');
+    z = Complex.fromPolar(mag, phi);
+  }
+  showResult('cvt', z);
+}
+
+// ─── SERIES / PARALLEL ENTRIES ─────────────────────────────────────
+const entries = { series: [], parallel: [] };
+let entryCounter = 0;
+
+function addImpedance(group) {
+  const id = ++entryCounter;
+  entries[group].push(id);
+  const div = document.createElement('div');
+  div.className = 'imp-entry';
+  div.id = `entry-${group}-${id}`;
+  div.innerHTML = `
+    <h3>Z${entries[group].length}</h3>
+    <button class="remove-btn" onclick="removeEntry('${group}', ${id}, this.closest('.imp-entry'))">✕</button>
+    <div class="mode-row">
+      <button class="mode-btn active" id="em-rect-${id}" onclick="setEntryMode(${id},'rect')">R + jX</button>
+      <button class="mode-btn" id="em-polar-${id}" onclick="setEntryMode(${id},'polar')">|Z|∠φ°</button>
+    </div>
+    <div id="em-rect-inputs-${id}">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>R (real)</label>
+          <div class="input-row">
+            <input type="number" id="er-${id}" value="0" step="any">
+            <select id="eru-${id}"><option value="1">Ω</option><option value="1e3">kΩ</option></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>X (imaginary)</label>
+          <div class="input-row">
+            <input type="number" id="ex-${id}" value="0" step="any">
+            <select id="exu-${id}"><option value="1">Ω</option><option value="1e3">kΩ</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="em-polar-inputs-${id}" style="display:none;">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Magnitude |Z|</label>
+          <div class="input-row">
+            <input type="number" id="emag-${id}" value="1" step="any" min="0">
+            <select id="emagu-${id}"><option value="1">Ω</option><option value="1e3">kΩ</option></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Phase φ (°)</label>
+          <div class="input-row">
+            <input type="number" id="ephi-${id}" value="0" step="any">
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById(group + '-list').appendChild(div);
+  renumberEntries(group);
+}
+
+function removeEntry(group, id, el) {
+  entries[group] = entries[group].filter(x => x !== id);
+  el.remove();
+  renumberEntries(group);
+}
+
+function renumberEntries(group) {
+  const list = document.getElementById(group + '-list');
+  Array.from(list.querySelectorAll('.imp-entry h3')).forEach((h, i) => { h.textContent = 'Z' + (i+1); });
+}
+
+const entryModes = {};
+function setEntryMode(id, mode) {
+  entryModes[id] = mode;
+  document.getElementById('em-rect-inputs-' + id).style.display = mode === 'rect' ? '' : 'none';
+  document.getElementById('em-polar-inputs-' + id).style.display = mode === 'polar' ? '' : 'none';
+  document.getElementById('em-rect-' + id).classList.toggle('active', mode === 'rect');
+  document.getElementById('em-polar-' + id).classList.toggle('active', mode === 'polar');
+}
+
+function getEntryZ(id) {
+  const mode = entryModes[id] || 'rect';
+  if(mode === 'rect') {
+    const R = parseFloat(document.getElementById('er-'+id).value) * parseFloat(document.getElementById('eru-'+id).value);
+    const X = parseFloat(document.getElementById('ex-'+id).value) * parseFloat(document.getElementById('exu-'+id).value);
+    if(isNaN(R) || isNaN(X)) return null;
+    return new Complex(R, X);
+  } else {
+    const mag = parseFloat(document.getElementById('emag-'+id).value) * parseFloat(document.getElementById('emagu-'+id).value);
+    const phi = parseFloat(document.getElementById('ephi-'+id).value);
+    if(isNaN(mag) || isNaN(phi)) return null;
+    return Complex.fromPolar(mag, phi);
+  }
+}
+
+function calcSeries() {
+  if(entries.series.length < 2) return showError('series', 'Add at least 2 impedances.');
+  let z = new Complex(0, 0);
+  for(const id of entries.series) {
+    const zi = getEntryZ(id);
+    if(!zi) return showError('series', 'Invalid entry. Check all inputs.');
+    z = z.add(zi);
+  }
+  const parts = entries.series.map((id, i) => {
+    const zi = getEntryZ(id);
+    return `<div class="res-item"><div class="res-label">Z${i+1}</div><div class="res-value">${fmtRect(zi)}</div></div>`;
+  }).join('');
+  showResult('series', z, parts);
+}
+
+function calcParallel() {
+  if(entries.parallel.length < 2) return showError('parallel', 'Add at least 2 impedances.');
+  let Y = new Complex(0, 0);
+  for(const id of entries.parallel) {
+    const zi = getEntryZ(id);
+    if(!zi) return showError('parallel', 'Invalid entry. Check all inputs.');
+    if(zi.mag === 0) return showError('parallel', 'Impedance cannot be zero in parallel combination.');
+    Y = Y.add(zi.recip());
+  }
+  if(Y.mag < 1e-30) return showError('parallel', 'Total admittance is zero — check your inputs.');
+  const z = Y.recip();
+  const parts = entries.parallel.map((id, i) => {
+    const zi = getEntryZ(id);
+    return `<div class="res-item"><div class="res-label">Z${i+1}</div><div class="res-value">${fmtRect(zi)}</div></div>`;
+  }).join('');
+  showResult('parallel', z, parts);
+}
+
+// ─── RLC FROM COMPONENTS ───────────────────────────────────────────
+let rlcMode = 'series';
+function setRlcMode(m) {
+  rlcMode = m;
+  document.getElementById('rlc-series-btn').classList.toggle('active', m === 'series');
+  document.getElementById('rlc-parallel-btn').classList.toggle('active', m === 'parallel');
+}
+
+function calcRLC() {
+  const f  = parseFloat(document.getElementById('rlc-f').value) * parseFloat(document.getElementById('rlc-f-unit').value);
+  const R  = parseFloat(document.getElementById('rlc-R').value) * parseFloat(document.getElementById('rlc-R-unit').value);
+  const L  = parseFloat(document.getElementById('rlc-L').value) * parseFloat(document.getElementById('rlc-L-unit').value);
+  const C  = parseFloat(document.getElementById('rlc-C').value) * parseFloat(document.getElementById('rlc-C-unit').value);
+
+  if([f,R,L,C].some(isNaN) || f <= 0 || R < 0 || L < 0 || C < 0)
+    return showError('rlc', 'Enter positive frequency and non-negative R, L, C.');
+
+  const w = 2 * Math.PI * f;
+  const XL = L > 0 ? w * L : 0;
+  const XC = C > 0 ? 1 / (w * C) : 0;
+  const f0 = (L > 0 && C > 0) ? 1 / (2 * Math.PI * Math.sqrt(L * C)) : null;
+
+  let z;
+  let extra = '';
+
+  if(rlcMode === 'series') {
+    const X = XL - XC;
+    z = new Complex(R, X);
+    extra = `
+      <div class="res-item"><div class="res-label">Inductive Reactance XL</div><div class="res-value">${fmtZ(XL)}</div></div>
+      <div class="res-item"><div class="res-label">Capacitive Reactance XC</div><div class="res-value">${fmtZ(XC)}</div></div>
+      <div class="res-item"><div class="res-label">Net Reactance X</div><div class="res-value">${fmtZ(X)}</div></div>
+      ${f0 ? `<div class="res-item"><div class="res-label">Resonance f₀</div><div class="res-value">${fmtZ(f0,'Hz').replace('Ω','')}</div></div>` : ''}
+    `;
+  } else {
+    // Parallel: Y = G + j(BC - BL)
+    const G  = R > 0 ? 1/R : Infinity;
+    const BL = L > 0 ? 1/(w*L) : Infinity;
+    const BC = C > 0 ? w*C : 0;
+    const Y  = new Complex(G, BC - BL);
+    z = Y.recip();
+    extra = `
+      <div class="res-item"><div class="res-label">XL (Inductive)</div><div class="res-value">${fmtZ(XL)}</div></div>
+      <div class="res-item"><div class="res-label">XC (Capacitive)</div><div class="res-value">${fmtZ(XC)}</div></div>
+      <div class="res-item"><div class="res-label">Conductance G</div><div class="res-value">${fmtZ(G,'S')}</div></div>
+      <div class="res-item"><div class="res-label">Susceptance (net)</div><div class="res-value">${fmtZ(BC-BL,'S')}</div></div>
+      ${f0 ? `<div class="res-item"><div class="res-label">Resonance f₀</div><div class="res-value">${fmtZ(f0,'Hz').replace('Ω','')}</div></div>` : ''}
+    `;
+  }
+  showResult('rlc', z, extra);
+}
+
+// ─── INIT ───────────────────────────────────────────────────────────
+addImpedance('series');
+addImpedance('series');
+// Pre-fill with an RL and a C example
+document.getElementById('er-1').value = 50;
+document.getElementById('ex-1').value = 30;  // inductive
+document.getElementById('er-2').value = 0;
+document.getElementById('ex-2').value = -20; // capacitive
+
+addImpedance('parallel');
+addImpedance('parallel');
+document.getElementById('er-3').value = 100;
+document.getElementById('ex-3').value = 0;
+document.getElementById('er-4').value = 0;
+document.getElementById('ex-4').value = 50;
+
+// Auto-calculate the convert example on load
+calcConvert();
+</script>
+</body>
+</html>
