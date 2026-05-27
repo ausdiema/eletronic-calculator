@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LM317 Voltage Regulator Calculator – Resistor & Output Voltage | Electronics-Calc</title>
+  <meta name="description" content="Free LM317 adjustable voltage regulator calculator. Calculate R1, R2 resistors for any output voltage, or find Vout from resistor values. Includes LM317 design guide.">
+  <link rel="canonical" href="https://electronics-calc.com/lm317-calculator.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RKW4WPS5TY');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b}
+    nav{background:#1e293b;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    nav a.brand{color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;padding:14px 0}
+    nav a{color:#94a3b8;font-size:.85rem;text-decoration:none;padding:14px 6px}
+    nav a:hover{color:#fff}
+    .hero{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:#fff;padding:36px 24px 28px;text-align:center}
+    .hero h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:700;margin-bottom:8px}
+    .hero p{color:#94a3b8;font-size:.95rem;max-width:560px;margin:0 auto}
+    main{max-width:820px;margin:0 auto;padding:24px 16px 48px}
+    .tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+    .tab-btn{padding:8px 20px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;font-size:.9rem;font-weight:600;cursor:pointer;color:#475569;transition:all .15s}
+    .tab-btn.active{background:#2563eb;border-color:#2563eb;color:#fff}
+    .tab-btn:hover:not(.active){border-color:#2563eb;color:#2563eb}
+    .card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:20px}
+    .card h2{font-size:1rem;font-weight:700;margin-bottom:16px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+    @media(max-width:540px){.form-grid{grid-template-columns:1fr}}
+    .form-group label{display:block;font-size:.8rem;font-weight:600;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+    .hint{font-size:.78rem;color:#94a3b8;margin-top:3px}
+    .input-row{display:flex;gap:6px}
+    .input-row input{flex:1;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;outline:none;transition:border-color .15s}
+    .input-row input:focus{border-color:#2563eb}
+    .input-row select{padding:10px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;background:#f8fafc;cursor:pointer;outline:none}
+    .calc-btn{width:100%;padding:13px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s;margin-top:4px}
+    .calc-btn:hover{background:#1d4ed8}
+    .result-box{background:#f0f9ff;border:2px solid #bae6fd;border-radius:12px;padding:20px;margin-bottom:20px;display:none}
+    .result-main{font-size:2rem;font-weight:800;color:#1e293b;font-family:'Courier New',monospace;text-align:center}
+    .result-sub{font-size:.88rem;color:#64748b;margin-top:6px;text-align:center}
+    .result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-top:16px}
+    .res-item{background:#fff;border-radius:8px;padding:10px 14px;border:1px solid #e2e8f0}
+    .res-label{font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:2px}
+    .res-value{font-size:1rem;font-weight:700;color:#1e293b;font-family:'Courier New',monospace}
+    .error-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:.9rem;margin-bottom:16px;display:none}
+    .warn-box{background:#fffbeb;border:2px solid #fde68a;border-radius:10px;padding:14px;color:#92400e;font-size:.9rem;margin-bottom:16px;display:none}
+    .info-box{background:#f8fafc;border-left:4px solid #2563eb;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:16px;font-size:.88rem;color:#475569;line-height:1.6}
+    .info-box strong{color:#1e293b}
+    .formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+    .formula-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px}
+    .formula-card h3{font-size:.85rem;font-weight:700;color:#2563eb;margin-bottom:8px}
+    .formula-card p{font-size:.82rem;color:#475569;line-height:1.7;font-family:'Courier New',monospace}
+    table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:8px}
+    th{background:#f1f5f9;padding:8px 12px;text-align:left;font-weight:700;color:#475569;border-bottom:2px solid #e2e8f0}
+    td{padding:8px 12px;border-bottom:1px solid #f1f5f9;font-family:'Courier New',monospace}
+    tr:hover td{background:#f8fafc}
+    .circuit-text{background:#0f172a;color:#e2e8f0;font-family:'Courier New',monospace;font-size:.82rem;border-radius:10px;padding:16px;line-height:1.8;margin-top:8px;overflow-x:auto;white-space:pre}
+    details{border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px}
+    summary{padding:12px 16px;cursor:pointer;font-weight:600;font-size:.9rem;color:#1e293b}
+    details p{padding:0 16px 14px;font-size:.88rem;color:#475569;line-height:1.65}
+    details[open] summary{color:#2563eb}
+    .panel{display:none}.panel.active{display:block}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/">⚡ Electronics-Calc</a>
+  <a href="/ohms-law-calculator.html">Ohm's Law</a>
+  <a href="/zener-regulator-calculator.html">Zener</a>
+  <a href="/555-timer-calculator.html">555 Timer</a>
+  <a href="/op-amp-calculator.html">Op-Amp</a>
+  <a href="/bjt-switch-calculator.html">BJT Switch</a>
+</nav>
+<div class="hero">
+  <h1>LM317 Voltage Regulator Calculator</h1>
+  <p>Calculate R1 and R2 resistors for any LM317 output voltage, or find Vout from known resistor values.</p>
+</div>
+<main>
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('vout',this)">Find R2 from Vout</button>
+    <button class="tab-btn" onclick="switchTab('r',this)">Find Vout from R1+R2</button>
+  </div>
+
+  <!-- FIND R2 FROM Vout -->
+  <div class="panel active" id="panel-vout">
+    <div class="card">
+      <h2>Design: Set Target Output Voltage</h2>
+      <div class="info-box">
+        Standard circuit: R1 = 240 Ω between ADJ and output, R2 between ADJ and GND.<br>
+        <strong>V_out = 1.25 × (1 + R2/R1)</strong>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Target Output Voltage V_out</label>
+          <div class="input-row"><input type="number" id="vt-Vout" value="5" step="any" min="1.25"><select><option>V</option></select></div>
+          <div class="hint">Range: 1.25V to 37V</div></div>
+        <div class="form-group"><label>R1 (standard = 240 Ω)</label>
+          <div class="input-row"><input type="number" id="vt-R1" value="240" step="any" min="0"><select><option>Ω</option></select></div>
+          <div class="hint">TI recommends 240 Ω for low Iadj error</div></div>
+        <div class="form-group"><label>Input Voltage V_in</label>
+          <div class="input-row"><input type="number" id="vt-Vin" value="9" step="any" min="0"><select><option>V</option></select></div>
+          <div class="hint">Must be ≥ Vout + 3V (dropout)</div></div>
+        <div class="form-group"><label>Load Current I_load</label>
+          <div class="input-row"><input type="number" id="vt-IL" value="500" step="any" min="0">
+          <select id="vt-ILu"><option value="1e-3" selected>mA</option><option value="1">A</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcVout()">Calculate →</button>
+    </div>
+    <div class="error-box" id="vt-error"></div>
+    <div class="warn-box" id="vt-warn"></div>
+    <div class="result-box" id="vt-result">
+      <div class="result-main" id="vt-main"></div>
+      <div class="result-sub" id="vt-sub"></div>
+      <div class="result-grid" id="vt-grid"></div>
+    </div>
+  </div>
+
+  <!-- FIND Vout FROM R1+R2 -->
+  <div class="panel" id="panel-r">
+    <div class="card">
+      <h2>Analysis: Find V_out from R1 and R2</h2>
+      <div class="form-grid">
+        <div class="form-group"><label>R1</label>
+          <div class="input-row"><input type="number" id="r-R1" value="240" step="any" min="0"><select><option>Ω</option></select></div></div>
+        <div class="form-group"><label>R2</label>
+          <div class="input-row"><input type="number" id="r-R2" value="720" step="any" min="0">
+          <select id="r-R2u"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
+        <div class="form-group"><label>Input Voltage V_in</label>
+          <div class="input-row"><input type="number" id="r-Vin" value="9" step="any" min="0"><select><option>V</option></select></div></div>
+        <div class="form-group"><label>Load Current I_load</label>
+          <div class="input-row"><input type="number" id="r-IL" value="500" step="any" min="0">
+          <select id="r-ILu"><option value="1e-3" selected>mA</option><option value="1">A</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcFromR()">Calculate →</button>
+    </div>
+    <div class="error-box" id="r-error"></div>
+    <div class="warn-box" id="r-warn"></div>
+    <div class="result-box" id="r-result">
+      <div class="result-main" id="r-main"></div>
+      <div class="result-sub" id="r-sub"></div>
+      <div class="result-grid" id="r-grid"></div>
+    </div>
+  </div>
+
+  <!-- COMMON VOLTAGES TABLE -->
+  <div class="card">
+    <h2>📊 Common LM317 Output Voltages (R1 = 240 Ω)</h2>
+    <table>
+      <tr><th>V_out</th><th>R2 (exact)</th><th>R2 (E24 nearest)</th><th>Actual V_out</th></tr>
+      <tr><td>1.5V</td><td>48 Ω</td><td>47 Ω</td><td>1.495V</td></tr>
+      <tr><td>1.8V</td><td>105.6 Ω</td><td>100 Ω</td><td>1.771V</td></tr>
+      <tr><td>2.5V</td><td>240 Ω</td><td>240 Ω</td><td>2.5V</td></tr>
+      <tr><td>3.3V</td><td>393.6 Ω</td><td>390 Ω</td><td>3.281V</td></tr>
+      <tr><td>5.0V</td><td>720 Ω</td><td>720 Ω</td><td>5.0V</td></tr>
+      <tr><td>6.0V</td><td>960 Ω</td><td>1kΩ</td><td>6.042V</td></tr>
+      <tr><td>9.0V</td><td>1.488 kΩ</td><td>1.5 kΩ</td><td>9.063V</td></tr>
+      <tr><td>12.0V</td><td>2.064 kΩ</td><td>2.0 kΩ</td><td>11.667V</td></tr>
+      <tr><td>15.0V</td><td>2.640 kΩ</td><td>2.7 kΩ</td><td>15.25V</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>📐 LM317 Design Guide</h2>
+    <div class="formula-grid">
+      <div class="formula-card"><h3>Output Voltage</h3><p>Vout = 1.25×(1 + R2/R1)<br>Vref = 1.25V</p></div>
+      <div class="formula-card"><h3>Solve for R2</h3><p>R2 = R1×(Vout/1.25 − 1)</p></div>
+      <div class="formula-card"><h3>Min Dropout</h3><p>Vin ≥ Vout + 3V<br>(LM317 needs ~2–3V headroom)</p></div>
+      <div class="formula-card"><h3>Power Dissipation</h3><p>Pd = (Vin − Vout) × I_load<br>Use heatsink if Pd > 1W</p></div>
+    </div>
+    <div class="circuit-text">LM317 Standard Circuit:
+         IN ──── LM317 ──── OUT ──── Vout
+                   │
+                  ADJ
+                   │
+                  R1 (240Ω)
+                   │
+                  R2 (adjust) ──── GND
+
+Optional: 0.1µF ceramic on IN, 1µF electrolytic on OUT</div>
+  </div>
+
+  <div class="card"><h2>❓ FAQ</h2>
+    <details><summary>Why is R1 = 240 Ω recommended?</summary><p>TI's datasheet recommends R1 = 120–240 Ω. Using 240 Ω keeps the quiescent current through R1 low (about 5mA) while still dominating the small adjust pin current (Iadj ≈ 50–100µA), minimizing output voltage error. Lower R1 values slightly improve regulation but waste more power.</p></details>
+    <details><summary>What is the LM317's output range?</summary><p>The LM317 adjusts from 1.25V (minimum, R2=0) up to 37V. Maximum input voltage is 40V. For 5V output you need at least 8V input; for 12V output you need at least 15V. The output current is up to 1.5A with adequate heatsinking.</p></details>
+    <details><summary>Do I need a heatsink?</summary><p>Calculate power dissipation: Pd = (Vin − Vout) × Iload. Above about 1W, a heatsink is needed. For Pd > 5W, you need a substantial heatsink or consider a switching regulator. Without a heatsink, thermal shutdown occurs around 1–2W depending on the package.</p></details>
+    <details><summary>What capacitors should I add?</summary><p>Add a 0.1µF ceramic capacitor on the input (IN to GND) for stability, and a 1µF–10µF electrolytic on the output (OUT to GND) to improve transient response. If using a large input filter capacitor, also add a 10µF electrolytic across R2 to improve ripple rejection.</p></details>
+  </div>
+</main>
+
+<script>
+const VREF=1.25, IADJ=100e-6;
+function fmtV(v){return v.toPrecision(4)+'V';}
+function fmtI(a){const s=Math.abs(a);if(s>=1)return a.toPrecision(4)+'A';if(s>=1e-3)return(a*1e3).toPrecision(4)+'mA';return(a*1e6).toPrecision(4)+'µA';}
+function fmtR(r){if(r>=1e6)return(r/1e6).toPrecision(4)+'MΩ';if(r>=1e3)return(r/1e3).toPrecision(4)+'kΩ';return r.toPrecision(4)+'Ω';}
+function fmtP(w){if(Math.abs(w)<1)return(w*1e3).toPrecision(4)+'mW';return w.toPrecision(4)+'W';}
+
+function switchTab(n,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showErr(id,m){document.getElementById(id).textContent=m;document.getElementById(id).style.display='block';}
+function hideErr(id){document.getElementById(id).style.display='none';}
+function showWarn(id,m){document.getElementById(id).innerHTML=m;document.getElementById(id).style.display='block';}
+function hideWarn(id){document.getElementById(id).style.display='none';}
+
+function calcVout(){
+  hideErr('vt-error'); hideWarn('vt-warn');
+  const Vout=parseFloat(document.getElementById('vt-Vout').value);
+  const R1=parseFloat(document.getElementById('vt-R1').value);
+  const Vin=parseFloat(document.getElementById('vt-Vin').value);
+  const IL=parseFloat(document.getElementById('vt-IL').value)*parseFloat(document.getElementById('vt-ILu').value);
+  if([Vout,R1,Vin,IL].some(isNaN)||Vout<VREF||R1<=0||Vin<=0||IL<0)return showErr('vt-error','Check inputs. V_out must be ≥ 1.25V.');
+
+  const R2=R1*(Vout/VREF-1);
+  const Vout_actual=VREF*(1+R2/R1)+IADJ*R2; // with Iadj correction
+  const Pd=(Vin-Vout_actual)*IL;
+  const warns=[];
+  if(Vin<Vout+3) warns.push(`⚠ V_in (${fmtV(Vin)}) should be ≥ V_out + 3V = ${fmtV(Vout+3)} for proper regulation.`);
+  if(Pd>2) warns.push(`⚠ Power dissipation ${fmtP(Pd)} — heatsink required.`);
+  if(Pd>7.5) warns.push(`❌ Power ${fmtP(Pd)} exceeds LM317 absolute max (15W). Use a switching regulator or reduce Vin.`);
+  if(warns.length) showWarn('vt-warn',warns.join('<br>'));
+
+  document.getElementById('vt-result').style.display='block';
+  document.getElementById('vt-main').textContent=fmtR(R2);
+  document.getElementById('vt-sub').textContent=`R2 for V_out = ${fmtV(Vout_actual)} (with Iadj correction)`;
+  document.getElementById('vt-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">R2 (calculated)</div><div class="res-value">${fmtR(R2)}</div></div>
+    <div class="res-item"><div class="res-label">R1</div><div class="res-value">${fmtR(R1)}</div></div>
+    <div class="res-item"><div class="res-label">Actual V_out</div><div class="res-value">${fmtV(Vout_actual)}</div></div>
+    <div class="res-item"><div class="res-label">Headroom</div><div class="res-value">${fmtV(Vin-Vout_actual)}</div></div>
+    <div class="res-item"><div class="res-label">Power Dissipation</div><div class="res-value">${fmtP(Pd)}</div></div>
+    <div class="res-item"><div class="res-label">Heatsink needed?</div><div class="res-value">${Pd>1?'Yes':'Not required'}</div></div>
+    <div class="res-item"><div class="res-label">Efficiency</div><div class="res-value">${(Vout_actual/Vin*100).toFixed(1)}%</div></div>
+    <div class="res-item"><div class="res-label">I through R1+R2</div><div class="res-value">${fmtI(VREF/R1)}</div></div>
+  `;
+}
+
+function calcFromR(){
+  hideErr('r-error'); hideWarn('r-warn');
+  const R1=parseFloat(document.getElementById('r-R1').value);
+  const R2=parseFloat(document.getElementById('r-R2').value)*parseFloat(document.getElementById('r-R2u').value);
+  const Vin=parseFloat(document.getElementById('r-Vin').value);
+  const IL=parseFloat(document.getElementById('r-IL').value)*parseFloat(document.getElementById('r-ILu').value);
+  if([R1,R2,Vin,IL].some(isNaN)||R1<=0||R2<0||Vin<=0||IL<0)return showErr('r-error','Enter valid positive values.');
+
+  const Vout=VREF*(1+R2/R1)+IADJ*R2;
+  const Pd=(Vin-Vout)*IL;
+  const warns=[];
+  if(Vin<Vout+3) warns.push(`⚠ V_in (${fmtV(Vin)}) too low — need ≥ ${fmtV(Vout+3)}.`);
+  if(Pd>2) warns.push(`⚠ Power dissipation ${fmtP(Pd)} — heatsink required.`);
+  if(warns.length) showWarn('r-warn',warns.join('<br>'));
+
+  document.getElementById('r-result').style.display='block';
+  document.getElementById('r-main').textContent=fmtV(Vout);
+  document.getElementById('r-sub').textContent=`Vout = 1.25×(1 + R2/R1) + Iadj×R2`;
+  document.getElementById('r-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">V_out</div><div class="res-value">${fmtV(Vout)}</div></div>
+    <div class="res-item"><div class="res-label">V_out (approx)</div><div class="res-value">${fmtV(VREF*(1+R2/R1))}</div></div>
+    <div class="res-item"><div class="res-label">Headroom (Vin−Vout)</div><div class="res-value">${fmtV(Vin-Vout)}</div></div>
+    <div class="res-item"><div class="res-label">Power Dissipation</div><div class="res-value">${fmtP(Pd)}</div></div>
+    <div class="res-item"><div class="res-label">Efficiency</div><div class="res-value">${(Vout/Vin*100).toFixed(1)}%</div></div>
+    <div class="res-item"><div class="res-label">Heatsink needed?</div><div class="res-value">${Pd>1?'Yes':'Not required'}</div></div>
+  `;
+}
+calcVout();
+</script>
+</body>
+</html>
