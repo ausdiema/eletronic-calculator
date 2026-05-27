@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LC Resonance Frequency Calculator — Thomson Formula</title>
+  <meta name="description" content="Calculate LC resonant frequency using the Thomson formula f = 1/(2π√LC). Solve for frequency, inductance or capacitance. Instant results for any LC tank circuit or filter." />
+  <link rel="canonical" href="https://electronics-calc.com/resonance-frequency-calculator.html" />
+  <meta name="google-site-verification" content="miH9b5abkKUBm5JfTS3vTU6B1TrSRIQG3IjDfTy4RaA" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RKW4WPS5TY');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "LC Resonance Frequency Calculator",
+        "url": "https://electronics-calc.com/resonance-frequency-calculator.html",
+        "description": "Calculate LC resonant frequency, inductance or capacitance using the Thomson formula. Includes wavelength, period and angular frequency.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the Thomson formula for resonance?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The Thomson formula gives the resonant frequency of an LC circuit: f₀ = 1 / (2π√(L×C)), where L is inductance in henries and C is capacitance in farads. At this frequency, inductive reactance equals capacitive reactance (XL = XC)." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I calculate LC resonant frequency?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Use f₀ = 1 / (2π × √(L × C)). For example, L = 10 µH and C = 100 pF gives f₀ = 1 / (2π × √(10×10⁻⁶ × 100×10⁻¹²)) = 1 / (2π × 31.62×10⁻⁹) ≈ 5.03 MHz." }
+          },
+          {
+            "@type": "Question",
+            "name": "What happens at resonance in an LC circuit?",
+            "acceptedAnswer": { "@type": "Answer", "text": "At resonance, inductive reactance XL equals capacitive reactance XC. In a series LC circuit, impedance is minimum (ideally zero). In a parallel LC circuit (tank circuit), impedance is maximum. Energy oscillates between the inductor and capacitor." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is an LC tank circuit?",
+            "acceptedAnswer": { "@type": "Answer", "text": "An LC tank circuit (parallel LC) stores energy oscillating between the inductor's magnetic field and the capacitor's electric field. Tank circuits are used in radio transmitters and receivers to select or generate specific frequencies." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I choose L and C for a target frequency?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Rearrange the Thomson formula: L = 1 / (4π²f²C) or C = 1 / (4π²f²L). For example, to resonate at 1 MHz with C = 100 pF: L = 1 / (4π² × (10⁶)² × 10⁻¹⁰) ≈ 253 µH." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { background: #1e293b; padding: 0 24px; display: flex; align-items: center; gap: 8px; height: 52px; }
+    nav a { color: #94a3b8; font-size: 14px; }
+    nav a:hover { color: #fff; text-decoration: none; }
+    nav span { color: #475569; font-size: 14px; }
+    nav .brand { color: #fff; font-weight: 600; font-size: 15px; margin-right: auto; }
+
+    .page { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+    .subtitle { font-size: 1.05rem; color: #475569; margin-bottom: 40px; }
+
+    .calc-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .calc-card h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; color: #0f172a; }
+    .calc-card .card-sub { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+    .solve-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 28px; }
+    .solve-btn { padding: 12px 6px; border: 1.5px solid #e2e8f0; border-radius: 10px; background: #fff; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; transition: all .15s; text-align: center; }
+    .solve-btn .sym { font-size: 22px; display: block; margin-bottom: 3px; }
+    .solve-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .solve-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .solve-badge { display: inline-block; background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-left: 4px; vertical-align: middle; }
+
+    .input-grid { display: grid; gap: 16px; }
+    @media(min-width:520px){ .input-grid { grid-template-columns: 1fr 1fr; } }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .field-row { display: flex; gap: 8px; }
+    .input-wrap { position: relative; flex: 1; }
+    .input-wrap input { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; color: #0f172a; background: #fff; transition: border-color .15s; outline: none; }
+    .input-wrap input:focus { border-color: #2563eb; }
+    .input-wrap input:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
+    .unit-sel { padding: 10px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; color: #475569; background: #f8fafc; cursor: pointer; outline: none; flex-shrink: 0; appearance: none; text-align: center; min-width: 64px; }
+    .unit-sel:focus { border-color: #2563eb; }
+
+    .calc-btn { margin-top: 20px; width: 100%; padding: 13px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .calc-btn:hover { background: #1d4ed8; }
+
+    .result-box { margin-top: 22px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 20px 24px; display: none; }
+    .result-box.show { display: block; }
+    .result-main { font-size: 2rem; font-weight: 700; color: #1d4ed8; }
+    .result-sub  { font-size: 0.88rem; color: #3b82f6; margin-top: 4px; font-family: monospace; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px,1fr)); gap: 10px; margin-top: 16px; }
+    .res-item { background: #fff; border-radius: 8px; padding: 10px 14px; }
+    .res-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+    .res-value { font-size: 1rem; font-weight: 600; color: #0f172a; margin-top: 2px; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; }
+
+    /* formula dark card */
+    .info-card { background: #0f172a; border-radius: 14px; padding: 24px 28px; margin: 8px 0 28px; }
+    .info-title { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+    .formula-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; }
+    .f-item { background: #1e293b; border-radius: 8px; padding: 12px 14px; }
+    .f-label { font-size: 11px; color: #60a5fa; font-weight: 600; margin-bottom: 4px; }
+    .f-formula { font-family: monospace; font-size: 13px; color: #e2e8f0; line-height: 1.7; }
+
+    section { margin-bottom: 48px; }
+    section h2 { font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    section p { color: #475569; margin-bottom: 12px; }
+
+    .examples-grid { display: grid; gap: 16px; }
+    @media(min-width:560px){ .examples-grid { grid-template-columns: 1fr 1fr; } }
+    .example-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; }
+    .ex-title { font-weight: 600; color: #0f172a; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ex-badge { background: #dbeafe; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .ex-line { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; border-bottom: 1px solid #f1f5f9; color: #475569; }
+    .ex-line:last-child { border-bottom: none; font-weight: 700; color: #1d4ed8; font-size: 14px; }
+
+    .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .faq-q { padding: 15px 20px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; color: #0f172a; background: #fff; }
+    .faq-q:hover { background: #f8fafc; }
+    .faq-q .arrow { color: #94a3b8; transition: transform .2s; font-size: 18px; }
+    .faq-q.open .arrow { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 20px 15px; color: #475569; font-size: 0.9rem; line-height: 1.6; }
+    .faq-a.show { display: block; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
+    .related-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #0f172a; transition: all .15s; }
+    .related-card:hover { border-color: #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,.12); text-decoration: none; }
+    .related-icon { font-size: 22px; }
+    .related-name { font-size: 14px; font-weight: 600; }
+    .related-desc { font-size: 12px; color: #94a3b8; }
+
+    footer { text-align: center; padding: 32px 20px; color: #94a3b8; font-size: 13px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">⚡ ElectroCalc</span>
+  <a href="https://electronics-calc.com/">Home</a>
+  <span>›</span>
+  <span style="color:#cbd5e1">Resonance Frequency Calculator</span>
+</nav>
+
+<div class="page">
+
+  <h1>LC Resonance Frequency Calculator</h1>
+  <p class="subtitle">Calculate resonant frequency, inductance or capacitance for LC tank circuits and filters using the Thomson formula: f₀ = 1 / (2π√LC).</p>
+
+  <div class="calc-card">
+    <h2>Calculate</h2>
+    <p class="card-sub">Select what you want to solve for, then enter the two known values.</p>
+
+    <div class="solve-grid">
+      <button class="solve-btn active" id="btn-f" onclick="setSolve('f',this)">
+        <span class="sym">〜</span>Frequency f₀ <span class="solve-badge">SOLVE</span>
+      </button>
+      <button class="solve-btn" id="btn-L" onclick="setSolve('L',this)">
+        <span class="sym">🌀</span>Inductance L <span class="solve-badge">SOLVE</span>
+      </button>
+      <button class="solve-btn" id="btn-C" onclick="setSolve('C',this)">
+        <span class="sym">⚡</span>Capacitance C <span class="solve-badge">SOLVE</span>
+      </button>
+    </div>
+
+    <div class="input-grid">
+      <div class="field" id="field-f">
+        <label>Frequency (f₀)</label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="inp-f" placeholder="e.g. 1" min="0" step="any" /></div>
+          <select class="unit-sel" id="unit-f">
+            <option value="1">Hz</option>
+            <option value="1e3" selected>kHz</option>
+            <option value="1e6">MHz</option>
+            <option value="1e9">GHz</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="field-L">
+        <label>Inductance (L)</label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="inp-L" placeholder="e.g. 10" min="0" step="any" /></div>
+          <select class="unit-sel" id="unit-L">
+            <option value="1e-9">nH</option>
+            <option value="1e-6" selected>µH</option>
+            <option value="1e-3">mH</option>
+            <option value="1">H</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="field-C">
+        <label>Capacitance (C)</label>
+        <div class="field-row">
+          <div class="input-wrap"><input type="number" id="inp-C" placeholder="e.g. 100" min="0" step="any" /></div>
+          <select class="unit-sel" id="unit-C">
+            <option value="1e-12" selected>pF</option>
+            <option value="1e-9">nF</option>
+            <option value="1e-6">µF</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate →</button>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-main" id="resultMain"></div>
+      <div class="result-sub"  id="resultSub"></div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="error-msg"   id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- Formulas -->
+  <section>
+    <h2>Thomson Formula — All Three Forms</h2>
+    <p>Rearranging f₀ = 1/(2π√LC) lets you solve for any of the three variables:</p>
+    <div class="info-card">
+      <div class="info-title">LC Resonance Formulas</div>
+      <div class="formula-list">
+        <div class="f-item"><div class="f-label">Resonant Frequency</div><div class="f-formula">f₀ = 1 / (2π × √(L×C))</div></div>
+        <div class="f-item"><div class="f-label">Inductance</div><div class="f-formula">L = 1 / (4π² × f₀² × C)</div></div>
+        <div class="f-item"><div class="f-label">Capacitance</div><div class="f-formula">C = 1 / (4π² × f₀² × L)</div></div>
+        <div class="f-item"><div class="f-label">Angular Frequency</div><div class="f-formula">ω₀ = 2π × f₀ = 1/√(LC)</div></div>
+        <div class="f-item"><div class="f-label">Period</div><div class="f-formula">T = 1/f₀ = 2π×√(LC)</div></div>
+        <div class="f-item"><div class="f-label">Wavelength (RF)</div><div class="f-formula">λ = c / f₀  (c = 3×10⁸ m/s)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Examples -->
+  <section>
+    <h2>Worked Examples</h2>
+    <div class="examples-grid">
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">1</span>AM radio tank circuit</div>
+        <div class="ex-line"><span>L = 250 µH</span></div>
+        <div class="ex-line"><span>C = 100 pF</span></div>
+        <div class="ex-line"><span>f₀ = 1/(2π√(250µ×100p))</span></div>
+        <div class="ex-line"><span>≈ 1.006 MHz</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">2</span>Find C for 100 kHz</div>
+        <div class="ex-line"><span>Target f₀ = 100 kHz</span></div>
+        <div class="ex-line"><span>L = 10 mH</span></div>
+        <div class="ex-line"><span>C = 1/(4π²×(100k)²×10m)</span></div>
+        <div class="ex-line"><span>≈ 253.3 pF</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">3</span>Find L for 88 MHz FM</div>
+        <div class="ex-line"><span>Target f₀ = 88 MHz</span></div>
+        <div class="ex-line"><span>C = 10 pF</span></div>
+        <div class="ex-line"><span>L = 1/(4π²×(88M)²×10p)</span></div>
+        <div class="ex-line"><span>≈ 32.7 nH</span></div>
+      </div>
+      <div class="example-card">
+        <div class="ex-title"><span class="ex-badge">4</span>Crossover filter 3 kHz</div>
+        <div class="ex-line"><span>L = 2.7 mH</span></div>
+        <div class="ex-line"><span>C = 1.05 µF</span></div>
+        <div class="ex-line"><span>f₀ = 1/(2π√(2.7m×1.05µ))</span></div>
+        <div class="ex-line"><span>≈ 2.99 kHz</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the Thomson formula? <span class="arrow">▾</span></div>
+      <div class="faq-a">The Thomson formula gives the natural resonant frequency of an LC circuit: f₀ = 1 / (2π√(LC)). At this frequency, inductive reactance XL equals capacitive reactance XC, and the circuit oscillates freely.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What happens at LC resonance? <span class="arrow">▾</span></div>
+      <div class="faq-a">At resonance XL = XC. In a series LC circuit, impedance is minimum (ideally zero) and current is maximum. In a parallel LC tank circuit, impedance is maximum and current from the source is minimum. Energy oscillates between the inductor and capacitor.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is an LC tank circuit used for? <span class="arrow">▾</span></div>
+      <div class="faq-a">LC tank circuits are used in: radio receivers (tuning to a station), oscillators (generating a specific frequency), bandpass/bandstop filters, impedance matching networks, and induction heating systems.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I choose L and C for a target frequency? <span class="arrow">▾</span></div>
+      <div class="faq-a">Pick a convenient capacitor value first (e.g. 100 pF for RF), then calculate L = 1/(4π²f²C). Or pick L first and solve C = 1/(4π²f²L). This calculator does both rearrangements automatically.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the difference between series and parallel resonance? <span class="arrow">▾</span></div>
+      <div class="faq-a">Both have the same resonant frequency f₀ = 1/(2π√LC). Series LC resonance gives minimum impedance (short at f₀). Parallel LC (tank) resonance gives maximum impedance (open at f₀). Series is used in bandpass filters; parallel in oscillators and RF amplifiers.</div>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section>
+    <h2>Related Calculators</h2>
+    <div class="related-grid">
+      <a class="related-card" href="https://electronics-calc.com/rlc-impedance-calculator.html">
+        <span class="related-icon">〰️</span>
+        <div><div class="related-name">RLC Impedance</div><div class="related-desc">Z, phase, Q factor</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/capacitor-charge-calculator.html">
+        <span class="related-icon">🔋</span>
+        <div><div class="related-name">Capacitor Charge</div><div class="related-desc">RC time constant</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/ac-power-calculator.html">
+        <span class="related-icon">⚡</span>
+        <div><div class="related-name">AC Power</div><div class="related-desc">P, Q, S, power factor</div></div>
+      </a>
+      <a class="related-card" href="https://electronics-calc.com/">
+        <span class="related-icon">🔌</span>
+        <div><div class="related-name">All Calculators</div><div class="related-desc">Full toolset</div></div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2025 ElectroCalc · Free electronics calculators · <a href="https://electronics-calc.com/">Home</a></p>
+</footer>
+
+<script>
+let solveFor = 'f';
+
+function setSolve(target, btn) {
+  solveFor = target;
+  document.querySelectorAll('.solve-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // disable the solve target input
+  ['f','L','C'].forEach(v => {
+    document.getElementById('inp-' + v).disabled = (v === target);
+    document.getElementById('inp-' + v).value = '';
+  });
+  document.getElementById('resultBox').classList.remove('show');
+}
+
+// init: disable f input (solve for f by default)
+document.getElementById('inp-f').disabled = true;
+
+function fmtFreq(f) {
+  if (f >= 1e9)  return (f/1e9).toFixed(6)  + ' GHz';
+  if (f >= 1e6)  return (f/1e6).toFixed(6)  + ' MHz';
+  if (f >= 1e3)  return (f/1e3).toFixed(6)  + ' kHz';
+  return f.toFixed(4) + ' Hz';
+}
+function fmtInd(L) {
+  if (L >= 1)     return L.toFixed(6)         + ' H';
+  if (L >= 1e-3)  return (L*1e3).toFixed(6)   + ' mH';
+  if (L >= 1e-6)  return (L*1e6).toFixed(6)   + ' µH';
+  return (L*1e9).toFixed(4) + ' nH';
+}
+function fmtCap(C) {
+  if (C >= 1e-3)  return (C*1e3).toFixed(4)   + ' mF';
+  if (C >= 1e-6)  return (C*1e6).toFixed(6)   + ' µF';
+  if (C >= 1e-9)  return (C*1e9).toFixed(6)   + ' nF';
+  return (C*1e12).toFixed(4) + ' pF';
+}
+function fmtTime(t) {
+  if (t >= 1)     return t.toFixed(4)          + ' s';
+  if (t >= 1e-3)  return (t*1e3).toFixed(4)    + ' ms';
+  if (t >= 1e-6)  return (t*1e6).toFixed(4)    + ' µs';
+  if (t >= 1e-9)  return (t*1e9).toFixed(4)    + ' ns';
+  return (t*1e12).toFixed(4) + ' ps';
+}
+function fmtLen(m) {
+  if (m >= 1000) return (m/1000).toFixed(3) + ' km';
+  if (m >= 1)    return m.toFixed(3) + ' m';
+  if (m >= 0.01) return (m*100).toFixed(3) + ' cm';
+  return (m*1000).toFixed(3) + ' mm';
+}
+
+function getVal(id, uid) {
+  return parseFloat(document.getElementById(id).value) * parseFloat(document.getElementById(uid).value);
+}
+
+function showResult(main, sub, items) {
+  document.getElementById('resultMain').textContent = main;
+  document.getElementById('resultSub').textContent  = sub;
+  document.getElementById('resultGrid').innerHTML = items.map(i =>
+    `<div class="res-item"><div class="res-label">${i.label}</div><div class="res-value">${i.value}</div></div>`
+  ).join('');
+  document.getElementById('errorMsg').textContent = '';
+  document.getElementById('resultBox').classList.add('show');
+}
+
+function showError(msg) {
+  ['resultMain','resultSub'].forEach(id => document.getElementById(id).textContent = '');
+  document.getElementById('resultGrid').innerHTML = '';
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('resultBox').classList.add('show');
+}
+
+function calculate() {
+  const c = 3e8; // speed of light
+
+  if (solveFor === 'f') {
+    const L = getVal('inp-L','unit-L');
+    const C = getVal('inp-C','unit-C');
+    if (isNaN(L)||L<=0||isNaN(C)||C<=0) { showError('Enter valid L and C values.'); return; }
+    const f = 1 / (2 * Math.PI * Math.sqrt(L * C));
+    const T = 1/f, omega = 2*Math.PI*f, lam = c/f;
+    showResult(fmtFreq(f), `f₀ = 1 / (2π × √(${fmtInd(L)} × ${fmtCap(C)}))`, [
+      { label: 'Frequency f₀',     value: fmtFreq(f) },
+      { label: 'Angular freq ω₀',  value: omega.toExponential(4) + ' rad/s' },
+      { label: 'Period T',         value: fmtTime(T) },
+      { label: 'Wavelength λ',     value: fmtLen(lam) },
+      { label: 'Inductance L',     value: fmtInd(L) },
+      { label: 'Capacitance C',    value: fmtCap(C) },
+    ]);
+
+  } else if (solveFor === 'L') {
+    const f = getVal('inp-f','unit-f');
+    const C = getVal('inp-C','unit-C');
+    if (isNaN(f)||f<=0||isNaN(C)||C<=0) { showError('Enter valid f and C values.'); return; }
+    const L = 1 / (4 * Math.PI * Math.PI * f * f * C);
+    const omega = 2*Math.PI*f;
+    showResult(fmtInd(L), `L = 1 / (4π² × ${fmtFreq(f)}² × ${fmtCap(C)})`, [
+      { label: 'Inductance L',     value: fmtInd(L) },
+      { label: 'Frequency f₀',     value: fmtFreq(f) },
+      { label: 'Capacitance C',    value: fmtCap(C) },
+      { label: 'Angular freq ω₀',  value: omega.toExponential(4) + ' rad/s' },
+      { label: 'XL at f₀',        value: (omega*L).toFixed(4) + ' Ω' },
+    ]);
+
+  } else {
+    const f = getVal('inp-f','unit-f');
+    const L = getVal('inp-L','unit-L');
+    if (isNaN(f)||f<=0||isNaN(L)||L<=0) { showError('Enter valid f and L values.'); return; }
+    const C = 1 / (4 * Math.PI * Math.PI * f * f * L);
+    const omega = 2*Math.PI*f;
+    showResult(fmtCap(C), `C = 1 / (4π² × ${fmtFreq(f)}² × ${fmtInd(L)})`, [
+      { label: 'Capacitance C',    value: fmtCap(C) },
+      { label: 'Frequency f₀',     value: fmtFreq(f) },
+      { label: 'Inductance L',     value: fmtInd(L) },
+      { label: 'Angular freq ω₀',  value: omega.toExponential(4) + ' rad/s' },
+      { label: 'XC at f₀',        value: (1/(omega*C)).toFixed(4) + ' Ω' },
+    ]);
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+
+function toggleFaq(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('show');
+}
+</script>
+</body>
+</html>
