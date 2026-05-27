@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gate Sandbox – Boolean Expression & Truth Table Generator | Electronics-Calc</title>
+  <meta name="description" content="Free Boolean expression truth table generator. Enter any logic expression (A AND B OR NOT C) and instantly get the full truth table, simplified form, and logic evaluation.">
+  <link rel="canonical" href="https://electronics-calc.com/gate-sandbox.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RKW4WPS5TY');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b}
+    nav{background:#1e293b;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    nav a.brand{color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;padding:14px 0}
+    nav a{color:#94a3b8;font-size:.85rem;text-decoration:none;padding:14px 6px}
+    nav a:hover{color:#fff}
+    .hero{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:#fff;padding:36px 24px 28px;text-align:center}
+    .hero h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:700;margin-bottom:8px}
+    .hero p{color:#94a3b8;font-size:.95rem;max-width:560px;margin:0 auto}
+    main{max-width:900px;margin:0 auto;padding:24px 16px 48px}
+    .card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:20px}
+    .card h2{font-size:1rem;font-weight:700;margin-bottom:16px}
+
+    /* INPUT AREA */
+    .expr-wrap{position:relative;margin-bottom:12px}
+    .expr-input{width:100%;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:1.1rem;font-family:'Courier New',monospace;outline:none;transition:border-color .15s;background:#f8fafc}
+    .expr-input:focus{border-color:#2563eb;background:#fff}
+    .expr-input.error{border-color:#ef4444;background:#fef2f2}
+    .calc-btn{width:100%;padding:13px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s;margin-top:4px}
+    .calc-btn:hover{background:#1d4ed8}
+
+    /* QUICK INSERT BUTTONS */
+    .quick-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+    .q-btn{padding:5px 12px;border:2px solid #e2e8f0;border-radius:7px;background:#fff;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Courier New',monospace;color:#1e293b;transition:all .15s}
+    .q-btn:hover{border-color:#2563eb;color:#2563eb}
+
+    /* EXAMPLES */
+    .examples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+    .ex-btn{padding:6px 14px;border:2px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'Courier New',monospace;color:#475569;transition:all .15s}
+    .ex-btn:hover{border-color:#2563eb;background:#eff6ff;color:#1e40af}
+
+    .error-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:.9rem;margin-bottom:16px;display:none}
+    .result-section{display:none}
+
+    /* RESULT META */
+    .meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:16px}
+    .meta-item{background:#f8fafc;border-radius:8px;padding:10px 14px;border:1px solid #e2e8f0}
+    .meta-label{font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:2px}
+    .meta-value{font-size:.95rem;font-weight:700;color:#1e293b;font-family:'Courier New',monospace}
+
+    /* TRUTH TABLE */
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:300px}
+    th{background:#1e293b;color:#e2e8f0;padding:9px 14px;text-align:center;font-weight:700;font-family:'Courier New',monospace}
+    td{padding:8px 14px;border-bottom:1px solid #f1f5f9;text-align:center;font-family:'Courier New',monospace;font-weight:700;font-size:1rem}
+    td.one{color:#10b981}
+    td.zero{color:#ef4444}
+    td.sep{background:#f1f5f9;width:1px;padding:0}
+    tr:hover td{background:#f8fafc}
+    tr:hover td.sep{background:#e2e8f0}
+
+    /* CANONICAL FORMS */
+    .canon-box{background:#0f172a;border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:.88rem;color:#e2e8f0;line-height:2;overflow-x:auto}
+    .canon-box .hi{color:#10b981}
+    .canon-box .lo{color:#ef4444}
+    .canon-box .op{color:#f59e0b}
+
+    .info-box{background:#f8fafc;border-left:4px solid #2563eb;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:16px;font-size:.88rem;color:#475569;line-height:1.6}
+    .info-box strong{color:#1e293b}
+    .info-box code{background:#e2e8f0;padding:1px 5px;border-radius:4px;font-family:'Courier New',monospace;font-size:.9em}
+
+    details{border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px}
+    summary{padding:12px 16px;cursor:pointer;font-weight:600;font-size:.9rem;color:#1e293b}
+    details p{padding:0 16px 14px;font-size:.88rem;color:#475569;line-height:1.65}
+    details[open] summary{color:#2563eb}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/">⚡ Electronics-Calc</a>
+  <a href="/logic-gate-simulator.html">Gate Sim</a>
+  <a href="/number-systems-calculator.html">Number Systems</a>
+  <a href="/555-timer-calculator.html">555 Timer</a>
+</nav>
+<div class="hero">
+  <h1>Gate Sandbox</h1>
+  <p>Enter any Boolean expression — get the full truth table, minterms, maxterms, and canonical forms instantly.</p>
+</div>
+<main>
+
+  <div class="card">
+    <h2>Boolean Expression Evaluator</h2>
+    <div class="info-box">
+      <strong>Supported syntax:</strong><br>
+      Variables: <code>A</code> <code>B</code> <code>C</code> <code>D</code> (case-insensitive, up to 4 variables)<br>
+      Operators: <code>AND</code> <code>OR</code> <code>NOT</code> <code>NAND</code> <code>NOR</code> <code>XOR</code> <code>XNOR</code> · <code>&amp;</code> · <code>|</code> · <code>^</code> · <code>!</code> · <code>~</code><br>
+      Grouping: <code>( )</code> — e.g. <code>A AND (B OR NOT C)</code>
+    </div>
+
+    <div style="margin-bottom:8px;font-size:.8rem;font-weight:600;color:#64748b;text-transform:uppercase">Examples</div>
+    <div class="examples" id="examples"></div>
+
+    <div style="margin-bottom:8px;font-size:.8rem;font-weight:600;color:#64748b;text-transform:uppercase">Quick Insert</div>
+    <div class="quick-row">
+      <button class="q-btn" onclick="insert('AND')">AND</button>
+      <button class="q-btn" onclick="insert('OR')">OR</button>
+      <button class="q-btn" onclick="insert('NOT ')">NOT</button>
+      <button class="q-btn" onclick="insert('NAND')">NAND</button>
+      <button class="q-btn" onclick="insert('NOR')">NOR</button>
+      <button class="q-btn" onclick="insert('XOR')">XOR</button>
+      <button class="q-btn" onclick="insert('XNOR')">XNOR</button>
+      <button class="q-btn" onclick="insert('(')"> ( </button>
+      <button class="q-btn" onclick="insert(')')"> ) </button>
+    </div>
+
+    <div class="expr-wrap">
+      <input class="expr-input" type="text" id="expr-input" value="A AND (B OR NOT C)" placeholder="e.g. A AND (B OR NOT C)" onkeydown="if(event.key==='Enter')evaluate()">
+    </div>
+    <button class="calc-btn" onclick="evaluate()">Generate Truth Table →</button>
+  </div>
+
+  <div class="error-box" id="eval-error"></div>
+
+  <div class="result-section" id="result-section">
+    <div class="card">
+      <h2>Results</h2>
+      <div class="meta-grid" id="meta-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2>Truth Table</h2>
+      <div class="table-wrap" id="table-wrap"></div>
+    </div>
+
+    <div class="card">
+      <h2>Canonical Forms</h2>
+      <div class="canon-box" id="canon-box"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📐 Boolean Algebra Laws</h2>
+    <div class="info-box" style="margin-bottom:8px">
+      <strong>Identity:</strong> A AND 1 = A · A OR 0 = A<br>
+      <strong>Null:</strong> A AND 0 = 0 · A OR 1 = 1<br>
+      <strong>Idempotent:</strong> A AND A = A · A OR A = A<br>
+      <strong>Complement:</strong> A AND NOT A = 0 · A OR NOT A = 1<br>
+      <strong>De Morgan:</strong> NOT(A AND B) = NOT A OR NOT B · NOT(A OR B) = NOT A AND NOT B
+    </div>
+  </div>
+
+  <div class="card"><h2>❓ FAQ</h2>
+    <details><summary>What is a minterm?</summary><p>A minterm is a product term (AND of all variables) that evaluates to 1 for exactly one row of the truth table. The Sum of Minterms (SOM) is also called the canonical Sum of Products (SOP) form — it's the OR of all minterms where the output is 1. Every Boolean function has a unique SOM representation.</p></details>
+    <details><summary>What is a maxterm?</summary><p>A maxterm is a sum term (OR of all variables) that evaluates to 0 for exactly one row of the truth table. The Product of Maxterms (POM) is the canonical Product of Sums (POS) form — it's the AND of all maxterms where the output is 0.</p></details>
+    <details><summary>How do I simplify a Boolean expression?</summary><p>Use Boolean algebra laws (De Morgan's, distributive, absorption) or Karnaugh Maps (K-maps) for systematic minimization. For 2 variables use a 2×2 K-map; for 3 variables use a 2×4 K-map; for 4 variables use a 4×4 K-map. Group adjacent 1s in powers of 2 to find simplified AND terms.</p></details>
+  </div>
+
+</main>
+
+<script>
+const EXAMPLES = [
+  'A AND B',
+  'A OR NOT B',
+  'NOT (A AND B)',
+  'A AND (B OR NOT C)',
+  '(A XOR B) AND C',
+  'A XNOR B',
+  '(A OR B) AND (C OR D)',
+  'NOT A AND NOT B',
+];
+
+// Build examples
+const ex=document.getElementById('examples');
+EXAMPLES.forEach(e=>{
+  const b=document.createElement('button');
+  b.className='ex-btn'; b.textContent=e;
+  b.onclick=()=>{document.getElementById('expr-input').value=e;evaluate();};
+  ex.appendChild(b);
+});
+
+function insert(s){
+  const el=document.getElementById('expr-input');
+  const pos=el.selectionStart;
+  const val=el.value;
+  el.value=val.slice(0,pos)+' '+s+' '+val.slice(pos);
+  el.focus();
+  el.selectionStart=el.selectionEnd=pos+s.length+2;
+}
+
+// Tokenize & parse Boolean expression
+function tokenize(src){
+  // Replace symbols
+  let s=src.toUpperCase()
+    .replace(/XNOR/g,' XNOR ')
+    .replace(/NAND/g,' NAND ')
+    .replace(/NOR/g,' NOR ')
+    .replace(/XOR/g,' XOR ')
+    .replace(/AND/g,' AND ')
+    .replace(/NOT/g,' NOT ')
+    .replace(/OR/g,' OR ')
+    .replace(/&&/g,' AND ')
+    .replace(/\|\|/g,' OR ')
+    .replace(/[!~]/g,' NOT ')
+    .replace(/&/g,' AND ')
+    .replace(/\|/g,' OR ')
+    .replace(/\^/g,' XOR ')
+    .replace(/\(/g,' ( ')
+    .replace(/\)/g,' ) ');
+  return s.trim().split(/\s+/).filter(t=>t.length>0);
+}
+
+function getVars(tokens){
+  const vs=new Set();
+  tokens.forEach(t=>{if(/^[A-D]$/.test(t)) vs.add(t);});
+  return [...vs].sort();
+}
+
+// Recursive descent parser → evaluator
+function makeEval(tokens, vars, vals){
+  let pos=0;
+  function peek(){return tokens[pos];}
+  function consume(){return tokens[pos++];}
+  function parseExpr(){return parseOr();}
+  function parseOr(){
+    let left=parseAnd();
+    while(peek()==='OR'||peek()==='NOR'){
+      const op=consume();
+      const right=parseAnd();
+      if(op==='OR') left=left|right;
+      else left=(left|right)^1; // NOR
+    }
+    return left;
+  }
+  function parseAnd(){
+    let left=parseXor();
+    while(peek()==='AND'||peek()==='NAND'){
+      const op=consume();
+      const right=parseXor();
+      if(op==='AND') left=left&right;
+      else left=(left&right)^1; // NAND
+    }
+    return left;
+  }
+  function parseXor(){
+    let left=parseNot();
+    while(peek()==='XOR'||peek()==='XNOR'){
+      const op=consume();
+      const right=parseNot();
+      if(op==='XOR') left=left^right;
+      else left=(left^right)^1; // XNOR
+    }
+    return left;
+  }
+  function parseNot(){
+    if(peek()==='NOT'){consume();return parseNot()^1;}
+    return parsePrimary();
+  }
+  function parsePrimary(){
+    const t=peek();
+    if(t==='('){
+      consume();
+      const val=parseExpr();
+      if(peek()===')') consume();
+      return val;
+    }
+    if(/^[A-D]$/.test(t)){
+      consume();
+      return vals[vars.indexOf(t)];
+    }
+    throw new Error('Unexpected token: '+t);
+  }
+  const result=parseExpr();
+  if(pos<tokens.length) throw new Error('Unexpected token: '+tokens[pos]);
+  return result;
+}
+
+function evaluate(){
+  const raw=document.getElementById('expr-input').value.trim();
+  const errEl=document.getElementById('eval-error');
+  const resEl=document.getElementById('result-section');
+  errEl.style.display='none';
+  resEl.style.display='none';
+
+  if(!raw){errEl.textContent='Please enter a Boolean expression.';errEl.style.display='block';return;}
+
+  let tokens, vars;
+  try{
+    tokens=tokenize(raw);
+    vars=getVars(tokens);
+  }catch(e){
+    errEl.textContent='Parse error: '+e.message;errEl.style.display='block';return;
+  }
+
+  if(vars.length===0){errEl.textContent='No variables found. Use A, B, C, D.';errEl.style.display='block';return;}
+  if(vars.length>4){errEl.textContent='Maximum 4 variables (A, B, C, D) supported.';errEl.style.display='block';return;}
+
+  const rows=1<<vars.length;
+  const results=[];
+  const minterms=[],maxterms=[];
+
+  try{
+    for(let r=0;r<rows;r++){
+      const vals=[];
+      for(let i=vars.length-1;i>=0;i--) vals.push((r>>i)&1);
+      const out=makeEval([...tokens],vars,vals)&1;
+      results.push({vals,out});
+      if(out===1) minterms.push(r);
+      else maxterms.push(r);
+    }
+  }catch(e){
+    errEl.textContent='Evaluation error: '+e.message+'. Check your expression syntax.';
+    errEl.style.display='block';return;
+  }
+
+  // META
+  const ones=results.filter(r=>r.out===1).length;
+  document.getElementById('meta-grid').innerHTML=`
+    <div class="meta-item"><div class="meta-label">Variables</div><div class="meta-value">${vars.join(', ')}</div></div>
+    <div class="meta-item"><div class="meta-label">Rows</div><div class="meta-value">${rows}</div></div>
+    <div class="meta-item"><div class="meta-label">Output = 1</div><div class="meta-value">${ones} rows</div></div>
+    <div class="meta-item"><div class="meta-label">Output = 0</div><div class="meta-value">${rows-ones} rows</div></div>
+    <div class="meta-item"><div class="meta-label">Tautology?</div><div class="meta-value">${ones===rows?'Yes (always 1)':'No'}</div></div>
+    <div class="meta-item"><div class="meta-label">Contradiction?</div><div class="meta-value">${ones===0?'Yes (always 0)':'No'}</div></div>
+  `;
+
+  // TRUTH TABLE
+  let th='<table><tr>'+vars.map(v=>`<th>${v}</th>`).join('')+'<th style="background:#1d4ed8">Q</th></tr>';
+  results.forEach(({vals,out})=>{
+    th+='<tr>'+vals.map(v=>`<td class="${v?'one':'zero'}">${v}</td>`).join('')
+      +`<td class="${out?'one':'zero'}" style="background:${out?'#f0fdf4':'#fef2f2'}">${out}</td></tr>`;
+  });
+  th+='</table>';
+  document.getElementById('table-wrap').innerHTML=th;
+
+  // CANONICAL FORMS
+  const varnot=(v,val)=>val?v:`<span style="text-decoration:overline">${v}</span>`;
+
+  let sop='<strong>SOM (Sum of Minterms) = Σm('+minterms.join(',')+')</strong><br>';
+  if(minterms.length===0) sop+='<span class="lo">= 0 (contradiction)</span>';
+  else if(minterms.length===rows) sop+='<span class="hi">= 1 (tautology)</span>';
+  else {
+    sop+=minterms.map(m=>{
+      const vals=[];
+      for(let i=vars.length-1;i>=0;i--) vals.push((m>>i)&1);
+      return '('+vars.map((v,i)=>(vals[i]?`<span class="hi">${v}</span>`:`<span class="lo">¬${v}</span>`)).join('<span class="op"> · </span>')+')';
+    }).join('<span class="op"> + </span>');
+  }
+
+  let pos2='<br><br><strong>POM (Product of Maxterms) = ΠM('+maxterms.join(',')+')</strong><br>';
+  if(maxterms.length===0) pos2+='<span class="hi">= 1 (tautology)</span>';
+  else if(maxterms.length===rows) pos2+='<span class="lo">= 0 (contradiction)</span>';
+  else {
+    pos2+=maxterms.map(m=>{
+      const vals=[];
+      for(let i=vars.length-1;i>=0;i--) vals.push((m>>i)&1);
+      return '('+vars.map((v,i)=>(vals[i]?`<span class="lo">¬${v}</span>`:`<span class="hi">${v}</span>`)).join('<span class="op"> + </span>')+')';
+    }).join('<span class="op"> · </span>');
+  }
+
+  document.getElementById('canon-box').innerHTML=sop+pos2;
+  resEl.style.display='block';
+}
+
+evaluate();
+</script>
+</body>
+</html>
