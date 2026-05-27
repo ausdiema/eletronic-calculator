@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circuit Lab – Kirchhoff's Laws, Voltage Divider & Node Analysis | Electronics-Calc</title>
+  <meta name="description" content="Free circuit analysis lab. Apply Kirchhoff's voltage law (KVL) and current law (KCL), analyze voltage dividers, current dividers, and series-parallel circuits with step-by-step solutions.">
+  <link rel="canonical" href="https://electronics-calc.com/circuit-lab.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RKW4WPS5TY');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b}
+    nav{background:#1e293b;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    nav a.brand{color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;padding:14px 0}
+    nav a{color:#94a3b8;font-size:.85rem;text-decoration:none;padding:14px 6px}
+    nav a:hover{color:#fff}
+    .hero{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:#fff;padding:36px 24px 28px;text-align:center}
+    .hero h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:700;margin-bottom:8px}
+    .hero p{color:#94a3b8;font-size:.95rem;max-width:560px;margin:0 auto}
+    main{max-width:820px;margin:0 auto;padding:24px 16px 48px}
+    .tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+    .tab-btn{padding:8px 14px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;font-size:.85rem;font-weight:600;cursor:pointer;color:#475569;transition:all .15s}
+    .tab-btn.active{background:#2563eb;border-color:#2563eb;color:#fff}
+    .tab-btn:hover:not(.active){border-color:#2563eb;color:#2563eb}
+    .panel{display:none}.panel.active{display:block}
+    .card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:20px}
+    .card h2{font-size:1rem;font-weight:700;margin-bottom:16px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+    @media(max-width:540px){.form-grid{grid-template-columns:1fr}}
+    .full{grid-column:1/-1}
+    .form-group label{display:block;font-size:.8rem;font-weight:600;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+    .hint{font-size:.78rem;color:#94a3b8;margin-top:3px}
+    .input-row{display:flex;gap:6px}
+    .input-row input{flex:1;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;outline:none;transition:border-color .15s}
+    .input-row input:focus{border-color:#2563eb}
+    .input-row select{padding:10px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;background:#f8fafc;cursor:pointer;outline:none}
+    .calc-btn{width:100%;padding:13px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s;margin-top:4px}
+    .calc-btn:hover{background:#1d4ed8}
+    .result-box{background:#f0f9ff;border:2px solid #bae6fd;border-radius:12px;padding:20px;margin-bottom:20px;display:none}
+    .result-main{font-size:1.7rem;font-weight:800;color:#1e293b;font-family:'Courier New',monospace;text-align:center}
+    .result-sub{font-size:.85rem;color:#64748b;margin-top:6px;text-align:center}
+    .result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-top:16px}
+    .res-item{background:#fff;border-radius:8px;padding:10px 14px;border:1px solid #e2e8f0}
+    .res-label{font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:2px}
+    .res-value{font-size:1rem;font-weight:700;color:#1e293b;font-family:'Courier New',monospace}
+    .error-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:.9rem;margin-bottom:16px;display:none}
+    .info-box{background:#f8fafc;border-left:4px solid #2563eb;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:16px;font-size:.88rem;color:#475569;line-height:1.6}
+    .info-box strong{color:#1e293b}
+    .steps-box{background:#0f172a;border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:.85rem;color:#e2e8f0;line-height:2;margin-top:12px;overflow-x:auto}
+    .step-line{padding:2px 0}
+    .step-line .lbl{color:#94a3b8}
+    .step-line .val{color:#10b981;font-weight:700}
+    .step-line .eq{color:#f59e0b}
+    /* R-entry */
+    .r-entry{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+    .r-entry span{font-size:.85rem;font-weight:700;color:#475569;min-width:30px}
+    .r-entry input{flex:1;padding:8px 10px;border:2px solid #e2e8f0;border-radius:7px;font-size:.9rem;outline:none}
+    .r-entry input:focus{border-color:#2563eb}
+    .r-entry select{padding:8px 6px;border:2px solid #e2e8f0;border-radius:7px;font-size:.85rem;background:#fff}
+    .add-btn{background:none;border:2px dashed #cbd5e1;border-radius:8px;color:#64748b;font-size:.9rem;font-weight:600;cursor:pointer;padding:8px;width:100%;margin-bottom:12px;transition:all .15s}
+    .add-btn:hover{border-color:#2563eb;color:#2563eb}
+    /* Diagram */
+    .diag{background:#0f172a;border-radius:10px;padding:12px;text-align:center;margin-bottom:16px}
+    .diag svg{max-width:100%}
+    details{border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px}
+    summary{padding:12px 16px;cursor:pointer;font-weight:600;font-size:.9rem;color:#1e293b}
+    details p{padding:0 16px 14px;font-size:.88rem;color:#475569;line-height:1.65}
+    details[open] summary{color:#2563eb}
+    table{width:100%;border-collapse:collapse;font-size:.88rem}
+    th{background:#f1f5f9;padding:8px 12px;text-align:left;font-weight:700;color:#475569;border-bottom:2px solid #e2e8f0}
+    td{padding:8px 12px;border-bottom:1px solid #f1f5f9;font-family:'Courier New',monospace}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/">⚡ Electronics-Calc</a>
+  <a href="/ohms-law-calculator.html">Ohm's Law</a>
+  <a href="/series-parallel-resistor-calculator.html">Series/Parallel</a>
+  <a href="/logic-gate-simulator.html">Logic Gates</a>
+  <a href="/rlc-impedance-calculator.html">RLC</a>
+</nav>
+<div class="hero">
+  <h1>Circuit Lab</h1>
+  <p>Analyze circuits using KVL, KCL, voltage dividers, current dividers, and Thevenin/Norton equivalents.</p>
+</div>
+<main>
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('kvl',this)">📐 KVL Loop</button>
+    <button class="tab-btn" onclick="switchTab('kcl',this)">🔀 KCL Node</button>
+    <button class="tab-btn" onclick="switchTab('vdiv',this)">⬇ Voltage Divider</button>
+    <button class="tab-btn" onclick="switchTab('cdiv',this)">↔ Current Divider</button>
+    <button class="tab-btn" onclick="switchTab('thevenin',this)">🔋 Thévenin</button>
+  </div>
+
+  <!-- KVL -->
+  <div class="panel active" id="panel-kvl">
+    <div class="card">
+      <h2>Kirchhoff's Voltage Law – Series Loop</h2>
+      <div class="info-box">
+        <strong>KVL:</strong> The sum of all voltages around a closed loop = 0.<br>
+        Enter supply voltage and resistor values — get current and voltage drops.
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Supply Voltage V_s</label>
+          <div class="input-row"><input type="number" id="kvl-Vs" value="12" step="any" min="0"><select><option>V</option></select></div></div>
+      </div>
+      <div style="font-size:.8rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:8px">Resistors in Loop</div>
+      <div id="kvl-list"></div>
+      <button class="add-btn" onclick="addKVL()">+ Add Resistor</button>
+      <button class="calc-btn" onclick="calcKVL()">Analyze Loop →</button>
+    </div>
+    <div class="error-box" id="kvl-error"></div>
+    <div class="result-box" id="kvl-result">
+      <div class="result-main" id="kvl-main"></div>
+      <div class="result-sub" id="kvl-sub"></div>
+      <div class="result-grid" id="kvl-grid"></div>
+      <div class="steps-box" id="kvl-steps"></div>
+    </div>
+  </div>
+
+  <!-- KCL -->
+  <div class="panel" id="panel-kcl">
+    <div class="card">
+      <h2>Kirchhoff's Current Law – Node Analysis</h2>
+      <div class="info-box">
+        <strong>KCL:</strong> The sum of currents entering a node = sum of currents leaving.<br>
+        Enter known currents (positive = entering, negative = leaving). Unknown current is solved automatically.
+      </div>
+      <div style="font-size:.8rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:8px">Known Currents (+ entering, − leaving)</div>
+      <div id="kcl-list"></div>
+      <button class="add-btn" onclick="addKCL()">+ Add Current</button>
+      <button class="calc-btn" onclick="calcKCL()">Find Unknown Current →</button>
+    </div>
+    <div class="error-box" id="kcl-error"></div>
+    <div class="result-box" id="kcl-result">
+      <div class="result-main" id="kcl-main"></div>
+      <div class="result-sub" id="kcl-sub"></div>
+      <div class="result-grid" id="kcl-grid"></div>
+      <div class="steps-box" id="kcl-steps"></div>
+    </div>
+  </div>
+
+  <!-- VOLTAGE DIVIDER -->
+  <div class="panel" id="panel-vdiv">
+    <div class="card">
+      <h2>Loaded Voltage Divider</h2>
+      <div class="info-box">
+        Output voltage across R2, with optional load resistance R_L in parallel with R2.<br>
+        <strong>Unloaded:</strong> V_out = V_in × R2/(R1+R2)<br>
+        <strong>Loaded:</strong> V_out = V_in × R_parallel/(R1+R_parallel)
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Input Voltage V_in</label>
+          <div class="input-row"><input type="number" id="vd-Vin" value="12" step="any" min="0"><select><option>V</option></select></div></div>
+        <div class="form-group"><label>R1 (top resistor)</label>
+          <div class="input-row"><input type="number" id="vd-R1" value="10" step="any" min="0">
+          <select id="vd-R1u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>R2 (bottom resistor)</label>
+          <div class="input-row"><input type="number" id="vd-R2" value="10" step="any" min="0">
+          <select id="vd-R2u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
+        <div class="form-group"><label>Load R_L (0 = no load)</label>
+          <div class="input-row"><input type="number" id="vd-RL" value="0" step="any" min="0">
+          <select id="vd-RLu"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div>
+          <div class="hint">0 = ideal unloaded divider</div></div>
+      </div>
+      <button class="calc-btn" onclick="calcVDiv()">Calculate →</button>
+    </div>
+    <div class="error-box" id="vd-error"></div>
+    <div class="result-box" id="vd-result">
+      <div class="result-main" id="vd-main"></div>
+      <div class="result-sub" id="vd-sub"></div>
+      <div class="result-grid" id="vd-grid"></div>
+      <div class="steps-box" id="vd-steps"></div>
+    </div>
+  </div>
+
+  <!-- CURRENT DIVIDER -->
+  <div class="panel" id="panel-cdiv">
+    <div class="card">
+      <h2>Current Divider (2 Parallel Branches)</h2>
+      <div class="info-box">
+        Total current splits between two parallel resistors.<br>
+        <strong>I1 = I_total × R2/(R1+R2) &nbsp;·&nbsp; I2 = I_total × R1/(R1+R2)</strong>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Total Current I_total</label>
+          <div class="input-row"><input type="number" id="cd-I" value="100" step="any" min="0">
+          <select id="cd-Iu"><option value="1e-3" selected>mA</option><option value="1">A</option></select></div></div>
+        <div class="form-group"><label>Branch Resistor R1</label>
+          <div class="input-row"><input type="number" id="cd-R1" value="10" step="any" min="0">
+          <select id="cd-R1u"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
+        <div class="form-group"><label>Branch Resistor R2</label>
+          <div class="input-row"><input type="number" id="cd-R2" value="40" step="any" min="0">
+          <select id="cd-R2u"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcCDiv()">Calculate →</button>
+    </div>
+    <div class="error-box" id="cd-error"></div>
+    <div class="result-box" id="cd-result">
+      <div class="result-main" id="cd-main"></div>
+      <div class="result-sub" id="cd-sub"></div>
+      <div class="result-grid" id="cd-grid"></div>
+    </div>
+  </div>
+
+  <!-- THEVENIN -->
+  <div class="panel" id="panel-thevenin">
+    <div class="card">
+      <h2>Thévenin & Norton Equivalent Circuit</h2>
+      <div class="info-box">
+        Any linear circuit can be reduced to a Thévenin equivalent (V_th in series with R_th) or Norton equivalent (I_N in parallel with R_N = R_th).<br>
+        <strong>Enter V_oc</strong> (open-circuit voltage) and <strong>R_th</strong> (Thévenin resistance, or short-circuit current I_sc).
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Open-Circuit Voltage V_oc (= V_th)</label>
+          <div class="input-row"><input type="number" id="th-Voc" value="6" step="any"><select><option>V</option></select></div></div>
+        <div class="form-group"><label>Thévenin Resistance R_th</label>
+          <div class="input-row"><input type="number" id="th-Rth" value="50" step="any" min="0">
+          <select id="th-Rthu"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
+        <div class="form-group"><label>Load Resistance R_L</label>
+          <div class="input-row"><input type="number" id="th-RL" value="50" step="any" min="0">
+          <select id="th-RLu"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
+      </div>
+      <button class="calc-btn" onclick="calcThevenin()">Calculate →</button>
+    </div>
+    <div class="error-box" id="th-error"></div>
+    <div class="result-box" id="th-result">
+      <div class="result-main" id="th-main"></div>
+      <div class="result-sub" id="th-sub"></div>
+      <div class="result-grid" id="th-grid"></div>
+      <div class="steps-box" id="th-steps"></div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="card"><h2>❓ FAQ</h2>
+    <details><summary>What is Kirchhoff's Voltage Law (KVL)?</summary><p>KVL states that the sum of all voltage rises and drops around any closed loop is zero. In practice: V_source = V_R1 + V_R2 + … for a series circuit. This directly follows from conservation of energy.</p></details>
+    <details><summary>What is Kirchhoff's Current Law (KCL)?</summary><p>KCL states that the sum of currents entering a node equals the sum of currents leaving it. This follows from conservation of charge — no charge can accumulate at a node in steady state.</p></details>
+    <details><summary>Why does loading affect a voltage divider?</summary><p>A load resistance in parallel with R2 reduces the effective R2, pulling the output voltage down. The heavier the load (lower R_L), the more the output drops. For a stiff divider, choose R1, R2 much smaller than R_L — at least 10× smaller is a common rule of thumb.</p></details>
+    <details><summary>What is maximum power transfer?</summary><p>Maximum power is delivered to a load when R_L = R_th (Thévenin resistance). At this point, power in R_L = V_th² / (4×R_th). This is the maximum power transfer theorem, important in RF and audio circuits.</p></details>
+    <details><summary>What is the difference between Thévenin and Norton equivalents?</summary><p>Thévenin: voltage source V_th in series with R_th. Norton: current source I_N = V_th/R_th in parallel with R_N = R_th. They are completely equivalent — convert by Ohm's law. Use Thévenin for voltage analysis, Norton for current analysis.</p></details>
+  </div>
+</main>
+
+<script>
+function fmtV(v){const a=Math.abs(v);if(a>=1000)return(v/1000).toPrecision(4)+'kV';if(a<0.001)return(v*1000).toPrecision(4)+'mV';return v.toPrecision(4)+'V';}
+function fmtI(a){const s=Math.abs(a);if(s>=1)return a.toPrecision(4)+'A';if(s>=1e-3)return(a*1e3).toPrecision(4)+'mA';return(a*1e6).toPrecision(4)+'µA';}
+function fmtR(r){if(r>=1e6)return(r/1e6).toPrecision(4)+'MΩ';if(r>=1e3)return(r/1e3).toPrecision(4)+'kΩ';return r.toPrecision(4)+'Ω';}
+function fmtP(w){if(Math.abs(w)<0.001)return(w*1e3).toPrecision(4)+'mW';if(Math.abs(w)<1)return(w*1e3).toPrecision(4)+'mW';return w.toPrecision(4)+'W';}
+function showErr(id,m){document.getElementById(id).textContent=m;document.getElementById(id).style.display='block';}
+function hideErr(id){document.getElementById(id).style.display='none';}
+
+function switchTab(n,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── KVL ── */
+let kvlR=[];
+let kvlCnt=0;
+function addKVL(val=1,unit=1e3){
+  const id=++kvlCnt;
+  kvlR.push(id);
+  const d=document.createElement('div');
+  d.className='r-entry'; d.id='kr-'+id;
+  d.innerHTML=`<span>R${kvlR.length}</span>
+    <input type="number" id="kv-${id}" value="${val}" step="any" min="0">
+    <select id="ku-${id}"><option value="1">Ω</option><option value="1e3"${unit===1e3?' selected':''}>kΩ</option><option value="1e6">MΩ</option></select>
+    <button style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;padding:4px" onclick="removeKVL(${id})">✕</button>`;
+  document.getElementById('kvl-list').appendChild(d);
+}
+function removeKVL(id){
+  kvlR=kvlR.filter(x=>x!==id);
+  document.getElementById('kr-'+id)?.remove();
+}
+function calcKVL(){
+  hideErr('kvl-error');
+  const Vs=parseFloat(document.getElementById('kvl-Vs').value);
+  if(isNaN(Vs)||Vs<=0)return showErr('kvl-error','Enter a positive supply voltage.');
+  if(kvlR.length===0)return showErr('kvl-error','Add at least one resistor.');
+  const Rs=kvlR.map(id=>{
+    const v=parseFloat(document.getElementById('kv-'+id).value)*parseFloat(document.getElementById('ku-'+id).value);
+    return v;
+  });
+  if(Rs.some(r=>isNaN(r)||r<=0))return showErr('kvl-error','All resistor values must be positive.');
+  const Rtotal=Rs.reduce((a,b)=>a+b,0);
+  const I=Vs/Rtotal;
+  let steps=`<div class="step-line"><span class="lbl">R_total = </span><span class="eq">${Rs.map(r=>fmtR(r)).join(' + ')}</span><span class="val"> = ${fmtR(Rtotal)}</span></div>`;
+  steps+=`<div class="step-line"><span class="lbl">I = Vs/R_total = </span><span class="eq">${fmtV(Vs)} / ${fmtR(Rtotal)}</span><span class="val"> = ${fmtI(I)}</span></div>`;
+  let vsum=0;
+  let grid=`<div class="res-item"><div class="res-label">Total R</div><div class="res-value">${fmtR(Rtotal)}</div></div>
+    <div class="res-item"><div class="res-label">Loop Current I</div><div class="res-value">${fmtI(I)}</div></div>`;
+  Rs.forEach((r,i)=>{
+    const vd=I*r;
+    vsum+=vd;
+    steps+=`<div class="step-line"><span class="lbl">V_R${i+1} = I × R${i+1} = </span><span class="eq">${fmtI(I)} × ${fmtR(r)}</span><span class="val"> = ${fmtV(vd)}</span></div>`;
+    grid+=`<div class="res-item"><div class="res-label">V_R${i+1} (${fmtR(r)})</div><div class="res-value">${fmtV(vd)}</div></div>`;
+  });
+  const Ptotal=Vs*I;
+  steps+=`<div class="step-line"><span class="lbl">KVL check: ΣV = </span><span class="val">${fmtV(vsum)} ≈ ${fmtV(Vs)} ✓</span></div>`;
+  grid+=`<div class="res-item"><div class="res-label">Total Power</div><div class="res-value">${fmtP(Ptotal)}</div></div>`;
+  document.getElementById('kvl-result').style.display='block';
+  document.getElementById('kvl-main').textContent=fmtI(I);
+  document.getElementById('kvl-sub').textContent=`Loop current through ${kvlR.length} series resistor${kvlR.length>1?'s':''}`;
+  document.getElementById('kvl-grid').innerHTML=grid;
+  document.getElementById('kvl-steps').innerHTML=steps;
+}
+
+/* ── KCL ── */
+let kclC=[];let kclCnt=0;
+function addKCL(val=0){
+  const id=++kclCnt;kclC.push(id);
+  const d=document.createElement('div');
+  d.className='r-entry';d.id='kc-'+id;
+  d.innerHTML=`<span>I${kclC.length}</span>
+    <input type="number" id="ki-${id}" value="${val}" step="any" placeholder="mA">
+    <select id="kiu-${id}"><option value="1e-3" selected>mA</option><option value="1">A</option><option value="1e-6">µA</option></select>
+    <button style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;padding:4px" onclick="removeKCL(${id})">✕</button>`;
+  document.getElementById('kcl-list').appendChild(d);
+}
+function removeKCL(id){kclC=kclC.filter(x=>x!==id);document.getElementById('kc-'+id)?.remove();}
+function calcKCL(){
+  hideErr('kcl-error');
+  if(kclC.length===0)return showErr('kcl-error','Add at least one current.');
+  const currents=kclC.map(id=>parseFloat(document.getElementById('ki-'+id).value)*parseFloat(document.getElementById('kiu-'+id).value));
+  if(currents.some(isNaN))return showErr('kcl-error','Enter values for all currents.');
+  const sum=currents.reduce((a,b)=>a+b,0);
+  const unknown=-sum; // KCL: sum including unknown = 0 → unknown = -sum
+  const entering=currents.filter(i=>i>0).reduce((a,b)=>a+b,0);
+  const leaving=currents.filter(i=>i<0).reduce((a,b)=>a+Math.abs(b),0);
+  document.getElementById('kcl-result').style.display='block';
+  document.getElementById('kcl-main').textContent=fmtI(unknown);
+  document.getElementById('kcl-sub').textContent=`Unknown current I_x at node (${unknown>=0?'entering':'leaving'})`;
+  let steps=currents.map((c,i)=>`<div class="step-line"><span class="lbl">I${i+1} = </span><span class="${c>=0?'val':'lo'}">${fmtI(c)} (${c>=0?'entering':'leaving'})</span></div>`).join('');
+  steps+=`<div class="step-line"><span class="lbl">KCL: ΣI_in = ΣI_out</span></div>`;
+  steps+=`<div class="step-line"><span class="lbl">I_unknown = −(${currents.map(c=>fmtI(c)).join(' + ')}) = </span><span class="val">${fmtI(unknown)}</span></div>`;
+  document.getElementById('kcl-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">Unknown I_x</div><div class="res-value">${fmtI(unknown)}</div></div>
+    <div class="res-item"><div class="res-label">Direction</div><div class="res-value">${unknown>=0?'Entering':'Leaving'}</div></div>
+    <div class="res-item"><div class="res-label">Sum entering</div><div class="res-value">${fmtI(entering)}</div></div>
+    <div class="res-item"><div class="res-label">Sum leaving</div><div class="res-value">${fmtI(leaving)}</div></div>
+  `;
+  document.getElementById('kcl-steps').innerHTML=steps;
+}
+
+/* ── VOLTAGE DIVIDER ── */
+function calcVDiv(){
+  hideErr('vd-error');
+  const Vin=parseFloat(document.getElementById('vd-Vin').value);
+  const R1=parseFloat(document.getElementById('vd-R1').value)*parseFloat(document.getElementById('vd-R1u').value);
+  const R2=parseFloat(document.getElementById('vd-R2').value)*parseFloat(document.getElementById('vd-R2u').value);
+  const RL=parseFloat(document.getElementById('vd-RL').value)*parseFloat(document.getElementById('vd-RLu').value);
+  if([Vin,R1,R2].some(v=>isNaN(v)||v<=0))return showErr('vd-error','Enter positive values for Vin, R1, R2.');
+  const hasLoad=RL>0&&!isNaN(RL);
+  const R2eff=hasLoad?(R2*RL)/(R2+RL):R2;
+  const Vout=Vin*R2eff/(R1+R2eff);
+  const Vout_unloaded=Vin*R2/(R1+R2);
+  const I_total=Vin/(R1+R2eff);
+  const loading_error=hasLoad?((Vout_unloaded-Vout)/Vout_unloaded*100):0;
+  let steps=`<div class="step-line"><span class="lbl">V_out (unloaded) = ${fmtV(Vin)} × R2/(R1+R2) = </span><span class="val">${fmtV(Vout_unloaded)}</span></div>`;
+  if(hasLoad){
+    steps+=`<div class="step-line"><span class="lbl">R_eff = R2‖R_L = (${fmtR(R2)}×${fmtR(RL)})/(${fmtR(R2)}+${fmtR(RL)}) = </span><span class="val">${fmtR(R2eff)}</span></div>`;
+    steps+=`<div class="step-line"><span class="lbl">V_out (loaded) = ${fmtV(Vin)} × R_eff/(R1+R_eff) = </span><span class="val">${fmtV(Vout)}</span></div>`;
+    steps+=`<div class="step-line"><span class="lbl">Loading error = </span><span class="val">${loading_error.toFixed(2)}%</span></div>`;
+  }
+  document.getElementById('vd-result').style.display='block';
+  document.getElementById('vd-main').textContent=fmtV(Vout);
+  document.getElementById('vd-sub').textContent=hasLoad?`Loaded output (${loading_error.toFixed(1)}% drop from unloaded)`:'Unloaded output';
+  document.getElementById('vd-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">V_out</div><div class="res-value">${fmtV(Vout)}</div></div>
+    <div class="res-item"><div class="res-label">V_out (unloaded)</div><div class="res-value">${fmtV(Vout_unloaded)}</div></div>
+    ${hasLoad?`<div class="res-item"><div class="res-label">R_eff (R2‖R_L)</div><div class="res-value">${fmtR(R2eff)}</div></div>`:''}
+    <div class="res-item"><div class="res-label">V_R1</div><div class="res-value">${fmtV(Vin-Vout)}</div></div>
+    <div class="res-item"><div class="res-label">I_total</div><div class="res-value">${fmtI(I_total)}</div></div>
+    ${hasLoad?`<div class="res-item"><div class="res-label">Loading error</div><div class="res-value">${loading_error.toFixed(2)}%</div></div>`:''}
+    <div class="res-item"><div class="res-label">Power (R1)</div><div class="res-value">${fmtP((Vin-Vout)*I_total)}</div></div>
+    <div class="res-item"><div class="res-label">Ratio V_out/V_in</div><div class="res-value">${(Vout/Vin).toFixed(4)}</div></div>
+  `;
+  document.getElementById('vd-steps').innerHTML=steps;
+}
+
+/* ── CURRENT DIVIDER ── */
+function calcCDiv(){
+  hideErr('cd-error');
+  const I=parseFloat(document.getElementById('cd-I').value)*parseFloat(document.getElementById('cd-Iu').value);
+  const R1=parseFloat(document.getElementById('cd-R1').value)*parseFloat(document.getElementById('cd-R1u').value);
+  const R2=parseFloat(document.getElementById('cd-R2').value)*parseFloat(document.getElementById('cd-R2u').value);
+  if([I,R1,R2].some(v=>isNaN(v)||v<=0))return showErr('cd-error','Enter positive values.');
+  const I1=I*R2/(R1+R2);
+  const I2=I*R1/(R1+R2);
+  const Rpar=(R1*R2)/(R1+R2);
+  const V=I*Rpar;
+  document.getElementById('cd-result').style.display='block';
+  document.getElementById('cd-main').textContent=`I1=${fmtI(I1)} · I2=${fmtI(I2)}`;
+  document.getElementById('cd-sub').textContent=`Voltage across both branches: ${fmtV(V)}`;
+  document.getElementById('cd-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">I1 (through R1)</div><div class="res-value">${fmtI(I1)}</div></div>
+    <div class="res-item"><div class="res-label">I2 (through R2)</div><div class="res-value">${fmtI(I2)}</div></div>
+    <div class="res-item"><div class="res-label">Voltage V</div><div class="res-value">${fmtV(V)}</div></div>
+    <div class="res-item"><div class="res-label">R_parallel</div><div class="res-value">${fmtR(Rpar)}</div></div>
+    <div class="res-item"><div class="res-label">P1</div><div class="res-value">${fmtP(I1*I1*R1)}</div></div>
+    <div class="res-item"><div class="res-label">P2</div><div class="res-value">${fmtP(I2*I2*R2)}</div></div>
+  `;
+}
+
+/* ── THEVENIN ── */
+function calcThevenin(){
+  hideErr('th-error');
+  const Vth=parseFloat(document.getElementById('th-Voc').value);
+  const Rth=parseFloat(document.getElementById('th-Rth').value)*parseFloat(document.getElementById('th-Rthu').value);
+  const RL=parseFloat(document.getElementById('th-RL').value)*parseFloat(document.getElementById('th-RLu').value);
+  if([Vth,Rth,RL].some(v=>isNaN(v))||Rth<0||RL<0)return showErr('th-error','Enter valid values.');
+  const In=Rth>0?Vth/Rth:Infinity;
+  const VL=RL>0?Vth*RL/(Rth+RL):0;
+  const IL=RL>0?Vth/(Rth+RL):0;
+  const PL=VL*IL;
+  const Pmax=Rth>0?Vth*Vth/(4*Rth):Infinity;
+  const eff=RL>0?RL/(Rth+RL)*100:0;
+  const isMaxPower=Math.abs(RL-Rth)<Rth*0.01;
+  let steps=`<div class="step-line"><span class="lbl">V_th = V_oc = </span><span class="val">${fmtV(Vth)}</span></div>`;
+  steps+=`<div class="step-line"><span class="lbl">R_th = </span><span class="val">${fmtR(Rth)}</span></div>`;
+  steps+=`<div class="step-line"><span class="lbl">I_N = V_th/R_th = </span><span class="val">${isFinite(In)?fmtI(In):'∞'}</span></div>`;
+  steps+=`<div class="step-line"><span class="lbl">V_L = V_th × R_L/(R_th+R_L) = </span><span class="val">${fmtV(VL)}</span></div>`;
+  steps+=`<div class="step-line"><span class="lbl">P_L = V_L × I_L = </span><span class="val">${fmtP(PL)}</span></div>`;
+  steps+=`<div class="step-line"><span class="lbl">P_max (R_L=R_th) = V_th²/(4R_th) = </span><span class="val">${isFinite(Pmax)?fmtP(Pmax):'∞'}</span></div>`;
+  document.getElementById('th-result').style.display='block';
+  document.getElementById('th-main').textContent=fmtV(VL);
+  document.getElementById('th-sub').textContent=`Load voltage${isMaxPower?' ← Maximum Power Transfer!':''}`;
+  document.getElementById('th-grid').innerHTML=`
+    <div class="res-item"><div class="res-label">V_L (load)</div><div class="res-value">${fmtV(VL)}</div></div>
+    <div class="res-item"><div class="res-label">I_L</div><div class="res-value">${fmtI(IL)}</div></div>
+    <div class="res-item"><div class="res-label">P_L</div><div class="res-value">${fmtP(PL)}</div></div>
+    <div class="res-item"><div class="res-label">P_max (R_L=R_th)</div><div class="res-value">${isFinite(Pmax)?fmtP(Pmax):'∞'}</div></div>
+    <div class="res-item"><div class="res-label">Norton I_N</div><div class="res-value">${isFinite(In)?fmtI(In):'∞'}</div></div>
+    <div class="res-item"><div class="res-label">Efficiency</div><div class="res-value">${eff.toFixed(1)}%</div></div>
+    <div class="res-item"><div class="res-label">Max Power?</div><div class="res-value">${isMaxPower?'✓ Yes':'R_L = '+fmtR(Rth)}</div></div>
+  `;
+  document.getElementById('th-steps').innerHTML=steps;
+}
+
+// Init KVL with 3 resistors
+addKVL(1,1e3);addKVL(2,1e3);addKVL(3,1e3);
+// Init KCL with 3 currents
+addKCL(50);addKCL(30);addKCL(-20);
+calcVDiv();
+</script>
+</body>
+</html>
