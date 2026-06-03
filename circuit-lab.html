@@ -3,449 +3,1250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Circuit Lab – Kirchhoff's Laws, Voltage Divider & Node Analysis | Electronics-Calc</title>
-  <meta name="description" content="Free circuit analysis lab. Apply Kirchhoff's voltage law (KVL) and current law (KCL), analyze voltage dividers, current dividers, and series-parallel circuits with step-by-step solutions.">
+  <title>Circuit Lab – Interactive Circuit Simulator | Electronics-Calc</title>
+  <meta name="description" content="Free interactive circuit simulator. Place resistors, capacitors, voltage sources, calculate node voltages and branch currents. See capacitor charge/discharge curves.">
   <link rel="canonical" href="https://electronics-calc.com/circuit-lab.html">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKW4WPS5TY"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RKW4WPS5TY');</script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b}
-    nav{background:#1e293b;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-    nav a.brand{color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;padding:14px 0}
-    nav a{color:#94a3b8;font-size:.85rem;text-decoration:none;padding:14px 6px}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+    nav{background:#1e293b;padding:0 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:1px solid #334155}
+    nav a.brand{color:#fff;font-weight:700;font-size:1rem;text-decoration:none;padding:10px 0}
+    nav a{color:#64748b;font-size:.8rem;text-decoration:none;padding:10px 6px}
     nav a:hover{color:#fff}
-    .hero{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:#fff;padding:36px 24px 28px;text-align:center}
-    .hero h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:700;margin-bottom:8px}
-    .hero p{color:#94a3b8;font-size:.95rem;max-width:560px;margin:0 auto}
-    main{max-width:820px;margin:0 auto;padding:24px 16px 48px}
-    .tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-    .tab-btn{padding:8px 14px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;font-size:.85rem;font-weight:600;cursor:pointer;color:#475569;transition:all .15s}
-    .tab-btn.active{background:#2563eb;border-color:#2563eb;color:#fff}
-    .tab-btn:hover:not(.active){border-color:#2563eb;color:#2563eb}
-    .panel{display:none}.panel.active{display:block}
-    .card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:20px}
-    .card h2{font-size:1rem;font-weight:700;margin-bottom:16px}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-    @media(max-width:540px){.form-grid{grid-template-columns:1fr}}
-    .full{grid-column:1/-1}
-    .form-group label{display:block;font-size:.8rem;font-weight:600;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
-    .hint{font-size:.78rem;color:#94a3b8;margin-top:3px}
-    .input-row{display:flex;gap:6px}
-    .input-row input{flex:1;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;outline:none;transition:border-color .15s}
-    .input-row input:focus{border-color:#2563eb}
-    .input-row select{padding:10px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;background:#f8fafc;cursor:pointer;outline:none}
-    .calc-btn{width:100%;padding:13px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s;margin-top:4px}
-    .calc-btn:hover{background:#1d4ed8}
-    .result-box{background:#f0f9ff;border:2px solid #bae6fd;border-radius:12px;padding:20px;margin-bottom:20px;display:none}
-    .result-main{font-size:1.7rem;font-weight:800;color:#1e293b;font-family:'Courier New',monospace;text-align:center}
-    .result-sub{font-size:.85rem;color:#64748b;margin-top:6px;text-align:center}
-    .result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-top:16px}
-    .res-item{background:#fff;border-radius:8px;padding:10px 14px;border:1px solid #e2e8f0}
-    .res-label{font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:2px}
-    .res-value{font-size:1rem;font-weight:700;color:#1e293b;font-family:'Courier New',monospace}
-    .error-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:.9rem;margin-bottom:16px;display:none}
-    .info-box{background:#f8fafc;border-left:4px solid #2563eb;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:16px;font-size:.88rem;color:#475569;line-height:1.6}
-    .info-box strong{color:#1e293b}
-    .steps-box{background:#0f172a;border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:.85rem;color:#e2e8f0;line-height:2;margin-top:12px;overflow-x:auto}
-    .step-line{padding:2px 0}
-    .step-line .lbl{color:#94a3b8}
-    .step-line .val{color:#10b981;font-weight:700}
-    .step-line .eq{color:#f59e0b}
-    /* R-entry */
-    .r-entry{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
-    .r-entry span{font-size:.85rem;font-weight:700;color:#475569;min-width:30px}
-    .r-entry input{flex:1;padding:8px 10px;border:2px solid #e2e8f0;border-radius:7px;font-size:.9rem;outline:none}
-    .r-entry input:focus{border-color:#2563eb}
-    .r-entry select{padding:8px 6px;border:2px solid #e2e8f0;border-radius:7px;font-size:.85rem;background:#fff}
-    .add-btn{background:none;border:2px dashed #cbd5e1;border-radius:8px;color:#64748b;font-size:.9rem;font-weight:600;cursor:pointer;padding:8px;width:100%;margin-bottom:12px;transition:all .15s}
-    .add-btn:hover{border-color:#2563eb;color:#2563eb}
-    /* Diagram */
-    .diag{background:#0f172a;border-radius:10px;padding:12px;text-align:center;margin-bottom:16px}
-    .diag svg{max-width:100%}
-    details{border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px}
-    summary{padding:12px 16px;cursor:pointer;font-weight:600;font-size:.9rem;color:#1e293b}
-    details p{padding:0 16px 14px;font-size:.88rem;color:#475569;line-height:1.65}
-    details[open] summary{color:#2563eb}
-    table{width:100%;border-collapse:collapse;font-size:.88rem}
-    th{background:#f1f5f9;padding:8px 12px;text-align:left;font-weight:700;color:#475569;border-bottom:2px solid #e2e8f0}
-    td{padding:8px 12px;border-bottom:1px solid #f1f5f9;font-family:'Courier New',monospace}
+
+    /* TOOLBAR */
+    .toolbar{background:#1e293b;border-bottom:1px solid #334155;padding:6px 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0}
+    .tool-group{display:flex;gap:4px;padding-right:10px;border-right:1px solid #334155;margin-right:4px}
+    .tool-group:last-child{border-right:none}
+    .tool-btn{width:38px;height:38px;border:2px solid #334155;border-radius:8px;background:#0f172a;color:#94a3b8;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:all .15s;line-height:1}
+    .tool-btn .icon{font-size:1rem;line-height:1}
+    .tool-btn .lbl{font-size:.55rem;text-transform:uppercase;letter-spacing:.03em}
+    .tool-btn:hover{border-color:#3b82f6;color:#93c5fd}
+    .tool-btn.active{border-color:#2563eb;background:#1d3461;color:#60a5fa}
+    .sim-btn{padding:7px 14px;border:2px solid #334155;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .sim-btn.run-dc{background:#065f46;border-color:#059669;color:#6ee7b7}
+    .sim-btn.run-dc:hover{background:#047857}
+    .sim-btn.run-tr{background:#1e3a5f;border-color:#2563eb;color:#93c5fd}
+    .sim-btn.run-tr:hover{background:#1d4ed8}
+    .sim-btn.clear{background:#3f0f0f;border-color:#dc2626;color:#fca5a5}
+    .sim-btn.clear:hover{background:#7f1d1d}
+    .toolbar-label{font-size:.75rem;color:#475569;font-weight:600}
+    .key-hint{font-size:.65rem;color:#475569;margin-top:1px}
+
+    /* MAIN LAYOUT */
+    .main-area{display:flex;flex:1;overflow:hidden;min-height:0}
+    .canvas-wrap{flex:1;position:relative;overflow:hidden;cursor:crosshair}
+    canvas#schematic{display:block;width:100%;height:100%}
+
+    /* RIGHT PANEL */
+    .right-panel{width:260px;background:#1e293b;border-left:1px solid #334155;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+    .panel-tabs{display:flex;border-bottom:1px solid #334155}
+    .panel-tab{flex:1;padding:8px 4px;text-align:center;font-size:.75rem;font-weight:700;cursor:pointer;color:#64748b;border-bottom:2px solid transparent;transition:all .15s}
+    .panel-tab.active{color:#60a5fa;border-bottom-color:#2563eb}
+    .panel-content{flex:1;overflow-y:auto;padding:12px}
+    .panel-section{margin-bottom:16px}
+    .panel-section h3{font-size:.7rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+
+    /* PROPERTIES */
+    .prop-group{margin-bottom:10px}
+    .prop-label{font-size:.72rem;font-weight:600;color:#64748b;margin-bottom:3px;display:block}
+    .prop-input{width:100%;padding:6px 8px;background:#0f172a;border:1.5px solid #334155;border-radius:6px;color:#e2e8f0;font-size:.85rem;outline:none;font-family:'Courier New',monospace}
+    .prop-input:focus{border-color:#2563eb}
+    .prop-row{display:flex;gap:6px}
+    .prop-row .prop-input{flex:2}
+    .prop-row select.prop-input{flex:1}
+    .prop-btn{width:100%;padding:6px;background:#1d3461;border:1.5px solid #2563eb;border-radius:6px;color:#93c5fd;font-size:.8rem;font-weight:700;cursor:pointer;margin-top:4px}
+    .prop-btn:hover{background:#1e40af}
+    .no-sel{color:#475569;font-size:.82rem;text-align:center;padding:20px 0}
+
+    /* NODE RESULTS */
+    .node-row{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:6px;margin-bottom:3px;font-size:.8rem;cursor:pointer;transition:background .1s}
+    .node-row:hover{background:#0f172a}
+    .node-row.highlighted{background:#1d3461}
+    .node-id{color:#94a3b8;font-family:'Courier New',monospace;font-size:.75rem}
+    .node-v{color:#10b981;font-weight:700;font-family:'Courier New',monospace}
+    .branch-row{padding:5px 8px;border-radius:6px;margin-bottom:3px;font-size:.75rem}
+    .branch-id{color:#94a3b8;font-family:'Courier New',monospace}
+    .branch-i{color:#f59e0b;font-weight:700;font-family:'Courier New',monospace;float:right}
+
+    /* STATUS BAR */
+    .status-bar{background:#0f172a;border-top:1px solid #334155;padding:4px 12px;display:flex;gap:16px;font-size:.72rem;color:#475569;flex-shrink:0}
+    .status-item span{color:#94a3b8;margin-left:4px}
+
+    /* WAVEFORM PANEL */
+    .wave-panel{height:180px;border-top:1px solid #334155;background:#0f172a;flex-shrink:0;display:none;flex-direction:column}
+    .wave-panel.visible{display:flex}
+    .wave-header{background:#1e293b;padding:4px 12px;display:flex;align-items:center;gap:12px;font-size:.75rem;color:#64748b;border-bottom:1px solid #334155;flex-shrink:0}
+    .wave-header strong{color:#e2e8f0}
+    .wave-legend{display:flex;gap:8px}
+    .wave-legend-item{display:flex;align-items:center;gap:4px;font-size:.7rem}
+    .wave-dot{width:10px;height:3px;border-radius:2px}
+    canvas#waveform{flex:1;width:100%}
+
+    /* TOOLTIPS */
+    .tooltip{position:absolute;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 12px;font-size:.8rem;pointer-events:none;z-index:100;display:none;min-width:100px}
+    .tooltip.visible{display:block}
+    .tooltip-title{font-weight:700;color:#e2e8f0;margin-bottom:4px}
+    .tooltip-v{color:#10b981;font-family:'Courier New',monospace;font-size:.95rem}
+    .tooltip-i{color:#f59e0b;font-family:'Courier New',monospace;font-size:.95rem}
+
+    /* VOLTAGE OVERLAY */
+    .overlay-badge{position:absolute;background:#065f46;border:1.5px solid #059669;border-radius:6px;padding:2px 6px;font-size:.72rem;font-weight:700;color:#6ee7b7;pointer-events:none;font-family:'Courier New',monospace;transform:translate(-50%,-100%);margin-top:-4px}
+
+    /* HELP HINT */
+    .help-hint{position:absolute;bottom:12px;left:12px;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 12px;font-size:.72rem;color:#64748b;pointer-events:none}
+    .help-hint strong{color:#94a3b8}
   </style>
 </head>
 <body>
+
 <nav>
   <a class="brand" href="/">⚡ Electronics-Calc</a>
   <a href="/ohms-law-calculator.html">Ohm's Law</a>
-  <a href="/series-parallel-resistor-calculator.html">Series/Parallel</a>
-  <a href="/logic-gate-simulator.html">Logic Gates</a>
   <a href="/rlc-impedance-calculator.html">RLC</a>
+  <a href="/filter-designer-calculator.html">Filter</a>
+  <a href="/logic-gate-simulator.html">Logic Gates</a>
 </nav>
-<div class="hero">
-  <h1>Circuit Lab</h1>
-  <p>Analyze circuits using KVL, KCL, voltage dividers, current dividers, and Thevenin/Norton equivalents.</p>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="tool-group">
+    <div style="display:flex;flex-direction:column;justify-content:center"><div class="toolbar-label">Cursor</div></div>
+    <button class="tool-btn active" id="btn-sel" onclick="setTool('sel')" title="Select / Move (S)">
+      <span class="icon">↖</span><span class="lbl">Select</span>
+    </button>
+    <button class="tool-btn" id="btn-wire" onclick="setTool('wire')" title="Wire (W)">
+      <span class="icon">╱</span><span class="lbl">Wire</span>
+    </button>
+    <button class="tool-btn" id="btn-probe" onclick="setTool('probe')" title="Probe voltage/current (P)">
+      <span class="icon">🔍</span><span class="lbl">Probe</span>
+    </button>
+    <button class="tool-btn" id="btn-del" onclick="setTool('del')" title="Delete (Del)">
+      <span class="icon">✕</span><span class="lbl">Delete</span>
+    </button>
+  </div>
+  <div class="tool-group">
+    <div style="display:flex;flex-direction:column;justify-content:center"><div class="toolbar-label">Bauteile</div></div>
+    <button class="tool-btn" id="btn-R" onclick="setTool('R')" title="Resistor (R)">
+      <span class="icon">▭</span><span class="lbl">R</span>
+    </button>
+    <button class="tool-btn" id="btn-C" onclick="setTool('C')" title="Capacitor (C)">
+      <span class="icon">┤├</span><span class="lbl">C</span>
+    </button>
+    <button class="tool-btn" id="btn-L" onclick="setTool('L')" title="Inductor (L)">
+      <span class="icon">⌒</span><span class="lbl">L</span>
+    </button>
+    <button class="tool-btn" id="btn-V" onclick="setTool('V')" title="DC Voltage Source (V)">
+      <span class="icon">⊕</span><span class="lbl">V DC</span>
+    </button>
+    <button class="tool-btn" id="btn-I" onclick="setTool('I')" title="Current Source (I)">
+      <span class="icon">⊙</span><span class="lbl">I DC</span>
+    </button>
+    <button class="tool-btn" id="btn-GND" onclick="setTool('GND')" title="Ground (G)">
+      <span class="icon">⏚</span><span class="lbl">GND</span>
+    </button>
+  </div>
+  <div class="tool-group">
+    <div style="display:flex;flex-direction:column;justify-content:center"><div class="toolbar-label">Simulation</div></div>
+    <button class="sim-btn run-dc" onclick="runDC()">▶ DC Analyse</button>
+    <button class="sim-btn run-tr" onclick="runTransient()">📈 Transient</button>
+    <button class="sim-btn clear" onclick="clearAll()">🗑 Alles löschen</button>
+  </div>
+  <div class="tool-group">
+    <button class="sim-btn" style="background:#1e293b;border-color:#334155;color:#94a3b8" onclick="rotateSelected()" title="Rotate selected (R key)">⟳ Drehen</button>
+    <button class="sim-btn" style="background:#1e293b;border-color:#334155;color:#94a3b8" onclick="loadExample()">📂 Beispiel laden</button>
+  </div>
 </div>
-<main>
-  <div class="tab-row">
-    <button class="tab-btn active" onclick="switchTab('kvl',this)">📐 KVL Loop</button>
-    <button class="tab-btn" onclick="switchTab('kcl',this)">🔀 KCL Node</button>
-    <button class="tab-btn" onclick="switchTab('vdiv',this)">⬇ Voltage Divider</button>
-    <button class="tab-btn" onclick="switchTab('cdiv',this)">↔ Current Divider</button>
-    <button class="tab-btn" onclick="switchTab('thevenin',this)">🔋 Thévenin</button>
-  </div>
 
-  <!-- KVL -->
-  <div class="panel active" id="panel-kvl">
-    <div class="card">
-      <h2>Kirchhoff's Voltage Law – Series Loop</h2>
-      <div class="info-box">
-        <strong>KVL:</strong> The sum of all voltages around a closed loop = 0.<br>
-        Enter supply voltage and resistor values — get current and voltage drops.
-      </div>
-      <div class="form-grid">
-        <div class="form-group"><label>Supply Voltage V_s</label>
-          <div class="input-row"><input type="number" id="kvl-Vs" value="12" step="any" min="0"><select><option>V</option></select></div></div>
-      </div>
-      <div style="font-size:.8rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:8px">Resistors in Loop</div>
-      <div id="kvl-list"></div>
-      <button class="add-btn" onclick="addKVL()">+ Add Resistor</button>
-      <button class="calc-btn" onclick="calcKVL()">Analyze Loop →</button>
+<!-- MAIN AREA -->
+<div class="main-area">
+  <div class="canvas-wrap" id="canvas-wrap">
+    <canvas id="schematic"></canvas>
+    <div class="tooltip" id="tooltip">
+      <div class="tooltip-title" id="tt-title"></div>
+      <div class="tooltip-v" id="tt-v"></div>
+      <div class="tooltip-i" id="tt-i"></div>
     </div>
-    <div class="error-box" id="kvl-error"></div>
-    <div class="result-box" id="kvl-result">
-      <div class="result-main" id="kvl-main"></div>
-      <div class="result-sub" id="kvl-sub"></div>
-      <div class="result-grid" id="kvl-grid"></div>
-      <div class="steps-box" id="kvl-steps"></div>
+    <div class="help-hint" id="help-hint">
+      <strong>Tipp:</strong> Bauteil auswählen → Klicken zum Platzieren · <strong>R</strong> = Drehen · <strong>Entf</strong> = Löschen
     </div>
   </div>
 
-  <!-- KCL -->
-  <div class="panel" id="panel-kcl">
-    <div class="card">
-      <h2>Kirchhoff's Current Law – Node Analysis</h2>
-      <div class="info-box">
-        <strong>KCL:</strong> The sum of currents entering a node = sum of currents leaving.<br>
-        Enter known currents (positive = entering, negative = leaving). Unknown current is solved automatically.
-      </div>
-      <div style="font-size:.8rem;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:8px">Known Currents (+ entering, − leaving)</div>
-      <div id="kcl-list"></div>
-      <button class="add-btn" onclick="addKCL()">+ Add Current</button>
-      <button class="calc-btn" onclick="calcKCL()">Find Unknown Current →</button>
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="panel-tabs">
+      <div class="panel-tab active" id="tab-props" onclick="switchPanel('props')">Eigenschaften</div>
+      <div class="panel-tab" id="tab-results" onclick="switchPanel('results')">Ergebnisse</div>
     </div>
-    <div class="error-box" id="kcl-error"></div>
-    <div class="result-box" id="kcl-result">
-      <div class="result-main" id="kcl-main"></div>
-      <div class="result-sub" id="kcl-sub"></div>
-      <div class="result-grid" id="kcl-grid"></div>
-      <div class="steps-box" id="kcl-steps"></div>
+    <div class="panel-content" id="panel-props">
+      <div class="no-sel" id="no-sel-msg">Bauteil auswählen zum Bearbeiten</div>
+      <div id="props-form" style="display:none">
+        <div class="panel-section">
+          <h3 id="prop-type-title">Bauteil</h3>
+          <div class="prop-group">
+            <label class="prop-label">Bezeichnung</label>
+            <input class="prop-input" id="prop-label" type="text" oninput="updatePropLabel()">
+          </div>
+          <div class="prop-group" id="prop-val-group">
+            <label class="prop-label" id="prop-val-label">Wert</label>
+            <div class="prop-row">
+              <input class="prop-input" id="prop-val" type="number" step="any" oninput="updatePropVal()">
+              <select class="prop-input" id="prop-unit" onchange="updatePropUnit()">
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-content" id="panel-results" style="display:none">
+      <div class="panel-section" id="res-nodes-sec" style="display:none">
+        <h3>Knotenspannungen</h3>
+        <div id="res-nodes"></div>
+      </div>
+      <div class="panel-section" id="res-branches-sec" style="display:none">
+        <h3>Zweigströme</h3>
+        <div id="res-branches"></div>
+      </div>
+      <div class="no-sel" id="no-sim-msg">Simulation noch nicht ausgeführt.<br>Klicke auf "▶ DC Analyse"</div>
     </div>
   </div>
+</div>
 
-  <!-- VOLTAGE DIVIDER -->
-  <div class="panel" id="panel-vdiv">
-    <div class="card">
-      <h2>Loaded Voltage Divider</h2>
-      <div class="info-box">
-        Output voltage across R2, with optional load resistance R_L in parallel with R2.<br>
-        <strong>Unloaded:</strong> V_out = V_in × R2/(R1+R2)<br>
-        <strong>Loaded:</strong> V_out = V_in × R_parallel/(R1+R_parallel)
-      </div>
-      <div class="form-grid">
-        <div class="form-group"><label>Input Voltage V_in</label>
-          <div class="input-row"><input type="number" id="vd-Vin" value="12" step="any" min="0"><select><option>V</option></select></div></div>
-        <div class="form-group"><label>R1 (top resistor)</label>
-          <div class="input-row"><input type="number" id="vd-R1" value="10" step="any" min="0">
-          <select id="vd-R1u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
-        <div class="form-group"><label>R2 (bottom resistor)</label>
-          <div class="input-row"><input type="number" id="vd-R2" value="10" step="any" min="0">
-          <select id="vd-R2u"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div></div>
-        <div class="form-group"><label>Load R_L (0 = no load)</label>
-          <div class="input-row"><input type="number" id="vd-RL" value="0" step="any" min="0">
-          <select id="vd-RLu"><option value="1">Ω</option><option value="1e3" selected>kΩ</option><option value="1e6">MΩ</option></select></div>
-          <div class="hint">0 = ideal unloaded divider</div></div>
-      </div>
-      <button class="calc-btn" onclick="calcVDiv()">Calculate →</button>
-    </div>
-    <div class="error-box" id="vd-error"></div>
-    <div class="result-box" id="vd-result">
-      <div class="result-main" id="vd-main"></div>
-      <div class="result-sub" id="vd-sub"></div>
-      <div class="result-grid" id="vd-grid"></div>
-      <div class="steps-box" id="vd-steps"></div>
-    </div>
+<!-- WAVEFORM PANEL -->
+<div class="wave-panel" id="wave-panel">
+  <div class="wave-header">
+    <strong>Transiente Simulation</strong>
+    <div class="wave-legend" id="wave-legend"></div>
+    <span id="wave-info" style="margin-left:auto;color:#475569"></span>
   </div>
+  <canvas id="waveform"></canvas>
+</div>
 
-  <!-- CURRENT DIVIDER -->
-  <div class="panel" id="panel-cdiv">
-    <div class="card">
-      <h2>Current Divider (2 Parallel Branches)</h2>
-      <div class="info-box">
-        Total current splits between two parallel resistors.<br>
-        <strong>I1 = I_total × R2/(R1+R2) &nbsp;·&nbsp; I2 = I_total × R1/(R1+R2)</strong>
-      </div>
-      <div class="form-grid">
-        <div class="form-group"><label>Total Current I_total</label>
-          <div class="input-row"><input type="number" id="cd-I" value="100" step="any" min="0">
-          <select id="cd-Iu"><option value="1e-3" selected>mA</option><option value="1">A</option></select></div></div>
-        <div class="form-group"><label>Branch Resistor R1</label>
-          <div class="input-row"><input type="number" id="cd-R1" value="10" step="any" min="0">
-          <select id="cd-R1u"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
-        <div class="form-group"><label>Branch Resistor R2</label>
-          <div class="input-row"><input type="number" id="cd-R2" value="40" step="any" min="0">
-          <select id="cd-R2u"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
-      </div>
-      <button class="calc-btn" onclick="calcCDiv()">Calculate →</button>
-    </div>
-    <div class="error-box" id="cd-error"></div>
-    <div class="result-box" id="cd-result">
-      <div class="result-main" id="cd-main"></div>
-      <div class="result-sub" id="cd-sub"></div>
-      <div class="result-grid" id="cd-grid"></div>
-    </div>
-  </div>
-
-  <!-- THEVENIN -->
-  <div class="panel" id="panel-thevenin">
-    <div class="card">
-      <h2>Thévenin & Norton Equivalent Circuit</h2>
-      <div class="info-box">
-        Any linear circuit can be reduced to a Thévenin equivalent (V_th in series with R_th) or Norton equivalent (I_N in parallel with R_N = R_th).<br>
-        <strong>Enter V_oc</strong> (open-circuit voltage) and <strong>R_th</strong> (Thévenin resistance, or short-circuit current I_sc).
-      </div>
-      <div class="form-grid">
-        <div class="form-group"><label>Open-Circuit Voltage V_oc (= V_th)</label>
-          <div class="input-row"><input type="number" id="th-Voc" value="6" step="any"><select><option>V</option></select></div></div>
-        <div class="form-group"><label>Thévenin Resistance R_th</label>
-          <div class="input-row"><input type="number" id="th-Rth" value="50" step="any" min="0">
-          <select id="th-Rthu"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
-        <div class="form-group"><label>Load Resistance R_L</label>
-          <div class="input-row"><input type="number" id="th-RL" value="50" step="any" min="0">
-          <select id="th-RLu"><option value="1" selected>Ω</option><option value="1e3">kΩ</option></select></div></div>
-      </div>
-      <button class="calc-btn" onclick="calcThevenin()">Calculate →</button>
-    </div>
-    <div class="error-box" id="th-error"></div>
-    <div class="result-box" id="th-result">
-      <div class="result-main" id="th-main"></div>
-      <div class="result-sub" id="th-sub"></div>
-      <div class="result-grid" id="th-grid"></div>
-      <div class="steps-box" id="th-steps"></div>
-    </div>
-  </div>
-
-  <!-- FAQ -->
-  <div class="card"><h2>❓ FAQ</h2>
-    <details><summary>What is Kirchhoff's Voltage Law (KVL)?</summary><p>KVL states that the sum of all voltage rises and drops around any closed loop is zero. In practice: V_source = V_R1 + V_R2 + … for a series circuit. This directly follows from conservation of energy.</p></details>
-    <details><summary>What is Kirchhoff's Current Law (KCL)?</summary><p>KCL states that the sum of currents entering a node equals the sum of currents leaving it. This follows from conservation of charge — no charge can accumulate at a node in steady state.</p></details>
-    <details><summary>Why does loading affect a voltage divider?</summary><p>A load resistance in parallel with R2 reduces the effective R2, pulling the output voltage down. The heavier the load (lower R_L), the more the output drops. For a stiff divider, choose R1, R2 much smaller than R_L — at least 10× smaller is a common rule of thumb.</p></details>
-    <details><summary>What is maximum power transfer?</summary><p>Maximum power is delivered to a load when R_L = R_th (Thévenin resistance). At this point, power in R_L = V_th² / (4×R_th). This is the maximum power transfer theorem, important in RF and audio circuits.</p></details>
-    <details><summary>What is the difference between Thévenin and Norton equivalents?</summary><p>Thévenin: voltage source V_th in series with R_th. Norton: current source I_N = V_th/R_th in parallel with R_N = R_th. They are completely equivalent — convert by Ohm's law. Use Thévenin for voltage analysis, Norton for current analysis.</p></details>
-  </div>
-</main>
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div>Werkzeug: <span id="st-tool">Auswahl</span></div>
+  <div>Bauteile: <span id="st-comps">0</span></div>
+  <div>Knoten: <span id="st-nodes">0</span></div>
+  <div id="st-sim">Simulation: <span>nicht ausgeführt</span></div>
+  <div style="margin-left:auto;color:#334155">Rechtsklick = Drehen · Entf = Löschen</div>
+</div>
 
 <script>
-function fmtV(v){const a=Math.abs(v);if(a>=1000)return(v/1000).toPrecision(4)+'kV';if(a<0.001)return(v*1000).toPrecision(4)+'mV';return v.toPrecision(4)+'V';}
-function fmtI(a){const s=Math.abs(a);if(s>=1)return a.toPrecision(4)+'A';if(s>=1e-3)return(a*1e3).toPrecision(4)+'mA';return(a*1e6).toPrecision(4)+'µA';}
-function fmtR(r){if(r>=1e6)return(r/1e6).toPrecision(4)+'MΩ';if(r>=1e3)return(r/1e3).toPrecision(4)+'kΩ';return r.toPrecision(4)+'Ω';}
-function fmtP(w){if(Math.abs(w)<0.001)return(w*1e3).toPrecision(4)+'mW';if(Math.abs(w)<1)return(w*1e3).toPrecision(4)+'mW';return w.toPrecision(4)+'W';}
-function showErr(id,m){document.getElementById(id).textContent=m;document.getElementById(id).style.display='block';}
-function hideErr(id){document.getElementById(id).style.display='none';}
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS & STATE
+// ═══════════════════════════════════════════════════════════════
+const GRID = 40;
+const canvas = document.getElementById('schematic');
+const ctx = canvas.getContext('2d');
 
-function switchTab(n,btn){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('panel-'+n).classList.add('active');
-  btn.classList.add('active');
-}
+const COMP_DEFS = {
+  R:   { name:'Resistor',        units:['Ω','kΩ','MΩ'], mults:[1,1e3,1e6], defVal:1,    defUnit:'kΩ', color:'#ef4444' },
+  C:   { name:'Kondensator',     units:['pF','nF','µF','mF'], mults:[1e-12,1e-9,1e-6,1e-3], defVal:100, defUnit:'nF', color:'#3b82f6' },
+  L:   { name:'Spule',           units:['nH','µH','mH','H'],  mults:[1e-9,1e-6,1e-3,1],   defVal:10,  defUnit:'mH', color:'#8b5cf6' },
+  V:   { name:'Spannungsquelle', units:['mV','V'],             mults:[1e-3,1],              defVal:5,   defUnit:'V',  color:'#10b981' },
+  I:   { name:'Stromquelle',     units:['µA','mA','A'],        mults:[1e-6,1e-3,1],         defVal:1,   defUnit:'mA', color:'#f59e0b' },
+  GND: { name:'Masse',           units:[],                     mults:[],                    defVal:0,   defUnit:'',   color:'#94a3b8' },
+};
 
-/* ── KVL ── */
-let kvlR=[];
-let kvlCnt=0;
-function addKVL(val=1,unit=1e3){
-  const id=++kvlCnt;
-  kvlR.push(id);
-  const d=document.createElement('div');
-  d.className='r-entry'; d.id='kr-'+id;
-  d.innerHTML=`<span>R${kvlR.length}</span>
-    <input type="number" id="kv-${id}" value="${val}" step="any" min="0">
-    <select id="ku-${id}"><option value="1">Ω</option><option value="1e3"${unit===1e3?' selected':''}>kΩ</option><option value="1e6">MΩ</option></select>
-    <button style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;padding:4px" onclick="removeKVL(${id})">✕</button>`;
-  document.getElementById('kvl-list').appendChild(d);
-}
-function removeKVL(id){
-  kvlR=kvlR.filter(x=>x!==id);
-  document.getElementById('kr-'+id)?.remove();
-}
-function calcKVL(){
-  hideErr('kvl-error');
-  const Vs=parseFloat(document.getElementById('kvl-Vs').value);
-  if(isNaN(Vs)||Vs<=0)return showErr('kvl-error','Enter a positive supply voltage.');
-  if(kvlR.length===0)return showErr('kvl-error','Add at least one resistor.');
-  const Rs=kvlR.map(id=>{
-    const v=parseFloat(document.getElementById('kv-'+id).value)*parseFloat(document.getElementById('ku-'+id).value);
-    return v;
-  });
-  if(Rs.some(r=>isNaN(r)||r<=0))return showErr('kvl-error','All resistor values must be positive.');
-  const Rtotal=Rs.reduce((a,b)=>a+b,0);
-  const I=Vs/Rtotal;
-  let steps=`<div class="step-line"><span class="lbl">R_total = </span><span class="eq">${Rs.map(r=>fmtR(r)).join(' + ')}</span><span class="val"> = ${fmtR(Rtotal)}</span></div>`;
-  steps+=`<div class="step-line"><span class="lbl">I = Vs/R_total = </span><span class="eq">${fmtV(Vs)} / ${fmtR(Rtotal)}</span><span class="val"> = ${fmtI(I)}</span></div>`;
-  let vsum=0;
-  let grid=`<div class="res-item"><div class="res-label">Total R</div><div class="res-value">${fmtR(Rtotal)}</div></div>
-    <div class="res-item"><div class="res-label">Loop Current I</div><div class="res-value">${fmtI(I)}</div></div>`;
-  Rs.forEach((r,i)=>{
-    const vd=I*r;
-    vsum+=vd;
-    steps+=`<div class="step-line"><span class="lbl">V_R${i+1} = I × R${i+1} = </span><span class="eq">${fmtI(I)} × ${fmtR(r)}</span><span class="val"> = ${fmtV(vd)}</span></div>`;
-    grid+=`<div class="res-item"><div class="res-label">V_R${i+1} (${fmtR(r)})</div><div class="res-value">${fmtV(vd)}</div></div>`;
-  });
-  const Ptotal=Vs*I;
-  steps+=`<div class="step-line"><span class="lbl">KVL check: ΣV = </span><span class="val">${fmtV(vsum)} ≈ ${fmtV(Vs)} ✓</span></div>`;
-  grid+=`<div class="res-item"><div class="res-label">Total Power</div><div class="res-value">${fmtP(Ptotal)}</div></div>`;
-  document.getElementById('kvl-result').style.display='block';
-  document.getElementById('kvl-main').textContent=fmtI(I);
-  document.getElementById('kvl-sub').textContent=`Loop current through ${kvlR.length} series resistor${kvlR.length>1?'s':''}`;
-  document.getElementById('kvl-grid').innerHTML=grid;
-  document.getElementById('kvl-steps').innerHTML=steps;
+let components = [];
+let wires = [];
+let idCnt = 0;
+let tool = 'sel';
+let selId = null;
+let wireStart = null;
+let hoverPt = null;
+let simResult = null;
+let mousePos = {x:0, y:0};
+let dragging = null;
+let dragOffset = {x:0, y:0};
+
+// ═══════════════════════════════════════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════════════════════════════════════
+function resizeCanvas() {
+  const wrap = document.getElementById('canvas-wrap');
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  render();
 }
 
-/* ── KCL ── */
-let kclC=[];let kclCnt=0;
-function addKCL(val=0){
-  const id=++kclCnt;kclC.push(id);
-  const d=document.createElement('div');
-  d.className='r-entry';d.id='kc-'+id;
-  d.innerHTML=`<span>I${kclC.length}</span>
-    <input type="number" id="ki-${id}" value="${val}" step="any" placeholder="mA">
-    <select id="kiu-${id}"><option value="1e-3" selected>mA</option><option value="1">A</option><option value="1e-6">µA</option></select>
-    <button style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;padding:4px" onclick="removeKCL(${id})">✕</button>`;
-  document.getElementById('kcl-list').appendChild(d);
-}
-function removeKCL(id){kclC=kclC.filter(x=>x!==id);document.getElementById('kc-'+id)?.remove();}
-function calcKCL(){
-  hideErr('kcl-error');
-  if(kclC.length===0)return showErr('kcl-error','Add at least one current.');
-  const currents=kclC.map(id=>parseFloat(document.getElementById('ki-'+id).value)*parseFloat(document.getElementById('kiu-'+id).value));
-  if(currents.some(isNaN))return showErr('kcl-error','Enter values for all currents.');
-  const sum=currents.reduce((a,b)=>a+b,0);
-  const unknown=-sum; // KCL: sum including unknown = 0 → unknown = -sum
-  const entering=currents.filter(i=>i>0).reduce((a,b)=>a+b,0);
-  const leaving=currents.filter(i=>i<0).reduce((a,b)=>a+Math.abs(b),0);
-  document.getElementById('kcl-result').style.display='block';
-  document.getElementById('kcl-main').textContent=fmtI(unknown);
-  document.getElementById('kcl-sub').textContent=`Unknown current I_x at node (${unknown>=0?'entering':'leaving'})`;
-  let steps=currents.map((c,i)=>`<div class="step-line"><span class="lbl">I${i+1} = </span><span class="${c>=0?'val':'lo'}">${fmtI(c)} (${c>=0?'entering':'leaving'})</span></div>`).join('');
-  steps+=`<div class="step-line"><span class="lbl">KCL: ΣI_in = ΣI_out</span></div>`;
-  steps+=`<div class="step-line"><span class="lbl">I_unknown = −(${currents.map(c=>fmtI(c)).join(' + ')}) = </span><span class="val">${fmtI(unknown)}</span></div>`;
-  document.getElementById('kcl-grid').innerHTML=`
-    <div class="res-item"><div class="res-label">Unknown I_x</div><div class="res-value">${fmtI(unknown)}</div></div>
-    <div class="res-item"><div class="res-label">Direction</div><div class="res-value">${unknown>=0?'Entering':'Leaving'}</div></div>
-    <div class="res-item"><div class="res-label">Sum entering</div><div class="res-value">${fmtI(entering)}</div></div>
-    <div class="res-item"><div class="res-label">Sum leaving</div><div class="res-value">${fmtI(leaving)}</div></div>
-  `;
-  document.getElementById('kcl-steps').innerHTML=steps;
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// ═══════════════════════════════════════════════════════════════
+// COMPONENT HELPERS
+// ═══════════════════════════════════════════════════════════════
+function newId(t) { return `${t}${++idCnt}`; }
+
+function compSIValue(comp) {
+  const d = COMP_DEFS[comp.type];
+  if (!d || d.mults.length === 0) return 0;
+  const idx = d.units.indexOf(comp.unit);
+  return comp.value * (idx >= 0 ? d.mults[idx] : 1);
 }
 
-/* ── VOLTAGE DIVIDER ── */
-function calcVDiv(){
-  hideErr('vd-error');
-  const Vin=parseFloat(document.getElementById('vd-Vin').value);
-  const R1=parseFloat(document.getElementById('vd-R1').value)*parseFloat(document.getElementById('vd-R1u').value);
-  const R2=parseFloat(document.getElementById('vd-R2').value)*parseFloat(document.getElementById('vd-R2u').value);
-  const RL=parseFloat(document.getElementById('vd-RL').value)*parseFloat(document.getElementById('vd-RLu').value);
-  if([Vin,R1,R2].some(v=>isNaN(v)||v<=0))return showErr('vd-error','Enter positive values for Vin, R1, R2.');
-  const hasLoad=RL>0&&!isNaN(RL);
-  const R2eff=hasLoad?(R2*RL)/(R2+RL):R2;
-  const Vout=Vin*R2eff/(R1+R2eff);
-  const Vout_unloaded=Vin*R2/(R1+R2);
-  const I_total=Vin/(R1+R2eff);
-  const loading_error=hasLoad?((Vout_unloaded-Vout)/Vout_unloaded*100):0;
-  let steps=`<div class="step-line"><span class="lbl">V_out (unloaded) = ${fmtV(Vin)} × R2/(R1+R2) = </span><span class="val">${fmtV(Vout_unloaded)}</span></div>`;
-  if(hasLoad){
-    steps+=`<div class="step-line"><span class="lbl">R_eff = R2‖R_L = (${fmtR(R2)}×${fmtR(RL)})/(${fmtR(R2)}+${fmtR(RL)}) = </span><span class="val">${fmtR(R2eff)}</span></div>`;
-    steps+=`<div class="step-line"><span class="lbl">V_out (loaded) = ${fmtV(Vin)} × R_eff/(R1+R_eff) = </span><span class="val">${fmtV(Vout)}</span></div>`;
-    steps+=`<div class="step-line"><span class="lbl">Loading error = </span><span class="val">${loading_error.toFixed(2)}%</span></div>`;
+function fmtSI(val, units, mults, precision=3) {
+  if (!isFinite(val)) return '∞';
+  for (let i = mults.length - 1; i >= 0; i--) {
+    if (Math.abs(val) >= mults[i] * 0.999) {
+      return (val / mults[i]).toPrecision(precision) + ' ' + units[i];
+    }
   }
-  document.getElementById('vd-result').style.display='block';
-  document.getElementById('vd-main').textContent=fmtV(Vout);
-  document.getElementById('vd-sub').textContent=hasLoad?`Loaded output (${loading_error.toFixed(1)}% drop from unloaded)`:'Unloaded output';
-  document.getElementById('vd-grid').innerHTML=`
-    <div class="res-item"><div class="res-label">V_out</div><div class="res-value">${fmtV(Vout)}</div></div>
-    <div class="res-item"><div class="res-label">V_out (unloaded)</div><div class="res-value">${fmtV(Vout_unloaded)}</div></div>
-    ${hasLoad?`<div class="res-item"><div class="res-label">R_eff (R2‖R_L)</div><div class="res-value">${fmtR(R2eff)}</div></div>`:''}
-    <div class="res-item"><div class="res-label">V_R1</div><div class="res-value">${fmtV(Vin-Vout)}</div></div>
-    <div class="res-item"><div class="res-label">I_total</div><div class="res-value">${fmtI(I_total)}</div></div>
-    ${hasLoad?`<div class="res-item"><div class="res-label">Loading error</div><div class="res-value">${loading_error.toFixed(2)}%</div></div>`:''}
-    <div class="res-item"><div class="res-label">Power (R1)</div><div class="res-value">${fmtP((Vin-Vout)*I_total)}</div></div>
-    <div class="res-item"><div class="res-label">Ratio V_out/V_in</div><div class="res-value">${(Vout/Vin).toFixed(4)}</div></div>
-  `;
-  document.getElementById('vd-steps').innerHTML=steps;
+  return val.toPrecision(precision) + ' ' + units[0];
 }
 
-/* ── CURRENT DIVIDER ── */
-function calcCDiv(){
-  hideErr('cd-error');
-  const I=parseFloat(document.getElementById('cd-I').value)*parseFloat(document.getElementById('cd-Iu').value);
-  const R1=parseFloat(document.getElementById('cd-R1').value)*parseFloat(document.getElementById('cd-R1u').value);
-  const R2=parseFloat(document.getElementById('cd-R2').value)*parseFloat(document.getElementById('cd-R2u').value);
-  if([I,R1,R2].some(v=>isNaN(v)||v<=0))return showErr('cd-error','Enter positive values.');
-  const I1=I*R2/(R1+R2);
-  const I2=I*R1/(R1+R2);
-  const Rpar=(R1*R2)/(R1+R2);
-  const V=I*Rpar;
-  document.getElementById('cd-result').style.display='block';
-  document.getElementById('cd-main').textContent=`I1=${fmtI(I1)} · I2=${fmtI(I2)}`;
-  document.getElementById('cd-sub').textContent=`Voltage across both branches: ${fmtV(V)}`;
-  document.getElementById('cd-grid').innerHTML=`
-    <div class="res-item"><div class="res-label">I1 (through R1)</div><div class="res-value">${fmtI(I1)}</div></div>
-    <div class="res-item"><div class="res-label">I2 (through R2)</div><div class="res-value">${fmtI(I2)}</div></div>
-    <div class="res-item"><div class="res-label">Voltage V</div><div class="res-value">${fmtV(V)}</div></div>
-    <div class="res-item"><div class="res-label">R_parallel</div><div class="res-value">${fmtR(Rpar)}</div></div>
-    <div class="res-item"><div class="res-label">P1</div><div class="res-value">${fmtP(I1*I1*R1)}</div></div>
-    <div class="res-item"><div class="res-label">P2</div><div class="res-value">${fmtP(I2*I2*R2)}</div></div>
-  `;
+function fmtV(v) {
+  if (!isFinite(v)) return '?';
+  const a = Math.abs(v);
+  if (a >= 1e3) return (v/1e3).toPrecision(3)+'kV';
+  if (a >= 1) return v.toPrecision(4)+'V';
+  if (a >= 1e-3) return (v*1e3).toPrecision(3)+'mV';
+  return (v*1e6).toPrecision(3)+'µV';
 }
 
-/* ── THEVENIN ── */
-function calcThevenin(){
-  hideErr('th-error');
-  const Vth=parseFloat(document.getElementById('th-Voc').value);
-  const Rth=parseFloat(document.getElementById('th-Rth').value)*parseFloat(document.getElementById('th-Rthu').value);
-  const RL=parseFloat(document.getElementById('th-RL').value)*parseFloat(document.getElementById('th-RLu').value);
-  if([Vth,Rth,RL].some(v=>isNaN(v))||Rth<0||RL<0)return showErr('th-error','Enter valid values.');
-  const In=Rth>0?Vth/Rth:Infinity;
-  const VL=RL>0?Vth*RL/(Rth+RL):0;
-  const IL=RL>0?Vth/(Rth+RL):0;
-  const PL=VL*IL;
-  const Pmax=Rth>0?Vth*Vth/(4*Rth):Infinity;
-  const eff=RL>0?RL/(Rth+RL)*100:0;
-  const isMaxPower=Math.abs(RL-Rth)<Rth*0.01;
-  let steps=`<div class="step-line"><span class="lbl">V_th = V_oc = </span><span class="val">${fmtV(Vth)}</span></div>`;
-  steps+=`<div class="step-line"><span class="lbl">R_th = </span><span class="val">${fmtR(Rth)}</span></div>`;
-  steps+=`<div class="step-line"><span class="lbl">I_N = V_th/R_th = </span><span class="val">${isFinite(In)?fmtI(In):'∞'}</span></div>`;
-  steps+=`<div class="step-line"><span class="lbl">V_L = V_th × R_L/(R_th+R_L) = </span><span class="val">${fmtV(VL)}</span></div>`;
-  steps+=`<div class="step-line"><span class="lbl">P_L = V_L × I_L = </span><span class="val">${fmtP(PL)}</span></div>`;
-  steps+=`<div class="step-line"><span class="lbl">P_max (R_L=R_th) = V_th²/(4R_th) = </span><span class="val">${isFinite(Pmax)?fmtP(Pmax):'∞'}</span></div>`;
-  document.getElementById('th-result').style.display='block';
-  document.getElementById('th-main').textContent=fmtV(VL);
-  document.getElementById('th-sub').textContent=`Load voltage${isMaxPower?' ← Maximum Power Transfer!':''}`;
-  document.getElementById('th-grid').innerHTML=`
-    <div class="res-item"><div class="res-label">V_L (load)</div><div class="res-value">${fmtV(VL)}</div></div>
-    <div class="res-item"><div class="res-label">I_L</div><div class="res-value">${fmtI(IL)}</div></div>
-    <div class="res-item"><div class="res-label">P_L</div><div class="res-value">${fmtP(PL)}</div></div>
-    <div class="res-item"><div class="res-label">P_max (R_L=R_th)</div><div class="res-value">${isFinite(Pmax)?fmtP(Pmax):'∞'}</div></div>
-    <div class="res-item"><div class="res-label">Norton I_N</div><div class="res-value">${isFinite(In)?fmtI(In):'∞'}</div></div>
-    <div class="res-item"><div class="res-label">Efficiency</div><div class="res-value">${eff.toFixed(1)}%</div></div>
-    <div class="res-item"><div class="res-label">Max Power?</div><div class="res-value">${isMaxPower?'✓ Yes':'R_L = '+fmtR(Rth)}</div></div>
-  `;
-  document.getElementById('th-steps').innerHTML=steps;
+function fmtI(i) {
+  if (!isFinite(i)) return '?';
+  const a = Math.abs(i);
+  if (a >= 1) return i.toPrecision(3)+'A';
+  if (a >= 1e-3) return (i*1e3).toPrecision(3)+'mA';
+  return (i*1e6).toPrecision(3)+'µA';
 }
 
-// Init KVL with 3 resistors
-addKVL(1,1e3);addKVL(2,1e3);addKVL(3,1e3);
-// Init KCL with 3 currents
-addKCL(50);addKCL(30);addKCL(-20);
-calcVDiv();
+// Get terminal grid positions for a component
+function getTerminals(comp) {
+  if (comp.type === 'GND') {
+    return [{gx: comp.gx, gy: comp.gy}];
+  }
+  const rot = comp.rot || 0;
+  if (rot === 0) return [{gx: comp.gx-1, gy: comp.gy}, {gx: comp.gx+1, gy: comp.gy}];
+  if (rot === 1) return [{gx: comp.gx, gy: comp.gy-1}, {gx: comp.gx, gy: comp.gy+1}];
+  if (rot === 2) return [{gx: comp.gx+1, gy: comp.gy}, {gx: comp.gx-1, gy: comp.gy}];
+  if (rot === 3) return [{gx: comp.gx, gy: comp.gy+1}, {gx: comp.gx, gy: comp.gy-1}];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NODE IDENTIFICATION (Union-Find)
+// ═══════════════════════════════════════════════════════════════
+function buildNodeMap() {
+  // Union-Find on grid points
+  const parent = {};
+  function key(gx, gy) { return `${gx},${gy}`; }
+  function find(k) { if (!parent[k]) parent[k]=k; if (parent[k]!==k) parent[k]=find(parent[k]); return parent[k]; }
+  function union(k1,k2) { const r1=find(k1),r2=find(k2); if(r1!==r2) parent[r1]=r2; }
+
+  // Points from component terminals
+  for (const c of components) {
+    const terms = getTerminals(c);
+    for (const t of terms) find(key(t.gx, t.gy));
+  }
+  // Points from wire endpoints — AND all intermediate grid points along wire
+  for (const w of wires) {
+    const x1=Math.min(w.x1,w.x2), x2=Math.max(w.x1,w.x2);
+    const y1=Math.min(w.y1,w.y2), y2=Math.max(w.y1,w.y2);
+    if (y1===y2) { // horizontal
+      for (let x=x1; x<=x2; x++) union(key(x,y1), key(x1,y1));
+    } else if (x1===x2) { // vertical
+      for (let y=y1; y<=y2; y++) union(key(x1,y), key(x1,y1));
+    }
+  }
+  // Also union all terminal points at same grid position via wires
+  for (const c of components) {
+    const terms = getTerminals(c);
+    for (const t of terms) find(key(t.gx, t.gy));
+  }
+
+  // Build node labels: GND-connected root = node "0"
+  const gndNodes = new Set();
+  for (const c of components) {
+    if (c.type === 'GND') {
+      const t = getTerminals(c)[0];
+      gndNodes.add(find(key(t.gx, t.gy)));
+    }
+  }
+
+  // Assign node numbers
+  const rootToNode = {};
+  let nodeNum = 1;
+  const ptToNode = {};
+  const allPts = new Set();
+  for (const c of components) for (const t of getTerminals(c)) allPts.add(key(t.gx, t.gy));
+
+  for (const pt of allPts) {
+    const root = find(pt);
+    if (rootToNode[root] === undefined) {
+      rootToNode[root] = gndNodes.has(root) ? 0 : nodeNum++;
+    }
+    ptToNode[pt] = rootToNode[root];
+  }
+
+  // Also map wire endpoints
+  for (const w of wires) {
+    for (const [gx,gy] of [[w.x1,w.y1],[w.x2,w.y2]]) {
+      const k = key(gx,gy);
+      const root = find(k);
+      if (rootToNode[root] === undefined) rootToNode[root] = gndNodes.size > 0 ? nodeNum++ : 0;
+      ptToNode[k] = rootToNode[root];
+    }
+  }
+
+  return { ptToNode, nodeCount: nodeNum };
+}
+
+function getCompNodes(comp, ptToNode) {
+  const terms = getTerminals(comp);
+  return terms.map(t => {
+    const k = `${t.gx},${t.gy}`;
+    return ptToNode[k] !== undefined ? ptToNode[k] : -1;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MNA SOLVER (Modified Nodal Analysis)
+// ═══════════════════════════════════════════════════════════════
+function gaussElim(A, b) {
+  const n = b.length;
+  const M = A.map((row, i) => [...row, b[i]]);
+  for (let col = 0; col < n; col++) {
+    let maxR = col;
+    for (let r = col+1; r < n; r++) if (Math.abs(M[r][col]) > Math.abs(M[maxR][col])) maxR = r;
+    [M[col], M[maxR]] = [M[maxR], M[col]];
+    if (Math.abs(M[col][col]) < 1e-14) continue;
+    for (let r = col+1; r < n; r++) {
+      const f = M[r][col] / M[col][col];
+      for (let k = col; k <= n; k++) M[r][k] -= f * M[col][k];
+    }
+  }
+  const x = new Array(n).fill(0);
+  for (let i = n-1; i >= 0; i--) {
+    if (Math.abs(M[i][i]) < 1e-14) continue;
+    x[i] = M[i][n];
+    for (let j = i+1; j < n; j++) x[i] -= M[i][j] * x[j];
+    x[i] /= M[i][i];
+  }
+  return x;
+}
+
+function solveMNA(nodeCount, ptToNode, capState=null, dt=null) {
+  const N = nodeCount - 1; // number of non-ground nodes
+  const vsources = components.filter(c => c.type === 'V');
+  const M = N + vsources.length;
+  if (M === 0) return null;
+
+  const G = Array.from({length: M}, () => new Array(M).fill(0));
+  const b = new Array(M).fill(0);
+  const nodeIdx = n => n - 1; // node 1→idx 0, etc. (node 0 = GND, excluded)
+
+  for (const comp of components) {
+    const nodes = getCompNodes(comp, ptToNode);
+    if (nodes.some(n => n < 0)) continue;
+    const [n1, n2] = nodes;
+    const i1 = n1 > 0 ? nodeIdx(n1) : -1;
+    const i2 = (n2 !== undefined && n2 > 0) ? nodeIdx(n2) : -1;
+
+    if (comp.type === 'R') {
+      const val = compSIValue(comp);
+      if (val <= 0) continue;
+      const g = 1 / val;
+      if (i1>=0) G[i1][i1] += g;
+      if (i2>=0) G[i2][i2] += g;
+      if (i1>=0 && i2>=0) { G[i1][i2] -= g; G[i2][i1] -= g; }
+    }
+    if (comp.type === 'C' && dt !== null) {
+      // Companion model: Geq = C/dt, Ieq = Geq * V_prev
+      const C = compSIValue(comp);
+      if (C <= 0) continue;
+      const geq = C / dt;
+      const vprev = capState ? (capState[comp.id] || 0) : 0;
+      const ieq = geq * vprev;
+      if (i1>=0) { G[i1][i1] += geq; b[i1] += ieq; }
+      if (i2>=0) { G[i2][i2] += geq; b[i2] -= ieq; }
+      if (i1>=0 && i2>=0) { G[i1][i2] -= geq; G[i2][i1] -= geq; }
+    }
+    if (comp.type === 'C' && dt === null) {
+      // DC: capacitor = open circuit, but add tiny leakage for numerical stability
+      // This gives correct DC steady-state (V across R = 0 when no current path)
+      const g = 1e-9; // 1 GΩ leakage
+      if (i1>=0) G[i1][i1] += g;
+      if (i2>=0) G[i2][i2] += g;
+      if (i1>=0 && i2>=0) { G[i1][i2] -= g; G[i2][i1] -= g; }
+    }
+    if (comp.type === 'L' && dt === null) {
+      // DC: inductor = short circuit (wire)
+      if (i1>=0 && i2>=0 && i1!==i2) {
+        const g = 1e6; // large conductance
+        G[i1][i1] += g; G[i2][i2] += g; G[i1][i2] -= g; G[i2][i1] -= g;
+      }
+    }
+    if (comp.type === 'I') {
+      const val = compSIValue(comp);
+      if (i1>=0) b[i1] -= val;
+      if (i2>=0) b[i2] += val;
+    }
+  }
+  // Voltage sources
+  vsources.forEach((vs, k) => {
+    const nodes = getCompNodes(vs, ptToNode);
+    if (nodes.some(n => n < 0)) return;
+    const [n1, n2] = nodes; // n1=+ terminal, n2=- terminal
+    const i1 = n1>0?nodeIdx(n1):-1;
+    const i2 = n2>0?nodeIdx(n2):-1;
+    const vi = N + k;
+    if (vi >= M) return;
+    if (i1>=0) { G[i1][vi]+=1; G[vi][i1]+=1; }
+    if (i2>=0) { G[i2][vi]-=1; G[vi][i2]-=1; }
+    b[vi] = compSIValue(vs);
+  });
+
+  const x = gaussElim(G, b);
+  // x[0..N-1] = node voltages (1..nodeCount-1)
+  // x[N..] = voltage source currents
+  const nodeV = {};
+  nodeV[0] = 0;
+  for (let i = 0; i < N; i++) nodeV[i+1] = x[i] || 0;
+
+  // Branch currents
+  const branchI = {};
+  vsources.forEach((vs, k) => { branchI[vs.id] = x[N+k] || 0; });
+
+  // Resistor currents
+  for (const comp of components) {
+    if (comp.type === 'R') {
+      const nodes = getCompNodes(comp, ptToNode);
+      if (nodes.some(n => n < 0)) continue;
+      const v1 = nodeV[nodes[0]] || 0;
+      const v2 = (nodes[1]!==undefined ? nodeV[nodes[1]] : 0) || 0;
+      const val = compSIValue(comp);
+      branchI[comp.id] = val > 0 ? (v1-v2)/val : 0;
+    }
+    if (comp.type === 'C' && dt !== null) {
+      const nodes = getCompNodes(comp, ptToNode);
+      const v1 = nodeV[nodes[0]] || 0;
+      const v2 = (nodes[1]!==undefined ? nodeV[nodes[1]] : 0) || 0;
+      const C = compSIValue(comp);
+      const dt2 = dt;
+      const vprev = capState ? (capState[comp.id] || 0) : 0;
+      branchI[comp.id] = C * ((v1-v2) - vprev) / dt2;
+    }
+  }
+
+  return { nodeV, branchI };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TRANSIENT SIMULATION
+// ═══════════════════════════════════════════════════════════════
+function runTransient() {
+  const { ptToNode, nodeCount } = buildNodeMap();
+  if (nodeCount <= 1) { alert('Keine vollständige Schaltung erkannt. Bitte GND hinzufügen.'); return; }
+
+  const caps = components.filter(c => c.type === 'C');
+  if (caps.length === 0) { alert('Kein Kondensator in der Schaltung. Transiente Simulation benötigt mindestens einen Kondensator.'); return; }
+
+  // Find max tau = R*C
+  const totalR = components.filter(c=>c.type==='R').reduce((s,c)=>s+compSIValue(c),0) || 1000;
+  const totalC = caps.reduce((s,c)=>s+compSIValue(c),0);
+  const tau = totalR * totalC;
+  const tEnd = Math.max(tau * 6, 1e-6);
+  const steps = 400;
+  const dt = tEnd / steps;
+
+  let capState = {};
+  caps.forEach(c => { capState[c.id] = 0; });
+
+  const tData = [];
+  const nodeData = {};
+  for (let n = 1; n < nodeCount; n++) nodeData[n] = [];
+
+  for (let step = 0; step <= steps; step++) {
+    const t = step * dt;
+    const res = solveMNA(nodeCount, ptToNode, capState, dt);
+    if (!res) break;
+
+    tData.push(t);
+    for (let n = 1; n < nodeCount; n++) {
+      nodeData[n].push(res.nodeV[n] || 0);
+    }
+
+    // Update cap state
+    caps.forEach(c => {
+      const nodes = getCompNodes(c, ptToNode);
+      const v1 = res.nodeV[nodes[0]] || 0;
+      const v2 = (nodes[1]!==undefined ? res.nodeV[nodes[1]] : 0) || 0;
+      capState[c.id] = v1 - v2;
+    });
+  }
+
+  drawWaveform(tData, nodeData, tau);
+  document.getElementById('wave-panel').classList.add('visible');
+  document.getElementById('st-sim').innerHTML = 'Simulation: <span style="color:#10b981">Transient ✓</span>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DC ANALYSIS
+// ═══════════════════════════════════════════════════════════════
+function runDC() {
+  const { ptToNode, nodeCount } = buildNodeMap();
+  if (nodeCount <= 1) { alert('Keine vollständige Schaltung erkannt. Bitte GND hinzufügen und Bauteile verbinden.'); return; }
+
+  const hasGND = components.some(c => c.type === 'GND');
+  if (!hasGND) { alert('Keine Masse (GND) in der Schaltung!'); return; }
+
+  simResult = solveMNA(nodeCount, ptToNode);
+  simResult.ptToNode = ptToNode;
+  simResult.nodeCount = nodeCount;
+
+  // Show results panel
+  switchPanel('results');
+  document.getElementById('no-sim-msg').style.display = 'none';
+  document.getElementById('res-nodes-sec').style.display = 'block';
+  document.getElementById('res-branches-sec').style.display = 'block';
+
+  let nodesHtml = '';
+  for (let n = 0; n < nodeCount; n++) {
+    const v = simResult.nodeV[n] || 0;
+    nodesHtml += `<div class="node-row" onclick="highlightNode(${n})" data-node="${n}">
+      <span class="node-id">Knoten ${n}${n===0?' (GND)':''}</span>
+      <span class="node-v">${fmtV(v)}</span>
+    </div>`;
+  }
+  document.getElementById('res-nodes').innerHTML = nodesHtml;
+
+  let branchHtml = '';
+  for (const [id, I] of Object.entries(simResult.branchI)) {
+    const comp = components.find(c=>c.id===id);
+    const label = comp ? comp.label : id;
+    branchHtml += `<div class="branch-row"><span class="branch-id">${label}</span><span class="branch-i">${fmtI(I)}</span></div>`;
+  }
+  document.getElementById('res-branches').innerHTML = branchHtml || '<div style="color:#475569;font-size:.8rem">Keine Ströme berechnet</div>';
+
+  document.getElementById('st-sim').innerHTML = 'Simulation: <span style="color:#10b981">DC ✓</span>';
+  document.getElementById('st-nodes').textContent = nodeCount;
+  render();
+}
+
+function highlightNode(n) {
+  document.querySelectorAll('.node-row').forEach(el => {
+    el.classList.toggle('highlighted', parseInt(el.dataset.node) === n);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WAVEFORM DRAWING
+// ═══════════════════════════════════════════════════════════════
+const WAVE_COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
+
+function drawWaveform(tData, nodeData, tau) {
+  const wcanvas = document.getElementById('waveform');
+  const wctx = wcanvas.getContext('2d');
+  wcanvas.width = wcanvas.parentElement.clientWidth;
+  wcanvas.height = wcanvas.parentElement.clientHeight;
+  const W = wcanvas.width, H = wcanvas.height;
+  const PAD = {l:50, r:20, t:10, b:30};
+  const PW = W-PAD.l-PAD.r, PH = H-PAD.t-PAD.b;
+
+  wctx.clearRect(0,0,W,H);
+  wctx.fillStyle='#0f172a';
+  wctx.fillRect(0,0,W,H);
+
+  // Get all voltage series
+  const nodeIds = Object.keys(nodeData).map(Number).filter(n=>n>0);
+  if (!nodeIds.length) return;
+
+  let vMin=Infinity, vMax=-Infinity;
+  for (const id of nodeIds) for (const v of nodeData[id]) { if(v<vMin)vMin=v; if(v>vMax)vMax=v; }
+  if (Math.abs(vMax-vMin) < 0.001) { vMin -= 0.5; vMax += 0.5; }
+  const tMax = tData[tData.length-1];
+
+  // Grid
+  wctx.strokeStyle='#1e293b'; wctx.lineWidth=1;
+  for (let i=0; i<=4; i++) {
+    const y = PAD.t + i*(PH/4);
+    wctx.beginPath(); wctx.moveTo(PAD.l,y); wctx.lineTo(PAD.l+PW,y); wctx.stroke();
+    const v = vMax - i*(vMax-vMin)/4;
+    wctx.fillStyle='#475569'; wctx.font='10px Segoe UI'; wctx.textAlign='right';
+    wctx.fillText(fmtV(v), PAD.l-4, y+4);
+  }
+  for (let i=0; i<=5; i++) {
+    const x = PAD.l + i*(PW/5);
+    wctx.beginPath(); wctx.moveTo(x,PAD.t); wctx.lineTo(x,PAD.t+PH); wctx.stroke();
+    const t = i*tMax/5;
+    wctx.fillStyle='#475569'; wctx.font='10px Segoe UI'; wctx.textAlign='center';
+    wctx.fillText(fmtTime(t), x, PAD.t+PH+18);
+  }
+
+  // Tau line
+  if (tau < tMax) {
+    const tx = PAD.l + (tau/tMax)*PW;
+    wctx.strokeStyle='#334155'; wctx.lineWidth=1; wctx.setLineDash([4,4]);
+    wctx.beginPath(); wctx.moveTo(tx,PAD.t); wctx.lineTo(tx,PAD.t+PH); wctx.stroke();
+    wctx.setLineDash([]);
+    wctx.fillStyle='#475569'; wctx.font='10px Segoe UI'; wctx.textAlign='center';
+    wctx.fillText('τ', tx, PAD.t+8);
+  }
+
+  // Plot each node
+  const legend = document.getElementById('wave-legend');
+  legend.innerHTML='';
+  nodeIds.forEach((nodeId, ci) => {
+    const color = WAVE_COLORS[ci % WAVE_COLORS.length];
+    wctx.strokeStyle = color; wctx.lineWidth = 2.5; wctx.beginPath();
+    const data = nodeData[nodeId];
+    for (let i=0; i<tData.length; i++) {
+      const x = PAD.l + (tData[i]/tMax)*PW;
+      const y = PAD.t + ((vMax - data[i])/(vMax-vMin))*PH;
+      i===0 ? wctx.moveTo(x,y) : wctx.lineTo(x,y);
+    }
+    wctx.stroke();
+    legend.innerHTML += `<div class="wave-legend-item"><div class="wave-dot" style="background:${color}"></div>Knoten ${nodeId}</div>`;
+  });
+
+  // Axes
+  wctx.strokeStyle='#334155'; wctx.lineWidth=1;
+  wctx.beginPath(); wctx.moveTo(PAD.l,PAD.t); wctx.lineTo(PAD.l,PAD.t+PH); wctx.lineTo(PAD.l+PW,PAD.t+PH); wctx.stroke();
+
+  document.getElementById('wave-info').textContent = `τ ≈ ${fmtTime(tau)}`;
+}
+
+function fmtTime(s) {
+  if (s >= 1) return s.toPrecision(3)+'s';
+  if (s >= 1e-3) return (s*1e3).toPrecision(3)+'ms';
+  if (s >= 1e-6) return (s*1e6).toPrecision(3)+'µs';
+  return (s*1e9).toPrecision(3)+'ns';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════════════════════════
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawGrid();
+  wires.forEach(w => drawWire(w));
+  components.forEach(c => drawComponent(c));
+  if (wireStart) drawWirePreview();
+  if (tool !== 'sel' && tool !== 'wire' && tool !== 'probe' && tool !== 'del' && hoverPt) drawGhost();
+}
+
+function drawGrid() {
+  ctx.fillStyle = '#1a2332';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  const cols = Math.ceil(canvas.width/GRID)+1;
+  const rows = Math.ceil(canvas.height/GRID)+1;
+  ctx.fillStyle = '#243244';
+  for (let x=0; x<cols; x++) for (let y=0; y<rows; y++) {
+    ctx.beginPath(); ctx.arc(x*GRID, y*GRID, 1.5, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function p(gx, gy) { return {x: gx*GRID, y: gy*GRID}; }
+
+function drawWire(w) {
+  const p1 = p(w.x1,w.y1), p2 = p(w.x2,w.y2);
+  ctx.strokeStyle = w.id === selId ? '#60a5fa' : '#64748b';
+  ctx.lineWidth = w.id === selId ? 3 : 2;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+
+  // Show current on wire if simulated
+  if (simResult && w.id === selId) {
+    const mx = (p1.x+p2.x)/2, my = (p1.y+p2.y)/2;
+    ctx.fillStyle='#f59e0b'; ctx.font='bold 11px Courier New'; ctx.textAlign='center';
+    ctx.fillText('~', mx, my-8);
+  }
+
+  // Junction dots
+  const pts = getAllTerminals();
+  for (const [pt, count] of Object.entries(pts)) {
+    if (count > 2) {
+      const [gx,gy] = pt.split(',').map(Number);
+      ctx.fillStyle='#64748b'; ctx.beginPath(); ctx.arc(gx*GRID,gy*GRID,4,0,Math.PI*2); ctx.fill();
+    }
+  }
+}
+
+function getAllTerminals() {
+  const pts = {};
+  const inc = k => pts[k] = (pts[k]||0)+1;
+  for (const c of components) for (const t of getTerminals(c)) inc(`${t.gx},${t.gy}`);
+  for (const w of wires) { inc(`${w.x1},${w.y1}`); inc(`${w.x2},${w.y2}`); }
+  return pts;
+}
+
+function drawComponent(comp) {
+  const isSel = comp.id === selId;
+  const def = COMP_DEFS[comp.type];
+  const pp = p(comp.gx, comp.gy);
+  const rot = (comp.rot||0) * Math.PI/2;
+
+  ctx.save();
+  ctx.translate(pp.x, pp.y);
+  ctx.rotate(rot);
+
+  const color = isSel ? '#60a5fa' : def.color;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = isSel ? 2.5 : 2;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  ctx.beginPath();
+  drawSymbol(ctx, comp);
+  ctx.stroke();
+
+  // Label
+  ctx.rotate(-rot);
+  ctx.fillStyle = isSel ? '#93c5fd' : '#94a3b8';
+  ctx.font = 'bold 10px Segoe UI';
+  ctx.textAlign = 'center';
+  ctx.fillText(comp.label, 0, -GRID*0.65);
+
+  // Value label
+  if (comp.type !== 'GND') {
+    ctx.fillStyle = '#64748b';
+    ctx.font = '9px Courier New';
+    ctx.fillText(`${comp.value}${comp.unit}`, 0, GRID*0.72);
+  }
+
+  // Node voltage overlay if simulated
+  if (simResult && comp.type !== 'GND') {
+    const { ptToNode } = simResult;
+    const terms = getTerminals(comp);
+    terms.forEach(t => {
+      const nodeId = ptToNode[`${t.gx},${t.gy}`];
+      if (nodeId !== undefined && simResult.nodeV[nodeId] !== undefined) {
+        const v = simResult.nodeV[nodeId];
+        ctx.rotate(-rot);
+        const tp = p(t.gx - comp.gx, t.gy - comp.gy);
+        ctx.fillStyle = '#065f46';
+        ctx.strokeStyle = '#059669';
+        const txt = fmtV(v);
+        const tw = ctx.measureText(txt).width + 8;
+        ctx.beginPath();
+        roundRect(ctx, tp.x - tw/2, tp.y - 18, tw, 14, 4);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#6ee7b7';
+        ctx.font = 'bold 9px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText(txt, tp.x, tp.y - 8);
+        ctx.rotate(rot);
+      }
+    });
+  }
+
+  ctx.restore();
+}
+
+function roundRect(c,x,y,w,h,r){c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);}
+
+function drawSymbol(ctx, comp) {
+  const G = GRID;
+  if (comp.type === 'R') {
+    ctx.moveTo(-G, 0); ctx.lineTo(-G*0.38, 0);
+    ctx.rect(-G*0.38, -G*0.2, G*0.76, G*0.4);
+    ctx.moveTo(G*0.38, 0); ctx.lineTo(G, 0);
+  }
+  else if (comp.type === 'C') {
+    ctx.moveTo(-G, 0); ctx.lineTo(-G*0.12, 0);
+    ctx.moveTo(-G*0.12, -G*0.38); ctx.lineTo(-G*0.12, G*0.38);
+    ctx.moveTo(G*0.12, -G*0.38); ctx.lineTo(G*0.12, G*0.38);
+    ctx.moveTo(G*0.12, 0); ctx.lineTo(G, 0);
+  }
+  else if (comp.type === 'L') {
+    ctx.moveTo(-G, 0); ctx.lineTo(-G*0.6, 0);
+    for (let i=0;i<4;i++) ctx.arc(-G*0.4+i*G*0.2, 0, G*0.2, Math.PI, 0, false);
+    ctx.moveTo(G*0.6, 0); ctx.lineTo(G, 0);
+  }
+  else if (comp.type === 'V') {
+    ctx.moveTo(-G, 0); ctx.lineTo(-G*0.42, 0);
+    ctx.arc(0, 0, G*0.42, 0, Math.PI*2);
+    ctx.moveTo(G*0.42, 0); ctx.lineTo(G, 0);
+    // + and - signs
+    ctx.moveTo(G*0.15,-G*0.1); ctx.lineTo(G*0.15,G*0.1);
+    ctx.moveTo(G*0.05,0); ctx.lineTo(G*0.25,0);
+    ctx.moveTo(-G*0.25,0); ctx.lineTo(-G*0.05,0);
+  }
+  else if (comp.type === 'I') {
+    ctx.moveTo(-G, 0); ctx.lineTo(-G*0.42, 0);
+    ctx.arc(0, 0, G*0.42, 0, Math.PI*2);
+    ctx.moveTo(G*0.42, 0); ctx.lineTo(G, 0);
+    // Arrow inside
+    ctx.moveTo(-G*0.25,0); ctx.lineTo(G*0.25,0);
+    ctx.moveTo(G*0.1,-G*0.1); ctx.lineTo(G*0.25,0); ctx.lineTo(G*0.1,G*0.1);
+  }
+  else if (comp.type === 'GND') {
+    ctx.moveTo(0, 0); ctx.lineTo(0, G*0.3);
+    ctx.moveTo(-G*0.38, G*0.3); ctx.lineTo(G*0.38, G*0.3);
+    ctx.moveTo(-G*0.26, G*0.52); ctx.lineTo(G*0.26, G*0.52);
+    ctx.moveTo(-G*0.13, G*0.74); ctx.lineTo(G*0.13, G*0.74);
+  }
+}
+
+function drawWirePreview() {
+  if (!hoverPt) return;
+  const p1 = p(wireStart.gx, wireStart.gy);
+  const p2 = p(hoverPt.gx, hoverPt.gy);
+  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(p1.x,p1.y);
+  // L-shaped wire preview
+  ctx.lineTo(p2.x, p1.y); ctx.lineTo(p2.x, p2.y);
+  ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#3b82f6'; ctx.beginPath(); ctx.arc(p1.x,p1.y,5,0,Math.PI*2); ctx.fill();
+}
+
+function drawGhost() {
+  if (tool === 'sel'||tool==='wire'||tool==='probe'||tool==='del'||tool==='GND') return;
+  const pp = p(hoverPt.gx, hoverPt.gy);
+  ctx.save(); ctx.translate(pp.x,pp.y);
+  ctx.globalAlpha = 0.4;
+  ctx.strokeStyle = COMP_DEFS[tool]?.color || '#60a5fa';
+  ctx.lineWidth = 2; ctx.lineCap='round'; ctx.lineJoin='round';
+  const ghost = {type:tool,gx:hoverPt.gx,gy:hoverPt.gy,rot:0,label:'',value:0,unit:''};
+  ctx.beginPath(); drawSymbol(ctx, ghost); ctx.stroke();
+  ctx.globalAlpha = 1; ctx.restore();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INPUT HANDLING
+// ═══════════════════════════════════════════════════════════════
+function snapToGrid(px, py) {
+  return { gx: Math.round(px/GRID), gy: Math.round(py/GRID) };
+}
+
+function getCanvasPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return { x: (e.clientX - rect.left)*scaleX, y: (e.clientY - rect.top)*scaleY };
+}
+
+canvas.addEventListener('mousemove', e => {
+  const pos = getCanvasPos(e);
+  mousePos = pos;
+  hoverPt = snapToGrid(pos.x, pos.y);
+  updateTooltip(e, hoverPt);
+  if (dragging) {
+    const comp = components.find(c=>c.id===dragging);
+    if (comp) { comp.gx=hoverPt.gx+dragOffset.gx; comp.gy=hoverPt.gy+dragOffset.gy; simResult=null; }
+  }
+  render();
+});
+
+canvas.addEventListener('mouseleave', () => { hoverPt=null; document.getElementById('tooltip').classList.remove('visible'); render(); });
+
+canvas.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  const pos = getCanvasPos(e);
+  const gp = snapToGrid(pos.x, pos.y);
+
+  if (tool === 'sel') {
+    // Check component hit
+    const hit = hitComponent(gp);
+    if (hit) {
+      selId = hit.id;
+      dragging = hit.id;
+      dragOffset = {gx: hit.gx-gp.gx, gy: hit.gy-gp.gy};
+      showProps(hit);
+    } else {
+      const hitW = hitWire(gp);
+      if (hitW) { selId = hitW.id; showPropsWire(hitW); }
+      else { selId = null; showNoSel(); }
+    }
+  }
+  else if (tool === 'wire') {
+    if (!wireStart) {
+      wireStart = gp;
+    } else {
+      // Draw L-shaped wire (or straight if same axis)
+      if (wireStart.gx !== gp.gx || wireStart.gy !== gp.gy) {
+        if (wireStart.gx !== gp.gx) {
+          wires.push({id:'W'+newId('w'), x1:wireStart.gx,y1:wireStart.gy,x2:gp.gx,y2:wireStart.gy});
+          if (wireStart.gy !== gp.gy)
+            wires.push({id:'W'+newId('w'), x1:gp.gx,y1:wireStart.gy,x2:gp.gx,y2:gp.gy});
+        } else {
+          wires.push({id:'W'+newId('w'), x1:wireStart.gx,y1:wireStart.gy,x2:gp.gx,y2:gp.gy});
+        }
+      }
+      wireStart = gp; // continue wire from here
+      simResult = null;
+    }
+    updateStatus();
+  }
+  else if (tool === 'del') {
+    const hit = hitComponent(gp);
+    if (hit) { components = components.filter(c=>c.id!==hit.id); selId=null; }
+    else {
+      const hitW = hitWire(gp);
+      if (hitW) wires = wires.filter(w=>w.id!==hitW.id);
+    }
+    simResult = null;
+  }
+  else if (tool === 'probe') {
+    const { ptToNode } = buildNodeMap();
+    const nodeId = ptToNode[`${gp.gx},${gp.gy}`];
+    if (nodeId !== undefined && simResult) {
+      const v = simResult.nodeV[nodeId];
+      showTooltipFixed(e, `Knoten ${nodeId}`, fmtV(v||0), '');
+    } else if (!simResult) {
+      alert('Zuerst DC Analyse ausführen!');
+    }
+  }
+  else if (tool === 'GND') {
+    const existing = components.find(c=>c.gx===gp.gx&&c.gy===gp.gy);
+    if (!existing) {
+      components.push({id:newId('GND'),type:'GND',gx:gp.gx,gy:gp.gy,rot:0,label:`GND${components.filter(c=>c.type==='GND').length+1}`,value:0,unit:''});
+      simResult=null; updateStatus();
+    }
+  }
+  else if (COMP_DEFS[tool]) {
+    const existing = components.find(c=>c.gx===gp.gx&&c.gy===gp.gy);
+    if (!existing) {
+      const def = COMP_DEFS[tool];
+      const cnt = components.filter(c=>c.type===tool).length+1;
+      components.push({id:newId(tool),type:tool,gx:gp.gx,gy:gp.gy,rot:0,label:`${tool}${cnt}`,value:def.defVal,unit:def.defUnit});
+      simResult=null; updateStatus();
+    }
+  }
+  render();
+});
+
+canvas.addEventListener('mouseup', () => { dragging=null; });
+
+canvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const pos = getCanvasPos(e);
+  const gp = snapToGrid(pos.x, pos.y);
+  const hit = hitComponent(gp);
+  if (hit) { hit.rot = ((hit.rot||0)+1)%4; simResult=null; render(); }
+  else if (tool !== 'sel') {
+    // Rotate ghost
+  }
+});
+
+canvas.addEventListener('dblclick', e => {
+  // Stop wire drawing
+  wireStart = null;
+  render();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// HIT TESTING
+// ═══════════════════════════════════════════════════════════════
+function hitComponent(gp) {
+  for (const c of [...components].reverse()) {
+    if (c.type === 'GND') {
+      if (Math.abs(c.gx-gp.gx)<=0 && Math.abs(c.gy-gp.gy)<=0) return c;
+    } else {
+      if (Math.abs(c.gx-gp.gx)<=1 && Math.abs(c.gy-gp.gy)<=1) return c;
+    }
+  }
+  return null;
+}
+
+function hitWire(gp) {
+  for (const w of [...wires].reverse()) {
+    const x1=Math.min(w.x1,w.x2),x2=Math.max(w.x1,w.x2);
+    const y1=Math.min(w.y1,w.y2),y2=Math.max(w.y1,w.y2);
+    if (y1===y2 && gp.gy===y1 && gp.gx>=x1&&gp.gx<=x2) return w;
+    if (x1===x2 && gp.gx===x1 && gp.gy>=y1&&gp.gy<=y2) return w;
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════════════════════
+function updateTooltip(e, gp) {
+  if (tool !== 'probe' && tool !== 'sel') { document.getElementById('tooltip').classList.remove('visible'); return; }
+  if (!simResult) { document.getElementById('tooltip').classList.remove('visible'); return; }
+
+  const { ptToNode } = simResult;
+  const nodeId = ptToNode[`${gp.gx},${gp.gy}`];
+  let title='', vStr='', iStr='';
+
+  if (nodeId !== undefined) {
+    title = `Knoten ${nodeId}${nodeId===0?' (GND)':''}`;
+    vStr = `V = ${fmtV(simResult.nodeV[nodeId]||0)}`;
+  }
+
+  // Check if hovering a component terminal for current
+  const comp = hitComponent(gp);
+  if (comp && simResult.branchI[comp.id] !== undefined) {
+    iStr = `I = ${fmtI(simResult.branchI[comp.id])}`;
+    if (!title) title = comp.label;
+  }
+
+  if (title) {
+    const tt = document.getElementById('tooltip');
+    tt.style.left = (e.clientX+12)+'px'; tt.style.top = (e.clientY-40)+'px';
+    document.getElementById('tt-title').textContent = title;
+    document.getElementById('tt-v').textContent = vStr;
+    document.getElementById('tt-i').textContent = iStr;
+    tt.classList.add('visible');
+  } else {
+    document.getElementById('tooltip').classList.remove('visible');
+  }
+}
+
+function showTooltipFixed(e, title, v, i) {
+  const tt = document.getElementById('tooltip');
+  tt.style.left = (e.clientX+12)+'px'; tt.style.top = (e.clientY-40)+'px';
+  document.getElementById('tt-title').textContent = title;
+  document.getElementById('tt-v').textContent = v;
+  document.getElementById('tt-i').textContent = i;
+  tt.classList.add('visible');
+  setTimeout(()=>tt.classList.remove('visible'), 2000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.target.tagName==='INPUT') return;
+  if (e.key==='Delete'||e.key==='Backspace') {
+    if (selId) { components=components.filter(c=>c.id!==selId); wires=wires.filter(w=>w.id!==selId); selId=null; simResult=null; render(); showNoSel(); }
+  }
+  if (e.key==='r'||e.key==='R') { if(selId){const c=components.find(x=>x.id===selId);if(c){c.rot=((c.rot||0)+1)%4;simResult=null;render();}}}
+  if (e.key==='Escape') { wireStart=null; setTool('sel'); render(); }
+  if (e.key==='s') setTool('sel');
+  if (e.key==='w') setTool('wire');
+  if (e.key==='p') setTool('probe');
+  if (e.key==='g') setTool('GND');
+});
+
+// ═══════════════════════════════════════════════════════════════
+// TOOL MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+const TOOL_NAMES = {sel:'Auswahl',wire:'Draht',probe:'Probe',del:'Löschen',R:'Widerstand',C:'Kondensator',L:'Spule',V:'Spannungsquelle',I:'Stromquelle',GND:'Masse'};
+
+function setTool(t) {
+  tool = t;
+  wireStart = null;
+  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('btn-'+t);
+  if (btn) btn.classList.add('active');
+  document.getElementById('st-tool').textContent = TOOL_NAMES[t]||t;
+  const hints = {
+    sel:'Klicken zum Auswählen · Ziehen zum Bewegen · Rechtsklick = Drehen',
+    wire:'Klicken: Startpunkt · Klicken: Endpunkt · Doppelklick = Beenden',
+    probe:'Klicken auf Knoten oder Bauteil → Spannung/Strom anzeigen',
+    del:'Klicken zum Löschen',
+    R:'Klicken zum Platzieren · Rechtsklick = Drehen',
+    C:'Klicken zum Platzieren · Rechtsklick = Drehen',
+    L:'Klicken zum Platzieren · Rechtsklick = Drehen',
+    V:'Klicken zum Platzieren (+ Terminal rechts) · Rechtsklick = Drehen',
+    I:'Klicken zum Platzieren · Rechtsklick = Drehen',
+    GND:'Klicken zum Platzieren (Masse-Symbol)',
+  };
+  document.getElementById('help-hint').innerHTML = `<strong>Tipp:</strong> ${hints[t]||''}`;
+  render();
+}
+
+function rotateSelected() {
+  if (selId) { const c=components.find(x=>x.id===selId); if(c){c.rot=((c.rot||0)+1)%4;simResult=null;render();}}
+}
+
+function clearAll(noConfirm=false) {
+  if (!noConfirm && !confirm('Alle Bauteile und Drähte löschen?')) return;
+  components=[]; wires=[]; selId=null; wireStart=null; simResult=null;
+  document.getElementById('wave-panel').classList.remove('visible');
+  document.getElementById('no-sim-msg').style.display='block';
+  document.getElementById('res-nodes-sec').style.display='none';
+  document.getElementById('res-branches-sec').style.display='none';
+  document.getElementById('st-sim').innerHTML='Simulation: <span>nicht ausgeführt</span>';
+  updateStatus(); render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROPERTIES PANEL
+// ═══════════════════════════════════════════════════════════════
+function switchPanel(tab) {
+  document.getElementById('panel-props').style.display = tab==='props'?'':'none';
+  document.getElementById('panel-results').style.display = tab==='results'?'':'none';
+  document.getElementById('tab-props').classList.toggle('active',tab==='props');
+  document.getElementById('tab-results').classList.toggle('active',tab==='results');
+}
+
+function showNoSel() {
+  document.getElementById('no-sel-msg').style.display='block';
+  document.getElementById('props-form').style.display='none';
+  switchPanel('props');
+}
+
+function showProps(comp) {
+  document.getElementById('no-sel-msg').style.display='none';
+  document.getElementById('props-form').style.display='block';
+  const def = COMP_DEFS[comp.type];
+  document.getElementById('prop-type-title').textContent = def.name;
+  document.getElementById('prop-label').value = comp.label;
+  document.getElementById('prop-val').value = comp.value;
+  const unitSel = document.getElementById('prop-unit');
+  unitSel.innerHTML = def.units.map(u=>`<option${u===comp.unit?' selected':''}>${u}</option>`).join('');
+  document.getElementById('prop-val-group').style.display = def.units.length?'':'none';
+  switchPanel('props');
+}
+
+function showPropsWire(w) {
+  document.getElementById('no-sel-msg').style.display='block';
+  document.getElementById('props-form').style.display='none';
+  switchPanel('props');
+}
+
+function updatePropLabel() {
+  const c = components.find(x=>x.id===selId);
+  if (c) { c.label = document.getElementById('prop-label').value; render(); }
+}
+
+function updatePropVal() {
+  const c = components.find(x=>x.id===selId);
+  if (c) { c.value = parseFloat(document.getElementById('prop-val').value)||0; simResult=null; render(); }
+}
+
+function updatePropUnit() {
+  const c = components.find(x=>x.id===selId);
+  if (c) { c.unit = document.getElementById('prop-unit').value; simResult=null; render(); }
+}
+
+function updateStatus() {
+  document.getElementById('st-comps').textContent = components.length;
+  document.getElementById('st-nodes').textContent = components.length>0 ? buildNodeMap().nodeCount : 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXAMPLE CIRCUIT
+// ═══════════════════════════════════════════════════════════════
+function loadExample() {
+  clearAll(true);
+  // RC circuit: V1(5V) — R1(1kΩ) — C1(100nF) — GND
+  // V1 vertical left, R1 horizontal top, C1 vertical right, GND bus bottom
+  // V1 rot=1: term0(top)=+ at (3,5), term1(bottom)=- at (3,7)
+  // R1 rot=0: term0(left)=(6,5), term1(right)=(8,5)
+  // C1 rot=1: term0(top)=(11,5), term1(bottom)=(11,7)
+  components = [
+    {id:'V1',type:'V', gx:3, gy:6,rot:1,label:'V1',value:5,  unit:'V'},
+    {id:'R1',type:'R', gx:7, gy:5,rot:0,label:'R1',value:1,  unit:'kΩ'},
+    {id:'C1',type:'C', gx:11,gy:6,rot:1,label:'C1',value:100,unit:'nF'},
+    {id:'G1',type:'GND',gx:7,gy:8,rot:0,label:'GND',value:0, unit:''},
+  ];
+  idCnt = 10;
+  wires = [
+    {id:'w1',x1:3, y1:5,x2:6, y2:5},  // V1+ → R1 left
+    {id:'w2',x1:8, y1:5,x2:11,y2:5},  // R1 right → C1+
+    {id:'w3',x1:3, y1:7,x2:3, y2:8},  // V1- down to GND bus
+    {id:'w4',x1:11,y1:7,x2:11,y2:8},  // C1- down to GND bus
+    {id:'w5',x1:3, y1:8,x2:11,y2:8},  // GND bus (includes GND symbol at x=7)
+  ];
+  simResult=null;
+  updateStatus();
+  render();
+  document.getElementById('help-hint').innerHTML = '<strong>Beispiel:</strong> RC-Schaltung (τ=100µs) · "▶ DC Analyse" oder "📈 Transient" ausführen!';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+loadExample();
+updateStatus();
+render();
 </script>
 </body>
 </html>
